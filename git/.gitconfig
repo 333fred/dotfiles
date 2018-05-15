@@ -1,0 +1,173 @@
+# Note: my aliases assume all commits will be signed with a gpg key. To not sign with a gpg key, remove the -S from the commit aliases
+# If signing with a gpg key, make sure to set the gpg with git config --global user.signingkey KEY_ID_HERE
+[user]
+  name = Fredric Silberberg
+  email = fred@silberberg.xyz
+[color]
+  ui = auto
+[color "branch"]
+  current = yellow reverse
+  local = yellow
+  remote = green
+[color "diff"]
+  meta = yellow bold
+  frag = magenta bold
+  old = red
+  new = green
+[alias]
+  # add
+  a = add                           # add
+  svnl = svn log --oneline --show-commit
+  au = add -u                       # add tracked
+  aa = add .                        # add current directory
+  ap = add -p                       # stage commits chunk by chunk
+  chunkyadd = add --patch           # stage commits chunk by chunk
+
+  # via http://blog.apiaxle.com/post/handy-git-tips-to-stop-you-getting-fired/
+  snapshot = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
+  snapshots = !git stash list --grep snapshot
+
+  #via http://stackoverflow.com/questions/5188320/how-can-i-get-a-list-of-git-branches-ordered-by-most-recent-commit
+  recent-branches = !git for-each-ref --count=15 --sort=-committerdate refs/heads/ --format='%(refname:short)'
+
+                          # branch
+  b = branch -v                     # branch (verbose)
+  bd = branch -d                    # branch (delete)
+  bD = branch -D                    # branch (force delete)
+
+  # commit
+  c = commit                     # commit
+  cm = commit -m                 # commit with message
+  ca = commit -a                 # commit all
+  cam = commit -am               # commit all
+  caa = commit -a --amend        # add all tracked and amend your last commit
+  amend = commit --amend         # amend your last commit
+  am = commit --amend            # amend your last commit (sign)
+  ammend = commit --amend        # amend your last commit
+
+  # checkout
+  co = checkout                     # checkout
+  cob = checkout -b                 # create and switch to a new branch
+  nb = checkout -b                  # create and switch to a new branch (mnemonic: "git new branch branchname...")
+
+  # clone
+  cl = clone
+  clr = clone --recursive
+
+  # cherry-pick
+  cp = cherry-pick -x               # grab a change from a branch
+
+  # diff
+  d = diff                          # diff unstaged changes
+  dc = diff --cached                # diff staged changes
+  last = diff HEAD^                 # diff last committed change
+  dl = "!git ll -1"
+  filelog = log -u
+  fl = log -u
+  dlc = diff --cached HEAD^
+
+  # fetch
+  f = fetch
+  fd = fetch dotnet
+
+  # log
+  l = log --graph --date=short
+  ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn,\\ %cr]" --decorate
+  ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn,\\ %cr]" --decorate --numstat
+
+  # merge
+  m = merge
+  mm = merge master
+  mmf = merge master --ff-only
+  mf = merge --ff-only
+  md = merge dotnet/master
+  mdf = merge --ff-only dotnet/master
+
+  # pull
+  pl = pull                         # pull
+
+  # push
+  ps = push                         # push
+  psf = push -f                     # push force
+  psu = push --set-upstream         # push with setting upstream
+  psuo = push --set-upstream origin # push with setting upstream to be a branch in the origin remote
+
+  # rebase
+  rb = rebase                       # rebase
+  rbi = rebase -i                   # interactive rebase
+  rc = rebase --continue            # continue rebase
+  rs = rebase --skip                # skip rebase
+  rbb = "!git rebase -i `git merge-base master HEAD`" # rebase the current branch
+
+  # remote
+  r = remote -v                     # show remotes (verbose)
+  ra = remote add
+  rsu = remote set-url
+
+  # reset
+  unstage = reset HEAD              # remove files from index (tracking)
+  uncommit = reset --soft HEAD^     # go back before last commit, with files in uncommitted state
+  filelog = log -u                  # show changes to a file
+  mt = mergetool                    # fire up the merge tool
+  nuke = reset --hard HEAD          # nuke from orbit
+  scorch = !git nuke && git clean -xfd
+
+  # stash
+  ss = stash                        # stash changes
+  sp = stash pop                    # pop the stash
+  sl = stash list                   # list stashes
+  sa = stash apply                  # apply stash (restore changes)
+  sd = stash drop                   # drop stashes (destory changes)
+
+  # status
+  s = status                        # status
+  st = status                       # status
+  stat = status                     # status
+
+  # tag
+  t = tag -n                        # show tags with <n> lines of each tag message
+
+  # index
+  chmod = update-index --chmod                   # Update the perms of a file
+  cx = chmod +x                                  # Set a file to executable
+  assume = update-index --assume-unchanged       # Always assume file is unchanged
+  unassume = update-index --no-assume-unchanged  # Undo above command
+[format]
+  pretty = format:%C(blue)%ad%Creset %C(yellow)%h%C(green)%d%Creset %C(blue)%s %C(magenta) [%an]%Creset
+[merge]
+  summary = true
+  verbosity = 1
+[apply]
+  whitespace = nowarn
+[branch]
+  autosetupmerge = true
+[push]
+  # 'git push' will push the current branch to its tracking branch
+  # the usual default is to push all branches
+  default = upstream
+[core]
+	autocrlf = false
+  fscache = true
+  preloadindex = true
+  safecrlf = true
+  editor = vim
+  excludesfile = ~/.gitignore_global
+[advice]
+  statusHints = false
+[diff]
+  # Git diff will use (i)ndex, (w)ork tree, (c)ommit and (o)bject
+  # instead of a/b/c/d as prefixes for patches
+  mnemonicprefix = true
+  algorithm = patience
+[rerere]
+  # Remember my merges
+  # http://gitfu.wordpress.com/2008/04/20/git-rerere-rereremember-what-you-did-last-time/
+  enabled = true
+[include]
+  path = .gitconfig.user
+[commit]
+  gpgsign = true
+[gpg]
+  program = c:/Program Files (x86)/GNU/GnuPG/gpg2.exe
+[include]
+  path = .gitconfig_local
