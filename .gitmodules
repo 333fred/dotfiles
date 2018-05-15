@@ -4,3 +4,6 @@
 [submodule "config/.config/base16-shell"]
 	path = config/.config/base16-shell
 	url = git@github.com:chriskempson/base16-shell.git
+[submodule "tmux/.tmux-themepack"]
+	path = tmux/.tmux-themepack
+	url = git@github.com:jimeh/tmux-themepack.git
