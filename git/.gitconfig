@@ -168,6 +168,6 @@
 [commit]
   gpgsign = true
 [gpg]
-  program = c:/Program Files (x86)/GNU/GnuPG/gpg2.exe
+	program = gpg2
 [include]
   path = .gitconfig_local

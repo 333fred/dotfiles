@@ -64,7 +64,11 @@ let g:airline_powerline_fonts = 1
 " first
 if filereadable(expand("~/.vimrc_background"))
   let base16colorspace=256
+  let g:base_16_shell_path="~/.config/base16-shell/"
   source ~/.vimrc_background
+
+  " Comments are unreadable by default
+  hi Comment ctermfg=19 cterm=bold
 endif
 
 " Change the mintty cursor when changing modes
