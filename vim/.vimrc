@@ -69,6 +69,10 @@ if filereadable(expand("~/.vimrc_background"))
 
   " Comments are unreadable by default
   hi Comment ctermfg=19 cterm=bold
+  " Line numbers have low contrast by default
+  hi LineNr ctermfg=12
+  " Fold background makes the text unreadable
+  hi Folded ctermbg=19
 endif
 
 " Change the mintty cursor when changing modes

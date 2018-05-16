@@ -13,6 +13,7 @@ These are my dotfiles, designed to run inside WSL with the https://github.com/mi
 7. Modify `~/.zprezto/modules/tmux/init.zsh`, and replace calls to tmux with `tmux -2`, to force 256 color support in the terminal.
 8. Restart wsl terminal.
 9. Open vim. There will be errors. Ignore, and run `:PlugInstall`. Restart vim, and errors should be gone.
+10. Create ~/.gitconfig_local, and put anything you need to have locally. I put my email and git signing key here. These are in the .gitignore, so even if you decide to put them in the `.dotfiles` folder they shouldn't be committed.
 10. ...
 11. Profit?
 
