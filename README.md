@@ -4,8 +4,8 @@ These are my dotfiles, designed to run inside WSL with the https://github.com/mi
 
 1. Install Ubuntu from the Window store.
 2. Install wsltty. I prefer using chocolatey for this.
-    a. Base16-Ocean theme for wsltty: https://github.com/iamthad/base16-mintty/blob/master/mintty/base16-ocean.minttyrc. Install by putting in %APPDATA%\wsltty\themes
-	b. Install patched consolas fonts: https://github.com/whitecolor/my-nerd-fonts/tree/master/Consolas%20NF. Set wsltty fonts to be these (size 10 is what I use).
+    * Base16-Ocean theme for wsltty: https://github.com/iamthad/base16-mintty/blob/master/mintty/base16-ocean.minttyrc. Install by putting in `%APPDATA%\wsltty\themes`.
+	* Install patched consolas fonts: https://github.com/whitecolor/my-nerd-fonts/tree/master/Consolas%20NF. Set wsltty fonts to be these (size 10 is what I use).
 3. `sudo apt update && sudo apt upgrade && sudo apt autoremove # Yes, WSL Ubuntu comes with unrequired packages`
 4. `sudo apt install git gnupg2 tmux zsh stow zsh-doc doc-base # Last 2 are optional. Stow is optional if you want to symlink everyting manually"`
 5. `git clone git@github.com:333fred/dotfiles.git .dotfiles --recursive`
