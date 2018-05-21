@@ -2,7 +2,6 @@
 # If signing with a gpg key, make sure to set the gpg with git config --global user.signingkey KEY_ID_HERE
 [user]
   name = Fredric Silberberg
-  email = fred@silberberg.xyz
 [color]
   ui = auto
 [color "branch"]
@@ -146,10 +145,10 @@
   # the usual default is to push all branches
   default = upstream
 [core]
-	autocrlf = false
+	autocrlf = true
   fscache = true
   preloadindex = true
-  safecrlf = true
+	safecrlf = true
   editor = vim
   excludesfile = ~/.gitignore_global
 [advice]
