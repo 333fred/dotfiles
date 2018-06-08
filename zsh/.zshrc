@@ -17,3 +17,6 @@ if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
 fi
 
 # Customize to your needs...
+alias cmd="cmd.exe /c"
+alias isCase="fsutil.exe file queryCaseSensitiveInfo ."
+alias setCase="fsutil.exe file setCaseSensitiveInfo ."
