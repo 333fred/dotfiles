@@ -18,3 +18,5 @@ These are my dotfiles, designed to run inside WSL with the https://github.com/mi
 11. Profit?
 
 This is more manual steps than I would like, but considering how often they need to be run, I don't care to attempt to automate it.
+
+I've also included my VsVim config, but this doens't need to be linked from linux.

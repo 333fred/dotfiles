@@ -1,0 +1,88 @@
+" Much of this settings file is borrowed liberally from jcouv: https://github.com/jcouv/dotfiles/blob/master/vsvimrc
+
+" I let Visual Studio handle those:
+" <C-x>
+" <A-f> Debug.StepOver to go "Forward"
+" <A-d> Debug.StepInto to go "Deeper"
+" <A-s> Debug.StepOut to "eScape"
+" <A-r> Debug.RunToCursor to "Run to cursor"
+" <A-q> Debug.SetNextStatement to "Quantum jump"
+" <A-c> Debug.Start to "Continue"
+" <A-b> Debug.ToggleBreakpoint to "set/unset Breakpoint"
+" <A-D> Debug.StepIntoSpecific for "Deeper (specific)"
+
+" No one likes hitting SHIFT+;, and I don't even remember what ; actually does
+nmap ; :
+nnoremap j gj
+nnoremap k gk
+vnoremap j gj
+vnoremap k gk
+
+set incsearch
+set hlsearch
+nnoremap <Esc> :noh<CR>
+
+set ignorecase
+set cursorline
+set backspace=indent,eol,start
+set scrolloff=10
+set number
+
+set vsvim_useeditordefaults
+
+let mapleader=","
+nnoremap <leader>rs :source C:\Users\frsilb\.vsvimrc<CR>
+nnoremap <leader>vs :edit C:\Users\frsilb\.vsvimrc<CR>
+nnoremap <leader>o :vsc File.OpenFile<CR>
+map <Leader>wg :vsc Team.Git.GoToGitChanges<CR>
+map <Leader>wp :vsc Team.Git.CompareWithPrevious<CR>
+map <Leader>wh :vsc Team.Git.ViewHistory<CR>
+nmap <Leader>t :vsc TestExplorer.ShowTestExplorer<CR> :vsc TestExplorer.RunAllTestsInContext<CR>
+nmap <Leader>d :vsc TestExplorer.ShowTestExplorer<CR> :vsc TestExplorer.DebugAllTestsInContext<CR>
+nmap <Leader>f :vsc TestExplorer.ShowTestExplorer<CR> :vsc TestExplorer.RunFailedTests<CR>
+
+" GoTo Things
+map <leader>, :vsc Edit.GoToAll<CR>
+map <leader>m :vsc Edit.GoToMember<CR>
+map <leader>s :vsc Edit.GoToSymbol<CR>
+map <leader>f :vsc Edit.GoToFile<CR>
+map <leader>c :vsc Edit.GoToType<CR>
+
+" Code navigation
+map gk :vsc Edit.PreviousMethod<CR>
+map gj :vsc Edit.NextMethod<CR>
+nmap gb :vsc View.NavigateBackward<CR>
+nmap gf :vsc View.NavigateForward<CR>
+
+" gd goes to definition by default
+map gr :vsc Edit.FindAllReferences<CR>
+map gi :vsc Edit.GoToImplementation<CR>
+
+" Show parameter and quick info
+map <Leader>sp :vsc Edit.ParameterInfo<CR>
+map <Leader>p :vsc Edit.ParameterInfo<CR>
+map <Leader>si :vsc Edit.QuickInfo<CR>
+map <Leader>i :vsc Edit.QuickInfo<CR>
+
+" Copy line without the <CR>
+noremap Y ^y$
+
+nnoremap == :vsc Edit.FormatDocument <CR>
+vnoremap == :vsc Edit.FormatSelection <CR>
+
+" reselect visual block after indent
+vnoremap < <gv
+vnoremap > >gv
+
+" keep search results in the center of the screen
+nnoremap n nzz
+nnoremap N Nzz
+
+" Folding
+" -------
+" Use za to fold
+" zc and zo to close and open folds
+" zC to close all.
+" But built-in zO to open all doesn't work.
+map zm :vsc Edit.CollapsetoDefinitions<CR>
+noremap zO :vsc Edit.ExpandAllOutlining <return>
