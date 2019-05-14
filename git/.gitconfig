@@ -2,6 +2,7 @@
 # If signing with a gpg key, make sure to set the gpg with git config --global user.signingkey KEY_ID_HERE
 [user]
   name = Fredric Silberberg
+  signingkey = BE676E599BF034B5
 [color]
   ui = auto
 [color "branch"]
@@ -16,20 +17,11 @@
 [alias]
   # add
   a = add                           # add
-  svnl = svn log --oneline --show-commit
   au = add -u                       # add tracked
   aa = add .                        # add current directory
   ap = add -p                       # stage commits chunk by chunk
-  chunkyadd = add --patch           # stage commits chunk by chunk
 
-  # via http://blog.apiaxle.com/post/handy-git-tips-to-stop-you-getting-fired/
-  snapshot = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
-  snapshots = !git stash list --grep snapshot
-
-  #via http://stackoverflow.com/questions/5188320/how-can-i-get-a-list-of-git-branches-ordered-by-most-recent-commit
-  recent-branches = !git for-each-ref --count=15 --sort=-committerdate refs/heads/ --format='%(refname:short)'
-
-                          # branch
+  # branch
   b = branch -v                     # branch (verbose)
   bd = branch -d                    # branch (delete)
   bD = branch -D                    # branch (force delete)
@@ -40,13 +32,9 @@
   ca = commit -a                 # commit all
   cam = commit -am               # commit all
   caa = commit -a --amend        # add all tracked and amend your last commit
-  amend = commit --amend         # amend your last commit
-  am = commit --amend            # amend your last commit (sign)
-  ammend = commit --amend        # amend your last commit
 
   # checkout
   co = checkout                     # checkout
-  cob = checkout -b                 # create and switch to a new branch
   nb = checkout -b                  # create and switch to a new branch (mnemonic: "git new branch branchname...")
 
   # clone
@@ -68,6 +56,7 @@
   # fetch
   f = fetch
   fd = fetch dotnet
+  fpa = fetch --prune --all
 
   # log
   l = log --graph --date=short
@@ -94,8 +83,8 @@
   # rebase
   rb = rebase                       # rebase
   rbi = rebase -i                   # interactive rebase
-  rc = rebase --continue            # continue rebase
-  rs = rebase --skip                # skip rebase
+  rbc = rebase --continue            # continue rebase
+  rbs = rebase --skip                # skip rebase
   rbb = "!git rebase -i `git merge-base master HEAD`" # rebase the current branch
 
   # remote
@@ -109,7 +98,8 @@
   filelog = log -u                  # show changes to a file
   mt = mergetool                    # fire up the merge tool
   nuke = reset --hard HEAD          # nuke from orbit
-  scorch = !git nuke && git clean -xfd
+  scorch = !git nuke && git clean -Xfd
+  annihilate = !git nuke && git clean -xfd
 
   # stash
   ss = stash -u                     # stash changes (with untracked)
@@ -124,7 +114,7 @@
   stat = status                     # status
 
   # tag
-  t = tag -n                        # show tags with <n> lines of each tag message
+  t = tag                           # show tags
 
   # index
   chmod = update-index --chmod                   # Update the perms of a file
@@ -167,6 +157,6 @@
 [commit]
   gpgsign = true
 [gpg]
-	program = gpg2
+  program = gpg2
 [include]
   path = .gitconfig_local

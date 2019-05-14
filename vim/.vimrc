@@ -9,7 +9,6 @@ nmap k gk
 " stolen from Steve Losh
 cmap w!! w !sudo tee % >/dev/null
 
-set mouse=a
 set noerrorbells
 set tabstop=4
 set softtabstop=4
