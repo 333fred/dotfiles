@@ -25,7 +25,7 @@ nnoremap <Esc> :noh<CR>
 set ignorecase
 set cursorline
 set backspace=indent,eol,start
-set scrolloff=10
+set scrolloff=5
 set number
 
 set vsvim_useeditordefaults
@@ -38,7 +38,7 @@ map <Leader>wg :vsc Team.Git.GoToGitChanges<CR>
 map <Leader>wp :vsc Team.Git.CompareWithPrevious<CR>
 map <Leader>wh :vsc Team.Git.ViewHistory<CR>
 nmap <Leader>t :vsc TestExplorer.ShowTestExplorer<CR> :vsc TestExplorer.RunAllTestsInContext<CR>
-nmap <Leader>d :vsc TestExplorer.ShowTestExplorer<CR> :vsc TestExplorer.DebugAllTestsInContext<CR>
+nmap <Leader>d :vsc TestExplorer.DebugAllTestsInContext<CR>
 nmap <Leader>f :vsc TestExplorer.ShowTestExplorer<CR> :vsc TestExplorer.RunFailedTests<CR>
 
 " GoTo Things
@@ -47,6 +47,8 @@ map <leader>m :vsc Edit.GoToMember<CR>
 map <leader>s :vsc Edit.GoToSymbol<CR>
 map <leader>f :vsc Edit.GoToFile<CR>
 map <leader>c :vsc Edit.GoToType<CR>
+map <leader>u :vsc View.PreviousError<CR>
+map <leader>n :vsc View.NextError<CR>
 
 " Code navigation
 map gk :vsc Edit.PreviousMethod<CR>
@@ -57,6 +59,7 @@ nmap gf :vsc View.NavigateForward<CR>
 " gd goes to definition by default
 map gr :vsc Edit.FindAllReferences<CR>
 map gi :vsc Edit.GoToImplementation<CR>
+map gp :vsc Edit.GoToBase<CR>
 
 " Show parameter and quick info
 map <Leader>sp :vsc Edit.ParameterInfo<CR>
