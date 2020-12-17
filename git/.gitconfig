@@ -2,7 +2,12 @@
 # If signing with a gpg key, make sure to set the gpg with git config --global user.signingkey KEY_ID_HERE
 [user]
   name = Fredric Silberberg
-  signingkey = BE676E599BF034B5
+  email = 
+  signingkey = 
+[core]
+  fscache = true
+  preloadindex = true
+  editor = vim
 [color]
   ui = auto
 [color "branch"]
@@ -25,6 +30,7 @@
   b = branch -v                     # branch (verbose)
   bd = branch -d                    # branch (delete)
   bD = branch -D                    # branch (force delete)
+  bf = branch -f
 
   # commit
   c = commit                     # commit
@@ -32,6 +38,7 @@
   ca = commit -a                 # commit all
   cam = commit -am               # commit all
   caa = commit -a --amend        # add all tracked and amend your last commit
+  amend = commit --amend
 
   # checkout
   co = checkout                     # checkout
@@ -76,7 +83,7 @@
 
   # push
   ps = push                         # push
-  psf = push -f                     # push force
+  psf = push --force-with-lease     # push force with lease
   psu = push --set-upstream         # push with setting upstream
   psuo = push --set-upstream origin # push with setting upstream to be a branch in the origin remote
 
@@ -134,13 +141,6 @@
   # 'git push' will push the current branch to its tracking branch
   # the usual default is to push all branches
   default = upstream
-[core]
-	autocrlf = true
-  fscache = true
-  preloadindex = true
-	safecrlf = true
-  editor = vim
-  excludesfile = ~/.gitignore_global
 [advice]
   statusHints = false
 [diff]
@@ -156,7 +156,9 @@
   path = .gitconfig.user
 [commit]
   gpgsign = true
-[gpg]
-  program = gpg2
 [include]
   path = .gitconfig_local
+[pager]
+  branch = false
+[pull]
+	ff = only

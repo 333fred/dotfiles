@@ -1,0 +1,3 @@
+rofi.theme: Arc-Dark.rasi
+rofi.font: Hack 10
+rofi.matching: fuzzy

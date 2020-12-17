@@ -1,4 +1,5 @@
 set nocompatible
+set encoding=utf-8
 
 " Keybindings
 nmap ; :
@@ -22,7 +23,10 @@ set lazyredraw
 set showmatch
 set incsearch
 set hlsearch
-nmap <silent> // :nohlsearch<CR>
+
+" Clear highlighting on escape in normal mode
+nnoremap <esc> :noh<return><esc>
+nnoremap <esc>^[ <esc>^[
 
 " Fold Settings
 set foldenable
@@ -56,30 +60,8 @@ Plug 'nathanaelkane/vim-indent-guides'
 call plug#end()
 
 " Airline customization
-let g:airline_theme='base16'
+let g:airline_theme='base16_ocean'
 let g:airline_powerline_fonts = 1
-
-" Include base16 info. Make sure to run base16-ocean from the command line
-" first
-if filereadable(expand("~/.vimrc_background"))
-  let base16colorspace=256
-  let g:base_16_shell_path="~/.config/base16-shell/"
-  source ~/.vimrc_background
-
-  " Comments are unreadable by default
-  hi Comment ctermfg=19 cterm=bold
-  " Visual is 19 by default, that has to change
-  hi Visual ctermbg=18
-  " Line numbers have low contrast by default
-  hi LineNr ctermfg=12
-  " Fold background makes the text unreadable
-  hi Folded ctermbg=19
-  " Git comments are also unreadable
-  hi gitcommitComment ctermfg=19 cterm=bold
-  hi gitcommitUntracked ctermfg=19 cterm=bold
-  hi gitcommitDiscarded ctermfg=19 cterm=bold
-  hi gitcommitSelected ctermfg=19 cterm=bold
-endif
 
 " Change the mintty cursor when changing modes
 let &t_ti.="\e[1 q"
