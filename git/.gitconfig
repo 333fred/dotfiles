@@ -2,8 +2,6 @@
 # If signing with a gpg key, make sure to set the gpg with git config --global user.signingkey KEY_ID_HERE
 [user]
   name = Fredric Silberberg
-  email = 
-  signingkey = 
 [core]
   fscache = true
   preloadindex = true
