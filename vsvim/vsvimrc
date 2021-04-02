@@ -40,6 +40,7 @@ map <Leader>wh :vsc Team.Git.ViewHistory<CR>
 nmap <Leader>t :vsc TestExplorer.ShowTestExplorer<CR> :vsc TestExplorer.RunAllTestsInContext<CR>
 nmap <Leader>d :vsc TestExplorer.DebugAllTestsInContext<CR>
 nmap <Leader>f :vsc TestExplorer.ShowTestExplorer<CR> :vsc TestExplorer.RunFailedTests<CR>
+nmap <Leader>b :vsc Debug.ToggleBreakpoint<CR>
 
 " GoTo Things
 map <leader>, :vsc Edit.GoToAll<CR>
