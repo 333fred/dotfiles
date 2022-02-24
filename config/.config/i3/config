@@ -9,6 +9,8 @@
 #
 # Please see https://i3wm.org/docs/userguide.html for a complete reference!
 
+# This file is unused by regolith: here merely as a reference for my non-regolith config
+
 set $mod Mod4
 
 ## Base16 Ocean
@@ -60,7 +62,7 @@ exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec --no-startup-id dex -a -s /etc/xdg/autostart/:~/.config/autostart
 
 # transparency:
-exec --no-startup-id picom -cC
+#exec --no-startup-id picom -cC
 
 # Desktop notifications
 exec --no-startup-id /usr/bin/dunst
@@ -159,10 +161,11 @@ bindsym $mod+Shift+9 move container to workspace number $ws9
 bindsym $mod+Shift+0 move container to workspace number $ws10
 
 # Workspace screen assignments
-workspace $ws1 output DP-4
-workspace $ws2 output DP-4
-workspace $ws3 output DP-4
-workspace $ws4 output DP-2
+#workspace $ws1 output DP-4
+#workspace $ws2 output DP-4
+#workspace $ws3 output DP-4
+#workspace $ws4 output DP-2
+workspace $ws4 output DP-5
 
 # bring up screenshot gui
 bindsym $mod+Shift+s exec "flameshot gui"

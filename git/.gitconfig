@@ -1,7 +1,7 @@
 # Note: my aliases assume all commits will be signed with a gpg key. To not sign with a gpg key, remove the -S from the commit aliases
 # If signing with a gpg key, make sure to set the gpg with git config --global user.signingkey KEY_ID_HERE
 [user]
-  name = Fredric Silberberg
+	name = Fredric Silberberg
 [core]
   fscache = true
   preloadindex = true
@@ -151,11 +151,9 @@
   # http://gitfu.wordpress.com/2008/04/20/git-rerere-rereremember-what-you-did-last-time/
   enabled = true
 [include]
-  path = .gitconfig.user
+  path = .gitconfig.local
 [commit]
   gpgsign = true
-[include]
-  path = .gitconfig_local
 [pager]
   branch = false
 [pull]

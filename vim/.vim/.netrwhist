@@ -1,5 +1,7 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhistcnt =7
+let g:netrw_dirhistcnt =9
+let g:netrw_dirhist_9='/home/fred/.config'
+let g:netrw_dirhist_8='/home/fred/.dotfiles/config/.config/i3'
 let g:netrw_dirhist_7='/home/fred/.config/share/systemd/user'
 let g:netrw_dirhist_6='/home/fred/.dotfiles/config/.config/qalculate/qalc.cfg'
 let g:netrw_dirhist_5='/home/fred/.dotfiles/config/.config/qalculate'

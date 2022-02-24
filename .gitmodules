@@ -7,3 +7,6 @@
 [submodule "tmux/.tmux-themepack"]
 	path = tmux/.tmux-themepack
 	url = git@github.com:jimeh/tmux-themepack.git
+[submodule "config/.polybar-spotify"]
+	path = config/.polybar-spotify
+	url = git@github.com:Jvanrhijn/polybar-spotify.git
