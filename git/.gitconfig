@@ -126,6 +126,11 @@
   cx = chmod +x                                  # Set a file to executable
   assume = update-index --assume-unchanged       # Always assume file is unchanged
   unassume = update-index --no-assume-unchanged  # Undo above command
+
+  # worktree
+  wa = worktree add                 # add a new worktree
+  wrm = worktree remove             # remove a worktree
+  wl = worktree list                # list worktrees
 [format]
   pretty = format:%C(blue)%ad%Creset %C(yellow)%h%C(green)%d%Creset %C(blue)%s %C(magenta) [%an]%Creset
 [merge]
