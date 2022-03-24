@@ -22,14 +22,12 @@ if [ -d "$HOME/bin" ] ; then
 fi
 
 # set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/.local/bin" ] ; then
+if [ -d "$HOME/.local/bin" ]; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-if [ -d  "$HOME/.cargo/env"] ; then
-    . "$HOME/.cargo/env"
-fi
+. "$HOME/.cargo/env"
 
-if [ -d "$HOME/.dotnet" ] ; then
+if [ -d "$HOME/.dotnet" ]; then
 	PATH="$HOME/.dotnet:$PATH"
 fi

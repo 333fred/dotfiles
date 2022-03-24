@@ -12,3 +12,6 @@ fi
 
 # Customize to your needs...
 export PATH=$PATH:$HOME/.dotnet/tools
+eval "$(zoxide init zsh)"
+
+alias cat='batcat'
