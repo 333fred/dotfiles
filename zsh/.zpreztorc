@@ -16,7 +16,7 @@ zstyle ':prezto:*:*' case-sensitive 'no'
 zstyle ':prezto:*:*' color 'yes'
 
 # Add additional directories to load prezto modules from
-# zstyle ':prezto:load' pmodule-dirs $HOME/.zprezto-contrib
+zstyle ':prezto:load' pmodule-dirs $HOME/.prezto-contrib $HOME/.modules
 
 # Allow module overrides when pmodule-dirs causes module name collisions
 # zstyle ':prezto:load' pmodule-allow-overrides 'yes'
@@ -33,6 +33,7 @@ zstyle ':prezto:load' pmodule \
   'environment' \
   'terminal' \
   'editor' \
+  'vi-mode' \
   'history' \
   'directory' \
   'spectrum' \
@@ -40,11 +41,13 @@ zstyle ':prezto:load' pmodule \
   'git' \
   'ssh' \
   'gpg' \
+  'enhancd' \
   'pacman' \
   'completion' \
   'syntax-highlighting' \
   'history-substring-search' \
   'autosuggestions' \
+  'contrib-prompt' \
   'prompt'
 
 #
@@ -123,7 +126,7 @@ zstyle ':prezto:module:pacman' frontend 'yay'
 # Set the prompt theme to load.
 # Setting it to 'random' loads a random theme.
 # Auto set to 'off' on dumb terminals.
-zstyle ':prezto:module:prompt' theme 'paradox'
+zstyle ':prezto:module:prompt' theme 'spaceship'
 
 # Set the working directory prompt display length.
 # By default, it is set to 'short'. Set it to 'long' (without '~' expansion)
@@ -232,3 +235,10 @@ zstyle ':prezto:module:terminal:multiplexer-title' format '%s'
 # before deleting or overwriting files. Set to 'no' to disable this safer
 # behavior.
 zstyle ':prezto:module:utility' safe-ops 'no'
+
+#
+# ENHANCD
+#
+
+# Sets the ENHANCD matcher
+zstyle ":prezto:module:enhancd" filter "fzy:fzf"

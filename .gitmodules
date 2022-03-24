@@ -10,3 +10,12 @@
 [submodule "config/.polybar-spotify"]
 	path = config/.polybar-spotify
 	url = git@github.com:Jvanrhijn/polybar-spotify.git
+[submodule "tools/.tools/i3-ratiosplit"]
+	path = tools/.tools/i3-ratiosplit
+	url = git@github.com:333fred/i3-ratiosplit.git
+[submodule "zsh/.prezto-contrib"]
+	path = zsh/.prezto-contrib
+	url = git@github.com:belak/prezto-contrib.git
+[submodule "zsh/.modules/vi-mode/zsh-vi-mode"]
+	path = zsh/.modules/vi-mode/zsh-vi-mode
+	url = git@github.com:jeffreytse/zsh-vi-mode.git

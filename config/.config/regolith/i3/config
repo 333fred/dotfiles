@@ -226,10 +226,10 @@ set_from_resource $i3-wm.workspace.layout i3-wm.workspace.layout default
 workspace_layout $i3-wm.workspace.layout
 
 # Configure default workspace monitors
-workspace $ws1 output DP-2
-workspace $ws2 output DP-2
-workspace $ws3 output DP-0
-workspace $ws4 output DP-5
+workspace $ws1 output DP-4
+workspace $ws2 output DP-4
+workspace $ws3 output DP-4
+workspace $ws4 output DP-2
 
 ###############################################################################
 # Session Management

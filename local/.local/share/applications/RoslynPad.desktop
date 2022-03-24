@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=RoslynPad
+Comment=An interactive C# playground
+Path=/home/fred/
+Exec=/home/fred/.tools/roslynpad/src/RoslynPad.Avalonia/bin/Release/net6.0/RoslynPad
+Icon=/home/fred/.tools/roslynpad/deploy/PackageRoot/Assets/logo.scale-400.png
