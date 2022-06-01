@@ -1,0 +1,68 @@
+regolith.wallpaper.file:
+regolith.wallpaper.color.primary:
+
+i3-wm.gaps.focus_follows_mouse: yes
+i3-wm.bar.position: top
+
+i3-wm.program.notifications: /usr/bin/dunst
+
+i3-wm.gaps.smart: off
+i3-wm.gaps.inner.size: 5
+
+i3-wm.workspace.auto_back_and_forth: yes
+
+i3-wm.binding.exit_app: q
+
+i3-wm.binding.sleep: Ctrl+s
+
+i3-wm.workspace.01.name: 1:
+i3-wm.workspace.02.name: 2:
+i3-wm.workspace.03.name: 3:
+i3-wm.workspace.04.name: 4:
+i3-wm.workspace.05.name: 5:五
+i3-wm.workspace.06.name: 6:六
+i3-wm.workspace.07.name: 7:七
+i3-wm.workspace.08.name: 8:八
+i3-wm.workspace.09.name: 9:九
+i3-wm.workspace.10.name: 10:十
+
+
+! Colors
+
+#define base00 #2b303b
+#define base01 #343d46
+#define base02 #4f5b66
+#define base03 #65737e
+#define base04 #a7adba
+#define base05 #c0c5ce
+#define base06 #dfe1e8
+#define base07 #eff1f5
+#define base08 #bf616a
+#define base09 #d08770
+#define base0A #ebcb8b
+#define base0B #a3be8c
+#define base0C #96b5b4
+#define base0D #8fa1b3
+#define base0E #b48ead
+#define base0F #ab7967
+
+i3-wm.bar.position: top
+i3-wm.bar.font: Noto Sans Regular
+i3-wm.bar.background.color: base00
+i3-wm.bar.statusline.color: base01
+i3-wm.bar.separator.color: base04
+i3-wm.bar.workspace.focused.border.color: base05
+i3-wm.bar.workspace.focused.background.color: base0D
+i3-wm.bar.workspace.focused.text.color: base00
+i3-wm.bar.workspace.active.border.color: base05
+i3-wm.bar.workspace.active.background.color: base03
+i3-wm.bar.workspace.active.text.color: base01
+i3-wm.bar.workspace.inactive.border.color: base03
+i3-wm.bar.workspace.inactive.background.color: base01
+i3-wm.bar.workspace.inactive.text.color: base05
+i3-wm.bar.workspace.urgent.border.color: base08
+i3-wm.bar.workspace.urgent.background.color: base08
+i3-wm.bar.workspace.urgent.text.color base00
+
+gnome.wallpaper: ""
+rofi.theme: /usr/share/rofi/themes/Arc-Dark.rasi

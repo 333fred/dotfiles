@@ -22,3 +22,9 @@
 [submodule "tools/.tools/roslynpad"]
 	path = tools/.tools/roslynpad
 	url = git@github.com:roslynpad/roslynpad.git
+[submodule "tools/.tools/rofi-calc"]
+	path = tools/.tools/rofi-calc
+	url = git@github.com:svenstaro/rofi-calc.git
+[submodule "tools/.tools/vmware-host-modules"]
+	path = tools/.tools/vmware-host-modules
+	url = https://github.com/mkubecek/vmware-host-modules

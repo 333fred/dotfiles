@@ -1,0 +1,6 @@
+set_from_resource $rofiTheme rofi.theme /etc/regolith/styles/lascaille/rofi.rasi
+
+# start rofi
+bindsym $mod+d exec "rofi -modi combi -show combi -combi-modi drun,ssh,window -show-icons -theme $rofiTheme -columns 2 -padding 50 -hide-scrollbar"
+bindsym $mod+period exec rofimoji -a clipboard --selector-args=" -columns 3"
+bindsym $mod+comma exec "rofi -show calc -modi calc -no-show-match -no-sort"

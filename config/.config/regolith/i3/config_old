@@ -513,4 +513,4 @@ exec telegram-desktop
 exec spotify
 exec pavucontrol
 exec /opt/microsoft/msedge-dev/microsoft-edge-dev --profile-directory=Default --app-id=cifhbcnohmdccbgoicgdjpfamggdegmo "--app-url=https://teams.microsoft.com/?clientType=pwa"
-exec /opt/microsoft/msedge-dev/microsoft-edge-dev --profile-directory=Default --app-id=pkooggnaalmfkidjmlhoelhdllpphaga --app-url=https://outlook.office365.com/mail/
+exec /opt/microsoft/msedge-dev/microsoft-edge-dev --profile-directory=Default --app-id=faolnafnngnfdaknnbpnkhgohbobgegn --app-url=https://outlook.office365.com/mail/
