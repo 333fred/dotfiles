@@ -28,3 +28,6 @@
 [submodule "tools/.tools/vmware-host-modules"]
 	path = tools/.tools/vmware-host-modules
 	url = https://github.com/mkubecek/vmware-host-modules
+[submodule "zsh/.modules/zsh-vi-mode"]
+	path = zsh/.modules/zsh-vi-mode
+	url = git@github.com:jeffreytse/zsh-vi-mode.git

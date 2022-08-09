@@ -33,7 +33,7 @@ zstyle ':prezto:load' pmodule \
   'environment' \
   'terminal' \
   'editor' \
-  'vi-mode' \
+  'zsh-vi-mode' \
   'history' \
   'directory' \
   'spectrum' \
@@ -47,6 +47,7 @@ zstyle ':prezto:load' pmodule \
   'syntax-highlighting' \
   'history-substring-search' \
   'autosuggestions' \
+  'dotnet-completion' \
   'contrib-prompt' \
   'prompt'
 

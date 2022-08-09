@@ -1,3 +1,4 @@
 git/.gitconfig_local
 vim/.vim/plugged
 **/ratiosplit.log
+qalc.history
