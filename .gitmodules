@@ -28,3 +28,9 @@
 [submodule "tools/.tools/vmware-host-modules"]
 	path = tools/.tools/vmware-host-modules
 	url = https://github.com/mkubecek/vmware-host-modules
+[submodule "config/.config/polybar/zscroll"]
+	path = config/.config/polybar/zscroll
+	url = git@github.com:noctuid/zscroll.git
+[submodule "config/.config/polybar/polybar-spotify"]
+	path = config/.config/polybar/polybar-spotify
+	url = git@github.com:PrayagS/polybar-spotify.git

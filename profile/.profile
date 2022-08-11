@@ -29,5 +29,6 @@ fi
 . "$HOME/.cargo/env"
 
 if [ -d "$HOME/.dotnet" ]; then
-	PATH="$HOME/.dotnet:$PATH"
+	DOTNET_ROOT="$HOME/.dotnet"
+	PATH="$DOTNET_ROOT:$PATH"
 fi

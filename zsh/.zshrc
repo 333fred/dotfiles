@@ -12,7 +12,7 @@ fi
 
 # Customize to your needs...
 alias cat='batcat'
-export PATH=$HOME/.dotnet/tools:$HOME/.local/bin:$PATH
+export PATH=$HOME/.dotnet:$HOME/.dotnet/tools:$HOME/.local/bin:$PATH
 
 # Spaceship Customization
 

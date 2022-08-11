@@ -44,6 +44,7 @@ padding-right = 2
 
 module-margin-left = 1
 module-margin-right = 2
+enable-ipc = true
 
 font-0 = ${fonts.font-0}
 font-1 = ${fonts.font-1}
@@ -53,7 +54,7 @@ font-4 = ${fonts.font-4}
 
 modules-left = i3
 modules-center = xwindow
-modules-right = spotify filesystem pulseaudio memory cpu eth date powermenu
+modules-right = spotify spotify-prev spotify-play-pause spotify-next filesystem pulseaudio memory cpu eth date powermenu
 
 tray-position = right
 tray-padding = 2
@@ -189,11 +190,31 @@ label-separator = |
 
 [module/spotify]
 type = custom/script
+tail = true
 interval = 1
 format-prefix = "  "
 format-prefix-foreground = ${colors.primary}
 format = <label>
-exec = python3 /home/fred/.polybar-spotify/spotify_status.py -t 42 -f '{artist}: {song}'
+exec = ~/.config/polybar/polybar-spotify/scroll_spotify_status.sh
+
+[module/spotify-prev]
+type = custom/script
+exec = echo "玲"
+format = <label>
+click-left = playerctl previous -p spotify
+
+[module/spotify-play-pause]
+type = custom/ipc
+hook-0 = echo ""
+hook-1 = echo ""
+initial = 1
+click-left = playerctl play-pause -p spotify
+
+[module/spotify-next]
+type = custom/script
+exec = echo "怜"
+format = <label>
+click-left = playerctl next -p spotify
 
 [module/cpu]
 type = internal/cpu
