@@ -152,10 +152,9 @@
   enabled = true
 [include]
   path = .gitconfig.user
+  path = .gitconfig.os
 [commit]
   gpgsign = true
-[include]
-  path = .gitconfig_local
 [pager]
   branch = false
 [pull]
