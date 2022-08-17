@@ -23,6 +23,7 @@ winget install --id Microsoft.Powershell
 winget install --id Starship.Starship
 ```
 * Copy `powershell\Microsoft.PowerShell_profile.ps1` to `C:\Users\<user>\Documents\Powershell\`
+* Open Windows Terminal settings, replace with `terminal\settings.json`
 
 ## Git
 
