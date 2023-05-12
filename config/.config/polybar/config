@@ -22,6 +22,7 @@ font-1 = Noto Sans Nerd Font:pixelsize=11;1
 font-2 = Hack:pixelsize=11;1
 font-3 = Hack Nerd Font:pixelsize=11;1
 font-4 = Noto Sans CJK JP:pixelsize=10;1
+font-5 = Noto Color Emoji
 
 [bar/main]
 monitor = ${env:MONITOR:}
