@@ -179,3 +179,5 @@
     hunk-header-style = file line-number syntax
 [help]
   autocorrect = prompt
+[init]
+	defaultBranch = main

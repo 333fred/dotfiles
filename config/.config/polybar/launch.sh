@@ -7,6 +7,5 @@ killall -q polybar
 
 MONITOR="DP-2" polybar --reload main >> /tmp/polybar.main.log 2>&1 &
 MONITOR="DP-0" polybar --reload second >> /tmp/polybar.second.log 2>&1 &
-MONITOR="DP-5" polybar --reload chat >> /tmp/polybar.third.log 2>&1 &
 
 echo "Bars launched..."
