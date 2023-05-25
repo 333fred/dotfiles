@@ -1,5 +1,5 @@
 # 333fred's Dotfiles
 
-These are my dotfiles, designed to run on Arch Linux. I manage them using GNU Stow.
+These are my dotfiles, designed to run on Regolith Linux 2. I manage them using GNU Stow.
 
-I've also included my VsVim config for Windows, but this doesn't need to be linked from linux.
+Other branches are old customizations for other distros, or my Windows config.
