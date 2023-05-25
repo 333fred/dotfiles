@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=MSBuild Binary Log Viewer
+Path=/home/fred/
+Exec=/home/fred/.tools/MSBuildStructuredLog/bin/StructuredLogViewer.Avalonia/Release/net7.0/linux-x64/publish/StructuredLogViewer.Avalonia
+Icon=/home/fred/.tools/MSBuildStructuredLog/src/StructuredLogViewer/icons/msbuild-structured-log-viewer.png

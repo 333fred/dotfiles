@@ -37,3 +37,6 @@
 [submodule "config/.config/polybar/polybar-spotify"]
 	path = config/.config/polybar/polybar-spotify
 	url = git@github.com:PrayagS/polybar-spotify.git
+[submodule "tools/.tools/MSBuildStructuredLog"]
+	path = tools/.tools/MSBuildStructuredLog
+	url = git@github.com:KirillOsenkov/MSBuildStructuredLog.git
