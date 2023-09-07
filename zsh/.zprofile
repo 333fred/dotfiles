@@ -68,3 +68,7 @@ if command -v batcat &> /dev/null; then
 fi
 
 alias cat='bat'
+
+if command -v code-insiders &> /dev/null; then
+  alias code='code-insiders'
+fi

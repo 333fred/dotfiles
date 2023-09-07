@@ -32,3 +32,8 @@ if [ -d "$HOME/.dotnet" ]; then
 	export DOTNET_ROOT="$HOME/.dotnet"
 	PATH="$DOTNET_ROOT:$PATH"
 fi
+
+# Define  a `.profile.local` file for setting local globals, such as `PRIMARY_MONITOR`` and `SECONDARY_MONITOR``
+if [ -f "$HOME/.profile.local" ]; then
+    . "$HOME/.profile.local"
+fi

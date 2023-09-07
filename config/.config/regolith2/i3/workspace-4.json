@@ -1,0 +1,191 @@
+// vim:ts=4:sw=4:et
+{
+   // this is a manually added container to restore the vertical split
+   "layout": "splitv",
+   "percent": 0.7,
+   "type": "con",
+   "nodes": [
+      {
+         // tabbed split container with 7 children
+         "border": "pixel",
+         "floating": "auto_off",
+         "layout": "tabbed",
+         "marks": [],
+         "percent": 0.68,
+         "type": "con",
+         "nodes": [
+            {
+               "border": "pixel",
+               "current_border_width": 2,
+               "floating": "auto_off",
+               "geometry": {
+                  "height": 1691,
+                  "width": 1428,
+                  "x": 6,
+                  "y": 57
+               },
+               "marks": [],
+               "name": "Discord",
+               "percent": 0.131665569453588,
+               "swallows": [
+                  {
+                     "class": "^discord$"
+                  }
+               ],
+               "type": "con"
+            },
+            {
+               "border": "pixel",
+               "current_border_width": 2,
+               "floating": "auto_off",
+               "geometry": {
+                  "height": 1691,
+                  "width": 1428,
+                  "x": 6,
+                  "y": 57
+               },
+               "marks": [],
+               "name": "Slack",
+               "percent": 0.131665569453588,
+               "swallows": [
+                  {
+                     "class": "^Slack$"
+                  }
+               ],
+               "type": "con"
+            },
+            {
+               "border": "pixel",
+               "current_border_width": 2,
+               "floating": "auto_off",
+               "geometry": {
+                  "height": 1691,
+                  "width": 1428,
+                  "x": 0,
+                  "y": 0
+               },
+               "marks": [],
+               "name": "Volume Control",
+               "percent": 0.176431863067808,
+               "swallows": [
+                  {
+                     "class": "^Pavucontrol$"
+                  }
+               ],
+               "type": "con"
+            },
+            {
+               "border": "pixel",
+               "current_border_width": 2,
+               "floating": "auto_off",
+               "geometry": {
+                  "height": 1691,
+                  "width": 1428,
+                  "x": 6,
+                  "y": 57
+               },
+               "marks": [],
+               "name": "Telegram",
+               "percent": 0.131665569453588,
+               "swallows": [
+                  {
+                     "class": "^TelegramDesktop$"
+                  }
+               ],
+               "type": "con"
+            },
+            {
+               "border": "pixel",
+               "current_border_width": 2,
+               "floating": "auto_off",
+               "geometry": {
+                  "height": 1691,
+                  "width": 1428,
+                  "x": 6,
+                  "y": 57
+               },
+               "marks": [],
+               "name": "To Do",
+               "percent": 0.142857142857143,
+               "swallows": [
+                  {
+                     "instance": "^crx__iiiljpmhiglbecnhhclpojoppccacidj$"
+                  }
+               ],
+               "type": "con"
+            },
+            {
+               "border": "pixel",
+               "current_border_width": 2,
+               "floating": "auto_off",
+               "geometry": {
+                  "height": 1691,
+                  "width": 1428,
+                  "x": 6,
+                  "y": 57
+               },
+               "marks": [],
+               "name": "Teams",
+               "percent": 0.142857142857143,
+               "swallows": [
+                  {
+                     "instance": "^crx__cifhbcnohmdccbgoicgdjpfamggdegmo$"
+                  }
+               ],
+               "type": "con"
+            },
+            {
+               "border": "pixel",
+               "current_border_width": 2,
+               "floating": "auto_off",
+               "geometry": {
+                  "height": 1691,
+                  "width": 1428,
+                  "x": 6,
+                  "y": 57
+               },
+               "marks": [],
+               "name": "Outlook",
+               "percent": 0.142857142857143,
+               "swallows": [
+                  {
+                     "instance": "^crx__faolnafnngnfdaknnbpnkhgohbobgegn$"
+                  }
+               ],
+               "type": "con"
+            }
+         ]
+      },
+      {
+         // tabbed split container with 1 children
+         "border": "pixel",
+         "floating": "auto_off",
+         "layout": "tabbed",
+         "marks": [],
+         "percent": 0.32,
+         "type": "con",
+         "nodes": [
+            {
+               "border": "pixel",
+               "current_border_width": 2,
+               "floating": "auto_off",
+               "geometry": {
+                  "height": 798,
+                  "width": 1428,
+                  "x": 3446,
+                  "y": 1756
+               },
+               "marks": [],
+               "name": "Spotify",
+               "percent": 1,
+               "swallows": [
+                  {
+                     "class": "^Spotify$"
+                  }
+               ],
+               "type": "con"
+            }
+         ]
+      }
+   ]
+}
