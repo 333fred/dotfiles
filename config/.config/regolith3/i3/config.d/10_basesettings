@@ -1,3 +1,6 @@
+# Restore layout on workspace 4. Webapps need to have the same classes updated in the layout file
+exec --no-startup-id "i3-msg 'workspace 4; append_layout /home/fred/.config/regolith2/i3/workspace-4.json'"
+
 # Define names for default workspaces for which we configure key bindings later on.
 # We use variables to avoid repeating the names in multiple places.
 set $ws1 "1:"

@@ -1,0 +1,69 @@
+regolith.wallpaper.file:
+regolith.wallpaper.color.primary:
+
+wm.gaps.focus_follows_mouse: yes
+
+wm.program.notifications: /usr/bin/dunst
+
+wm.gaps.smart: off
+wm.gaps.inner.size: 5
+
+wm.workspace.auto_back_and_forth: yes
+
+wm.binding.exit_app: q
+
+wm.binding.sleep: Ctrl+s
+
+wm.workspace.01.name: 1:
+wm.workspace.02.name: 2:
+wm.workspace.03.name: 3:
+wm.workspace.04.name: 4:
+wm.workspace.05.name: 5:五
+wm.workspace.06.name: 6:六
+wm.workspace.07.name: 7:七
+wm.workspace.08.name: 8:八
+wm.workspace.09.name: 9:九
+wm.workspace.10.name: 10:十
+
+
+! Colors
+
+#define base00 #2b303b
+#define base01 #343d46
+#define base02 #4f5b66
+#define base03 #65737e
+#define base04 #a7adba
+#define base05 #c0c5ce
+#define base06 #dfe1e8
+#define base07 #eff1f5
+#define base08 #bf616a
+#define base09 #d08770
+#define base0A #ebcb8b
+#define base0B #a3be8c
+#define base0C #96b5b4
+#define base0D #8fa1b3
+#define base0E #b48ead
+#define base0F #ab7967
+
+wm.bar.position: top
+wm.bar.font: Noto Sans Regular
+wm.bar.background.color: base00
+wm.bar.statusline.color: base01
+wm.bar.separator.color: base04
+wm.bar.workspace.focused.border.color: base05
+wm.bar.workspace.focused.background.color: base0D
+wm.bar.workspace.focused.text.color: base00
+wm.bar.workspace.active.border.color: base05
+wm.bar.workspace.active.background.color: base03
+wm.bar.workspace.active.text.color: base01
+wm.bar.workspace.inactive.border.color: base03
+wm.bar.workspace.inactive.background.color: base01
+wm.bar.workspace.inactive.text.color: base05
+wm.bar.workspace.urgent.border.color: base08
+wm.bar.workspace.urgent.background.color: base08
+wm.bar.workspace.urgent.text.color base00
+
+gnome.wallpaper: ""
+rofi.theme: /usr/share/rofi/themes/Arc-Dark.rasi
+
+regolith.sway.unsupported_gpu: true

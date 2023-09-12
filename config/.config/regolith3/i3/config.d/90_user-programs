@@ -18,9 +18,6 @@ assign [class="^Microsoft-edge-dev$" instance="^crx__cifhbcnohmdccbgoicgdjpfamgg
 # found in ~/.local/share/applications/relevant.desktop
 assign [class="^Microsoft-edge-dev$" instance="^crx__faolnafnngnfdaknnbpnkhgohbobgegn$"] $ws4
 
-# Restore layout on workspace 4. Webapps need to have the same classes updated in the layout file
-exec --no-startup-id "i3-msg 'workspace \\"4:\\"; append_layout /home/fred/.config/regolith2/i3/workspace-4.json'"
-
 exec --no-startup-id /home/fred/.cargo/bin/i3-ratiosplit
 exec --no-startup-id discord
 exec --no-startup-id slack
@@ -29,5 +26,5 @@ exec --no-startup-id spotify
 exec --no-startup-id pavucontrol
 
 # Startup polybar and Dunst
-exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+# exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 exec --no-startup-id /usr/bin/dunst

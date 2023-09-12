@@ -1,0 +1,7 @@
+theme = "slick"
+icons = "awesome"
+
+[[block]]
+block = "time"
+interval = 5
+format = "%a %d/%m %R"
