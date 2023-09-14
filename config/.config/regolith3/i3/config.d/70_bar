@@ -1,5 +1,5 @@
 bar {
-    font pango:Hack NF 11, Noto Sans CJK JP 11
+    font pango:Hack NF 11
     position top
     status_command /usr/bin/i3status-rs
     output DP-4
