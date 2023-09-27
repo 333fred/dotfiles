@@ -31,3 +31,6 @@
 [submodule "tools/.tools/MSBuildStructuredLog"]
 	path = tools/.tools/MSBuildStructuredLog
 	url = git@github.com:KirillOsenkov/MSBuildStructuredLog.git
+[submodule "tools/.tools/rofi-power-menu"]
+	path = tools/.tools/rofi-power-menu
+	url = git@github.com:jluttine/rofi-power-menu.git

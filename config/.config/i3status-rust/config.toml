@@ -51,7 +51,7 @@ block = "sound"
 [[block]]
 block = "custom"
 command = "echo \uf011" # assumes fontawesome icons
-on_click = "systemctl `echo -e 'suspend\npoweroff\nreboot' | dmenu"
+on_click = "rofi -show power-menu -modi power-menu:/home/fred/.tools/rofi-power-menu/rofi-power-menu"
 interval = "once"
 
 [[block]]
