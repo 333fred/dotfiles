@@ -62,6 +62,7 @@ wm.bar.workspace.inactive.text.color: base05
 wm.bar.workspace.urgent.border.color: base08
 wm.bar.workspace.urgent.background.color: base08
 wm.bar.workspace.urgent.text.color base00
+wm.gaps.smart off
 
 gnome.wallpaper: ""
 rofi.theme: /usr/share/rofi/themes/Arc-Dark.rasi
