@@ -24,7 +24,6 @@ exec --no-startup-id "i3-msg 'workspace 4; append_layout /home/fred/.config/rego
 exec --no-startup-id /home/fred/.cargo/bin/i3-ratiosplit
 exec --no-startup-id discord
 exec --no-startup-id slack
-exec --no-startup-id telegram-desktop
 exec --no-startup-id spotify
 exec --no-startup-id pavucontrol
 
