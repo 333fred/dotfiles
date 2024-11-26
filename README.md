@@ -13,10 +13,10 @@ Install the Hack Nerd Font from https://www.nerdfonts.com/font-downloads.
 * Install/update Windows Terminal
 * Install the following powershell modules:
 ```powershell
-Install-Module PSReadLine -AllowPrerelease -Force -Scope CurrentUser
-Install-Module posh-git -Scope CurrentUser
-Install-Module posh-sshell -Scope CurrentUser
-Install-Module -Name Terminal-Icons -Repository PSGallery -Scope CurrentUser
+Install-Module PSReadLine -AllowPrerelease -Force -Scope CurrentUser # https://github.com/PowerShell/PSReadLine
+Install-Module posh-git -Scope CurrentUser # https://github.com/dahlbyk/posh-git
+Install-Module posh-sshell -Scope CurrentUser # https://github.com/dahlbyk/posh-sshell
+Install-Module -Name Terminal-Icons -Repository PSGallery -Scope CurrentUser # https://github.com/devblackops/Terminal-Icons
 ```
 * Install the following winget packages:
 ```powershell
