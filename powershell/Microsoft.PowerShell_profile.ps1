@@ -14,6 +14,8 @@ Start-SshAgent -Quiet
 
 Invoke-Expression (&starship init powershell)
 
+Import-Module -Name Terminal-Icons
+
 # PowerShell parameter completion shim for the dotnet CLI
 Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
      param($commandName, $wordToComplete, $cursorPosition)

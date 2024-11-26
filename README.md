@@ -16,6 +16,7 @@ Install the Hack Nerd Font from https://www.nerdfonts.com/font-downloads.
 Install-Module PSReadLine -AllowPrerelease -Force -Scope CurrentUser
 Install-Module posh-git -Scope CurrentUser
 Install-Module posh-sshell -Scope CurrentUser
+Install-Module -Name Terminal-Icons -Repository PSGallery -Scope CurrentUser
 ```
 * Install the following winget packages:
 ```powershell
