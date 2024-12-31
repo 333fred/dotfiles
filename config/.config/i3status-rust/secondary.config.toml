@@ -1,7 +1,13 @@
+icons_format= " <span font_family='Hack NF'>{icon}</span> "
+
+[theme]
 theme = "slick"
-icons = "awesome"
+[icons]
+icons = "material-nf"
 
 [[block]]
 block = "time"
 interval = 5
-format = "%a %m/%d %R"
+[block.format]
+full = " $icon $timestamp.datetime(f:'%a %m/%d %R') "
+short = " $icon $timestamp.datetime(f:%R) "

@@ -31,3 +31,6 @@
 [submodule "tools/.tools/rofi-power-menu"]
 	path = tools/.tools/rofi-power-menu
 	url = git@github.com:jluttine/rofi-power-menu.git
+[submodule "config/i3status-rust"]
+	path = config/i3status-rust
+	url = git@github.com:greshake/i3status-rust.git

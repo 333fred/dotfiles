@@ -1,11 +1,13 @@
-theme = "slick"
-icons = "material-nf"
 icons_format= " <span font_family='Hack NF'>{icon}</span> "
+
+[theme]
+theme = "slick"
+[icons]
+icons = "material-nf"
 
 [[block]]
 block = "focused_window"
-max_width = 50
-show_marks = "visible"
+format = " $title |"
 
 [[block]]
 block="music"
@@ -13,18 +15,18 @@ block="music"
 [[block]]
 block = "disk_space"
 path = "/"
-alias = "/"
 info_type = "available"
-unit = "GB"
+alert_unit = "GB"
 interval = 20
 warning = 20.0
 alert = 10.0
 
 [[block]]
 block = "memory"
-display_type = "memory"
-format_mem = "{mem_used_percents}"
-format_swap = "{swap_used_percents}"
+format = " $icon $mem_used_percents.eng(w:1) "
+interval = 30
+warning_mem = 70
+critical_mem = 90
 
 [[block]]
 block = "net"
@@ -32,15 +34,19 @@ block = "net"
 [[block]]
 block = "cpu"
 interval = 1
-format = "{utilization} {frequency}"
+format = "$utilization $frequency "
 
 [[block]]
 block = "temperature"
+format = " $icon $max max "
+format_alt = " $icon $min min, $max max, $average avg "
+interval = 10
+chip = "k10temp-*"
 
 [[block]]
 block = "load"
 interval = 1
-format = "{1m}"
+format = " $icon $1m.eng(w:4) "
 
 [[block]]
 block = "nvidia_gpu"
@@ -49,12 +55,28 @@ block = "nvidia_gpu"
 block = "sound"
 
 [[block]]
-block = "custom"
-command = "echo \uf011" # assumes fontawesome icons
-on_click = "rofi -show power-menu -modi power-menu:/home/fred/.tools/rofi-power-menu/rofi-power-menu"
-interval = "once"
+block = "menu"
+text = " \uf011 "
+[[block.items]]
+display = " -&gt;   Sleep   &lt;-"
+cmd = "systemctl suspend"
+confirm_msg = "Are you sure you want to suspend?"
+[[block.items]]
+display = " -&gt; Power Off &lt;-"
+cmd = "poweroff"
+confirm_msg = "Are you sure you want to power off?"
+[[block.items]]
+display = " -&gt;  Reboot   &lt;-"
+cmd = "reboot"
+confirm_msg = "Are you sure you want to reboot?"
+[[block.items]]
+display = " -&gt;  Logout   &lt;-"
+cmd = "gnome-session-quit"
+
 
 [[block]]
 block = "time"
 interval = 5
-format = "%a %m/%d %R"
+[block.format]
+full = " $icon $timestamp.datetime(f:'%a %m/%d %R') "
+short = " $icon $timestamp.datetime(f:%R) "
