@@ -7,7 +7,7 @@ icons = "material-nf"
 
 [[block]]
 block = "focused_window"
-format = " $title |"
+format = " $title.str(max_w:60) |"
 
 [[block]]
 block="music"
