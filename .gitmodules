@@ -22,9 +22,6 @@
 [submodule "tools/.tools/rofi-calc"]
 	path = tools/.tools/rofi-calc
 	url = git@github.com:svenstaro/rofi-calc.git
-[submodule "tools/.tools/vmware-host-modules"]
-	path = tools/.tools/vmware-host-modules
-	url = https://github.com/mkubecek/vmware-host-modules
 [submodule "zsh/.modules/zsh-vi-mode"]
 	path = zsh/.modules/zsh-vi-mode
 	url = git@github.com:jeffreytse/zsh-vi-mode.git

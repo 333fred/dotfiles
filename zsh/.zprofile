@@ -67,8 +67,17 @@ if command -v batcat &> /dev/null; then
   alias bat='batcat'
 fi
 
-alias cat='bat'
+alias cat='batcat'
 
 if command -v code-insiders &> /dev/null; then
   alias code='code-insiders'
+fi
+
+export ANDROID_HOME=/home/fred/Android/Sdk
+export ANDROID_SDK_ROOT=/home/fred/Android/Sdk
+export PATH=/home/fred/Android/Sdk/cmdline-tools/latest/bin:/home/fred/Android/Sdk/platform-tools:$PATH
+
+if [ -f "$HOME/.local/share/dnvm/env" ]; then
+    echo "Test"
+    . "$HOME/.local/share/dnvm/env"
 fi
