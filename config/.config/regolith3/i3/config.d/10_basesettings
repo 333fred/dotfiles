@@ -12,10 +12,10 @@ set $ws9 "9:九"
 set $ws10 "10:十"
 
 # Configure default workspace monitors
-workspace $ws1 output DP-2
-workspace $ws2 output DP-2
-workspace $ws3 output DP-2
-workspace $ws4 output DP-0
+workspace $ws1 output DP-4
+workspace $ws2 output DP-4
+workspace $ws3 output DP-4
+workspace $ws4 output DP-2
 
 # bring up screenshot gui
 bindsym $mod+Shift+s exec "flameshot gui"
@@ -54,3 +54,8 @@ client.background       $base07
 
 # Sets i3 font for dialogs
 font pango:Hack 8
+
+set_from_resource $wm.binding.left wm.binding.left h
+set_from_resource $wm.binding.down wm.binding.down j
+set_from_resource $wm.binding.up wm.binding.up k
+set_from_resource $wm.binding.right wm.binding.right l
