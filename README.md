@@ -27,13 +27,14 @@ updating all submodules, install with:
 I override various regolith defaults in unsupported ways, so I maintain copies of the default regolith config files with my changes. Therefore, some packages need to be uninstalled from a default set:
 
 * `regolith-wm-navigation`
+* `regolith-wm-resize`
 * `regolith-i3-gaps`
-* i3-swap-focus
-* i3xrocks
-* regolith-i3-control-center-regolith
-* regolith-i3-ftue
-* regolith-i3-gaps-partial
-* regolith-i3-i3xrocks
-* regolith-i3-ilia
-* regolith-i3-rofication-ilia
-* regolith-i3-swap-focus
+* `i3-swap-focus`
+* `i3xrocks`
+* `regolith-i3-control-center-regolith`
+* `regolith-i3-ftue`
+* `regolith-i3-gaps-partial`
+* `regolith-i3-i3xrocks`
+* `regolith-i3-ilia`
+* `regolith-i3-rofication-ilia`
+* `regolith-i3-swap-focus`
