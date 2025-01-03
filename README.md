@@ -4,6 +4,15 @@ These are my dotfiles, designed to run on Regolith Linux 3. I manage them using 
 
 Other branches are old customizations for other distros, or my Windows config.
 
+## Monitor management
+
+I use two monitors, and make these files layout agnostic, I read values from Xresources to set my monitors correctly. Make a machine-specific `~/.Xresources` file and include the following:
+
+```Xresources
+wm.mainOutput: DP-X
+wm.secondaryOutput: DP-Y
+```
+
 ## `dotnet` management
 
 I use @agocke's [DN-VM](https://github.com/dn-vm/dnvm) to manage my `dotnet` installation, so there's nothing checked in this repo for it.

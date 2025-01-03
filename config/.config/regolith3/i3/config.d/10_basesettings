@@ -11,11 +11,14 @@ set $ws8 "8:八"
 set $ws9 "9:九"
 set $ws10 "10:十"
 
+set_from_resource $wm.mainOutput wm.mainOutput DP-2
+set_from_resource $wm.secondaryOutput wm.secondaryOutput DP-0
+
 # Configure default workspace monitors
-workspace $ws1 output DP-4
-workspace $ws2 output DP-4
-workspace $ws3 output DP-4
-workspace $ws4 output DP-2
+workspace $ws1 output $wm.mainOutput
+workspace $ws2 output $wm.mainOutput
+workspace $ws3 output $wm.mainOutput
+workspace $ws4 output $wm.secondaryOutput
 
 # bring up screenshot gui
 bindsym $mod+Shift+s exec "flameshot gui"
