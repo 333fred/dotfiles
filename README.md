@@ -47,3 +47,11 @@ I override various regolith defaults in unsupported ways, so I maintain copies o
 * `regolith-i3-ilia`
 * `regolith-i3-rofication-ilia`
 * `regolith-i3-swap-focus`
+
+## Fonts
+
+I use Hack as my main font, with Noto as the backup/CJK font. To install:
+
+1. Download Hack Nerd Font from https://www.nerdfonts.com/font-downloads
+2. Copy the contents of the zip to `~/.fonts`, and run `fc-cache -fv`
+3. `sudo apt install fonts-noto`
