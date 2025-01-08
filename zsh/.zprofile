@@ -76,8 +76,3 @@ fi
 export ANDROID_HOME=/home/fred/Android/Sdk
 export ANDROID_SDK_ROOT=/home/fred/Android/Sdk
 export PATH=/home/fred/Android/Sdk/cmdline-tools/latest/bin:/home/fred/Android/Sdk/platform-tools:$PATH
-
-if [ -f "$HOME/.local/share/dnvm/env" ]; then
-    echo "Test"
-    . "$HOME/.local/share/dnvm/env"
-fi

@@ -48,6 +48,8 @@ I override various regolith defaults in unsupported ways, so I maintain copies o
 * `regolith-i3-rofication-ilia`
 * `regolith-i3-swap-focus`
 
+Due to https://github.com/regolith-linux/regolith-desktop/issues/1042, rename `/etc/environment` to `/etc/environment.back`. Hopefully I can remove this hack at some point in the future.
+
 ## Fonts
 
 I use Hack as my main font, with Noto as the backup/CJK font. To install:
