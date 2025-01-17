@@ -57,3 +57,11 @@ I use Hack as my main font, with Noto as the backup/CJK font. To install:
 1. Download Hack Nerd Font from https://www.nerdfonts.com/font-downloads
 2. Copy the contents of the zip to `~/.fonts`, and run `fc-cache -fv`
 3. `sudo apt install fonts-noto`
+
+## Other settings
+
+Make sure to turn off the ibus emoji shortcut, or `ctrl+.` will be globally hooked and will mess up vscode.
+
+`gsettings set org.freedesktop.ibus.panel.emoji hotkey "[]"`
+
+https://stackoverflow.com/questions/71997823/ctrl-dot-makes-e-appear-instead-of-showing-suggestions-in-vscode-on-gnome
