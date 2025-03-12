@@ -8,9 +8,12 @@ Install the Hack Nerd Font from https://www.nerdfonts.com/font-downloads.
 
 ## Powershell
 
-* Install Microsoft Powershell from the store.
-* Install/update App Installer (winget) from the store.
 * Install/update Windows Terminal
+* Install the following winget packages:
+```powershell
+winget install --id Microsoft.Powershell
+winget install --id Starship.Starship
+```
 * Install the following powershell modules:
 ```powershell
 Install-Module PSReadLine -AllowPrerelease -Force -Scope CurrentUser # https://github.com/PowerShell/PSReadLine
@@ -18,13 +21,8 @@ Install-Module posh-git -Scope CurrentUser # https://github.com/dahlbyk/posh-git
 Install-Module posh-sshell -Scope CurrentUser # https://github.com/dahlbyk/posh-sshell
 Install-Module -Name Terminal-Icons -Repository PSGallery -Scope CurrentUser # https://github.com/devblackops/Terminal-Icons
 ```
-* Install the following winget packages:
-```powershell
-winget install --id Microsoft.Powershell
-winget install --id Starship.Starship
-```
-* Copy `powershell\Microsoft.PowerShell_profile.ps1` to `C:\Users\<user>\Documents\Powershell\`
-* Open Windows Terminal settings, replace with `terminal\settings.json`
+* Copy [`powershell\Profile.ps1`](./powershell/Profile.ps1) to `C:\Users\<user>\Documents\Powershell\`
+* Open Windows Terminal settings, replace with [`terminal\settings.json`](./terminal/settings.json)
 
 ## Git
 
@@ -34,7 +32,7 @@ winget install --id git.git
 winget install --id GnuPG.GnuPG
 winget install --id github.cli
 ```
-* Copy `git\.gitconfig` to `C:\Users\<user>`
+* Copy [`git\.gitconfig`](./git/.gitconfig) to `C:\Users\<user>`
 * Generate or import a private key for gpg
   * Import
 ```powershell
@@ -62,4 +60,4 @@ y
 ```powershell
 winget install --id 7zip.7zip
 ```
-* Copy `vsvim\vsvimrc` to `C:\Users\<home>\.vsvimrc`
+* Copy [`vsvim\vsvimrc`](./vsvim/vsvimrc) to `C:\Users\<home>\.vsvimrc`
