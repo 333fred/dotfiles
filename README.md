@@ -47,6 +47,11 @@ I override various regolith defaults in unsupported ways, so I maintain copies o
 * `regolith-i3-ilia`
 * `regolith-i3-rofication-ilia`
 * `regolith-i3-swap-focus`
+* `regolith-sway-ilia`
+* `regolith-sway-control-center-regolith`
+* `regolith-control-center`
+* `regolith-sway-i3status-rs`
+* `regolith-sway-grimshot`
 
 Due to https://github.com/regolith-linux/regolith-desktop/issues/1042, rename `/etc/environment` to `/etc/environment.back`. Hopefully I can remove this hack at some point in the future.
 

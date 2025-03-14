@@ -71,7 +71,7 @@ cmd = "reboot"
 confirm_msg = "Are you sure you want to reboot?"
 [[block.items]]
 display = " -&gt;  Logout   &lt;-"
-cmd = "gnome-session-quit"
+cmd = "/usr/bin/gnome-session-quit --logout --no-prompt"
 
 
 [[block]]
