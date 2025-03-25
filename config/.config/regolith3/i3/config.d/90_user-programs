@@ -27,6 +27,9 @@ exec --no-startup-id slack
 exec --no-startup-id spotify
 exec --no-startup-id pavucontrol
 
-# Startup polybar and Dunst
-# exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+# Startup Dunst
 exec --no-startup-id /usr/bin/dunst
+
+# Startup polkit. Various authentication issues will occur without this (such as azurevpn not working)
+# Make sure policykit-1-gnome is installed on Ubuntu
+exec --no-startup-id /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1
