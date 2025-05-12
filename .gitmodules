@@ -34,3 +34,6 @@
 [submodule "config/i3status-rust"]
 	path = config/i3status-rust
 	url = git@github.com:greshake/i3status-rust.git
+[submodule "zsh/.modules/spaceship-vi-mode"]
+	path = zsh/.modules/spaceship-vi-mode
+	url = git@github.com:spaceship-prompt/spaceship-vi-mode.git

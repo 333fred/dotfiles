@@ -65,6 +65,13 @@ I use Monaspace as my main font, with Noto as the backup/CJK font, and Hack as t
 4. Copy the contents of the zip to `~/.fonts`, and run `fc-cache -fv`
 5. `sudo apt install fonts-noto`
 
+## Rofimoji
+
+I use [Rofimoji](https://github.com/fdw/rofimoji) to input emoji. This is a python package, and should be installed with pipx:
+
+1. `sudo apt install pipx`
+2. `pipx install rofimoji`
+
 ## Other settings
 
 Make sure to turn off the ibus emoji shortcut, or `ctrl+.` will be globally hooked and will mess up vscode.

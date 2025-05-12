@@ -17,6 +17,7 @@ zstyle ':prezto:*:*' color 'yes'
 
 # Add additional directories to load prezto modules from
 zstyle ':prezto:load' pmodule-dirs $HOME/.prezto-contrib $HOME/.modules
+source "$HOME/.modules/spaceship-vi-mode/spaceship-vi-mode.plugin.zsh"
 
 # Allow module overrides when pmodule-dirs causes module name collisions
 # zstyle ':prezto:load' pmodule-allow-overrides 'yes'
