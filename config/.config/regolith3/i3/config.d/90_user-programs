@@ -13,10 +13,10 @@ for_window [class="Spotify"] move --no-auto-back-and-forth to workspace $ws4
 
 # Assign my teams webapp to workspace 4. This is installed as a PWA, and the command to launch can be
 # found in ~/.local/share/applications/relevant.desktop
-assign [class="^Microsoft-edge-dev$" instance="^crx__cifhbcnohmdccbgoicgdjpfamggdegmo$"] $ws4
+assign [title="^Microsoft Teams -"] $ws4
 # Assign my outlook webapp to workspace 4. This is installed as a PWA, and the command to launch can be
 # found in ~/.local/share/applications/relevant.desktop
-assign [class="^Microsoft-edge-dev$" instance="^crx__faolnafnngnfdaknnbpnkhgohbobgegn$"] $ws4
+assign [title="^Outlook \\(PWA\\)\\.+"] $ws4
 
 # Restore layout on workspace 4. Webapps need to have the same classes updated in the layout file
 exec --no-startup-id "i3-msg 'workspace 4; append_layout /home/fred/.config/regolith3/i3/workspace-4.json'"

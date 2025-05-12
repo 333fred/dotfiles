@@ -36,3 +36,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 export ENHANCD_ENABLE_DOUBLE_DOT=false
+
+if [ -f "$HOME/.local/share/dnvm/env" ]; then
+    . "$HOME/.local/share/dnvm/env"
+fi

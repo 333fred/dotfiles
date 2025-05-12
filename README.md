@@ -57,11 +57,13 @@ Due to https://github.com/regolith-linux/regolith-desktop/issues/1042, rename `/
 
 ## Fonts
 
-I use Hack as my main font, with Noto as the backup/CJK font. To install:
+I use Monaspace as my main font, with Noto as the backup/CJK font, and Hack as the backup monospace font. To install:
 
-1. Download Hack Nerd Font from https://www.nerdfonts.com/font-downloads
-2. Copy the contents of the zip to `~/.fonts`, and run `fc-cache -fv`
-3. `sudo apt install fonts-noto`
+1. Download Monaspace from https://github.com/githubnext/monaspace/releases.
+2. Run the installer in util/install_linux.sh
+3. Download Hack Nerd Font from https://www.nerdfonts.com/font-downloads
+4. Copy the contents of the zip to `~/.fonts`, and run `fc-cache -fv`
+5. `sudo apt install fonts-noto`
 
 ## Other settings
 

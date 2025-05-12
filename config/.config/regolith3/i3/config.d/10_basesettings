@@ -56,7 +56,7 @@ client.placeholder      $base00 $base00 $base05 $base00 $base00
 client.background       $base07
 
 # Sets i3 font for dialogs
-font pango:Hack 8
+font pango:Monaspace Neon 8
 
 set_from_resource $wm.binding.left wm.binding.left h
 set_from_resource $wm.binding.down wm.binding.down j

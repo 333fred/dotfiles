@@ -1,4 +1,4 @@
-icons_format= " <span font_family='Hack Nerd Font Propo'>{icon}</span> "
+icons_format= " <span font_family='Monaspace Neon'>{icon}</span> "
 
 [theme]
 theme = "slick"

@@ -1,5 +1,5 @@
 bar {
-    font pango:Hack Nerd Font Propo 11
+    font pango:Monaspace Neon 10
     position top
     status_command /home/fred/.cargo/bin/i3status-rs
     output $wm.mainOutput
@@ -21,7 +21,7 @@ bar {
 }
 
 bar {
-    font pango:Hack Nerd Font Propo 11
+    font pango:Monaspace Neon 12
     position top
     status_command /home/fred/.cargo/bin/i3status-rs /home/fred/.config/i3status-rust/secondary.config.toml
     output $wm.secondaryOutput

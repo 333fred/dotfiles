@@ -109,7 +109,7 @@
                "percent": 0.142857142857143,
                "swallows": [
                   {
-                     "instance": "^crx__cifhbcnohmdccbgoicgdjpfamggdegmo$"
+                     "title": "^Microsoft Teams -"
                   }
                ],
                "type": "con"
@@ -129,7 +129,7 @@
                "percent": 0.142857142857143,
                "swallows": [
                   {
-                     "instance": "^crx__faolnafnngnfdaknnbpnkhgohbobgegn$"
+                     "title": "^Outlook \\(PWA\\)\\.+"
                   }
                ],
                "type": "con"

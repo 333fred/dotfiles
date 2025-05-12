@@ -181,3 +181,8 @@
   autocorrect = prompt
 [init]
   defaultBranch = main
+[credential]
+	helper = /home/fred/.dotnet/tools/git-credential-manager
+	credentialStore = cache
+[credential "https://dev.azure.com"]
+	useHttpPath = true
