@@ -3,5 +3,5 @@ Type=Application
 Name=RoslynPad
 Comment=An interactive C# playground
 Path=/home/fred/
-Exec=/home/fred/.tools/roslynpad/src/RoslynPad.Avalonia/bin/Release/net8.0/RoslynPad
+Exec=/home/fred/.tools/roslynpad/src/RoslynPad.Avalonia/bin/Release/net9.0/RoslynPad
 Icon=/home/fred/.tools/roslynpad/deploy/PackageRoot/Assets/logo.scale-400.png
