@@ -13,9 +13,6 @@
 [submodule "zsh/.prezto-contrib"]
 	path = zsh/.prezto-contrib
 	url = git@github.com:belak/prezto-contrib.git
-[submodule "zsh/.modules/vi-mode/zsh-vi-mode"]
-	path = zsh/.modules/vi-mode/zsh-vi-mode
-	url = git@github.com:jeffreytse/zsh-vi-mode.git
 [submodule "tools/.tools/roslynpad"]
 	path = tools/.tools/roslynpad
 	url = git@github.com:roslynpad/roslynpad.git
