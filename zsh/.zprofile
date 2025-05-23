@@ -73,6 +73,8 @@ if command -v code-insiders &> /dev/null; then
   alias code='code-insiders'
 fi
 
+alias c='code'
+
 export ANDROID_HOME=/home/fred/Android/Sdk
 export ANDROID_SDK_ROOT=/home/fred/Android/Sdk
 export PATH=/home/fred/Android/Sdk/cmdline-tools/latest/bin:/home/fred/Android/Sdk/platform-tools:$PATH

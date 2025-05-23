@@ -40,3 +40,9 @@ export ENHANCD_ENABLE_DOUBLE_DOT=false
 if [ -f "$HOME/.local/share/dnvm/env" ]; then
     . "$HOME/.local/share/dnvm/env"
 fi
+
+if command -v code-insiders &> /dev/null; then
+  alias code='code-insiders'
+fi
+
+alias c='code'
