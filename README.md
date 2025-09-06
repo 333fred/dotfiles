@@ -60,10 +60,9 @@ Due to https://github.com/regolith-linux/regolith-desktop/issues/1042, rename `/
 I use Monaspace as my main font, with Noto as the backup/CJK font, and Hack as the backup monospace font. To install:
 
 1. Download Monaspace from https://github.com/githubnext/monaspace/releases.
-2. Run the installer in util/install_linux.sh
-3. Download Hack Nerd Font from https://www.nerdfonts.com/font-downloads
-4. Copy the contents of the zip to `~/.fonts`, and run `fc-cache -fv`
-5. `sudo apt install fonts-noto`
+2. Download Hack Nerd Font from https://www.nerdfonts.com/font-downloads
+3. Copy the contents of the zips to `~/.fonts`, and run `fc-cache -fv`
+4. `sudo apt install fonts-noto`
 
 ## Rofimoji
 
@@ -72,6 +71,10 @@ I use [Rofimoji](https://github.com/fdw/rofimoji) to input emoji. This is a pyth
 1. `sudo apt install pipx`
 2. `pipx install rofimoji`
 
+## cd
+
+I used enhancd for navigation. This requires fzf or fzy being installed. I use fzy.
+
 ## Other settings
 
 Make sure to turn off the ibus emoji shortcut, or `ctrl+.` will be globally hooked and will mess up vscode.
@@ -79,3 +82,12 @@ Make sure to turn off the ibus emoji shortcut, or `ctrl+.` will be globally hook
 `gsettings set org.freedesktop.ibus.panel.emoji hotkey "[]"`
 
 https://stackoverflow.com/questions/71997823/ctrl-dot-makes-e-appear-instead-of-showing-suggestions-in-vscode-on-gnome
+
+If you need to enable both analog and digital spdif on the same audio card, edit `/usr/share/alsa-card-profile/mixer/profile-sets/9999-custom.conf` to add (or possibly uncomment, why is this profile commented if maintainers know it's wanted!) this:
+
+```
+[Profile output:analog-stereo+output:iec958-stereo+input:analog-stereo]
+description = Analog + Digital Output + Analog Input
+output-mappings = analog-stereo iec958-stereo
+input-mappings = analog-stereo
+```
