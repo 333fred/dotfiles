@@ -61,7 +61,7 @@ TERM = "xterm-256color"
 size = 11.0
 
 [font.normal]
-family = "Monaspace Neon"
+family = "Monaspace Neon Frozen"
 
 [window]
 opacity = 0.92

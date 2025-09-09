@@ -1,4 +1,4 @@
-icons_format= " <span font_family='Monaspace Neon'>{icon}</span> "
+icons_format= " <span font_family='Monaspace Neon NF'>{icon}</span> "
 
 [theme]
 theme = "slick"
