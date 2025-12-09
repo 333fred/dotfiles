@@ -4,17 +4,23 @@ These are my dotfiles, designed to run on Windows.
 
 ## Fonts
 
-Install the Hack Nerd Font from https://www.nerdfonts.com/font-downloads.
+Install the Hack Nerd Font from https://www.nerdfonts.com/font-downloads.  
+Install the Monaspace Nerd Fonts from https://github.com/githubnext/monaspace/releases/.
 
 ## Powershell
 
 * Install/update Windows Terminal
-* Install the following winget packages:
+* Download [`winget\install.json`](./winget/install.json), and install with:
 ```powershell
-winget install --id Microsoft.Powershell
-winget install --id Starship.Starship
+winget import -i ~/Downloads/install.json
 ```
-* Install the following powershell modules:
+* Open an admin Terminal, and run the following to enable OpenSSH:
+```powershell
+Get-Service -Name ssh-agent | Set-Service -Startup
+```
+* Open Windows Terminal settings, replace with [`terminal\settings.json`](./terminal/settings.json)
+* Restart Windows Terminal so you're in a pwsh session
+* Install the following powershell modules if they don't automatically get populated from Onedrive backup:
 ```powershell
 Install-Module PSReadLine -AllowPrerelease -Force -Scope CurrentUser # https://github.com/PowerShell/PSReadLine
 Install-Module posh-git -Scope CurrentUser # https://github.com/dahlbyk/posh-git
@@ -22,17 +28,8 @@ Install-Module posh-sshell -Scope CurrentUser # https://github.com/dahlbyk/posh-
 Install-Module -Name Terminal-Icons -Repository PSGallery -Scope CurrentUser # https://github.com/devblackops/Terminal-Icons
 ```
 * Copy [`powershell\Profile.ps1`](./powershell/Profile.ps1) to `C:\Users\<user>\Documents\Powershell\`
-* Open Windows Terminal settings, replace with [`terminal\settings.json`](./terminal/settings.json)
-
-## Git
-
-* Install the following powershell modules
-```powershell
-winget install --id git.git
-winget install --id GnuPG.GnuPG
-winget install --id github.cli
-```
 * Copy [`git\.gitconfig`](./git/.gitconfig) to `C:\Users\<user>`
+* Generate ssh key (or import existing key): `ssh-keygen -t ed25519 -C <email>`
 * Generate or import a private key for gpg
   * Import
 ```powershell
@@ -42,7 +39,10 @@ trust
 5
 y
 ```
-* Get keyid: `gpg --list-keys --keyid-format long`
+* Get keyid:
+```powershell
+gpg --list-keys --keyid-format long
+```
 * Create `C:\Users\<user>\.gitconfig.user`
 * Add to user config:
 ```ini
@@ -50,14 +50,10 @@ y
   email = ...
   signingkey = ...
 ```
-* Generate ssh key (or import existing key): `ssh-keygen -t ed25519 -C <email>`
-* Enable the OpenSSH service
 * `gh auth login`
-
-## Misc
-
-* Install:
+* Download this repo:
 ```powershell
-winget install --id 7zip.7zip
+gh repo clone 333fred/dotfiles
 ```
+* Open Powertoys settings and, under General -> Backup and Restore, set the restore location to `.\powertoys\Backup\`. Restore settings from backup.
 * Copy [`vsvim\vsvimrc`](./vsvim/vsvimrc) to `C:\Users\<home>\.vsvimrc`

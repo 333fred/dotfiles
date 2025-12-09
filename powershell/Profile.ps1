@@ -18,8 +18,27 @@ Import-Module -Name Terminal-Icons
 
 # PowerShell parameter completion shim for the dotnet CLI
 Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
-     param($commandName, $wordToComplete, $cursorPosition)
-         dotnet complete --position $cursorPosition "$wordToComplete" | ForEach-Object {
-            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
-         }
- }
+   param($commandName, $wordToComplete, $cursorPosition)
+   dotnet complete --position $cursorPosition "$wordToComplete" | ForEach-Object {
+      [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+   }
+}
+
+ 
+# Add this to your PowerShell profile ($PROFILE)
+
+function c {
+   # Prefer 'code-insiders' if available; else fall back to 'code'
+   $cmd = if (Get-Command code-insiders -ErrorAction SilentlyContinue) {
+      'code-insiders'
+   }
+   elseif (Get-Command code -ErrorAction SilentlyContinue) {
+      'code'
+   }
+   else {
+      Write-Warning "Neither 'code-insiders' nor 'code' is installed or in PATH."
+      return
+   }
+
+   & $cmd @args
+}
