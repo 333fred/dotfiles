@@ -85,31 +85,11 @@
                   "y": 57
                },
                "marks": [],
-               "name": "To Do",
-               "percent": 0.142857142857143,
-               "swallows": [
-                  {
-                     "instance": "^crx__iiiljpmhiglbecnhhclpojoppccacidj$"
-                  }
-               ],
-               "type": "con"
-            },
-            {
-               "border": "pixel",
-               "current_border_width": 2,
-               "floating": "auto_off",
-               "geometry": {
-                  "height": 1691,
-                  "width": 1428,
-                  "x": 6,
-                  "y": 57
-               },
-               "marks": [],
                "name": "Teams",
                "percent": 0.142857142857143,
                "swallows": [
                   {
-                     "title": "^Microsoft Teams -"
+                     "class": "^crx__cifhbcnohmdccbgoicgdjpfamggdegmo$"
                   }
                ],
                "type": "con"
@@ -129,7 +109,7 @@
                "percent": 0.142857142857143,
                "swallows": [
                   {
-                     "title": "^Outlook \\(PWA\\)\\.+"
+                     "class": "^crx__pkooggnaalmfkidjmlhoelhdllpphaga$"
                   }
                ],
                "type": "con"

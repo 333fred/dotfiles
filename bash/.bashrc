@@ -115,3 +115,7 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+
+if [ -f "$HOME/.local/share/dnvm/env" ]; then
+    . "$HOME/.local/share/dnvm/env"
+fi
