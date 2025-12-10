@@ -35,6 +35,9 @@
 				},
 				{
 					"PackageIdentifier" : "Microsoft.WindowsTerminal"
+				},
+				{
+					"PackageIdentifier": "Ferdium.Ferdium"
 				}
 			],
 			"SourceDetails" : 
