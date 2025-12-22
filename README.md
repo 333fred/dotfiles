@@ -16,7 +16,7 @@ winget import -i ~/Downloads/install.json
 ```
 * Open an admin Terminal, and run the following to enable OpenSSH:
 ```powershell
-Get-Service -Name ssh-agent | Set-Service -Startup
+Get-Service -Name ssh-agent | Set-Service -Startup Manual
 ```
 * Open Windows Terminal settings, replace with [`terminal\settings.json`](./terminal/settings.json)
 * Restart Windows Terminal so you're in a pwsh session
