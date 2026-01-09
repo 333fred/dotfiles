@@ -1,6 +1,6 @@
 {
 	"$schema" : "https://aka.ms/winget-packages.schema.2.0.json",
-	"CreationDate" : "2025-12-08T16:40:14.624-00:00",
+	"CreationDate" : "2026-01-09T13:39:06.746-00:00",
 	"Sources" : 
 	[
 		{
@@ -13,10 +13,7 @@
 					"PackageIdentifier" : "Git.Git"
 				},
 				{
-					"PackageIdentifier" : "GitHub.cli"
-				},
-				{
-					"PackageIdentifier" : "Microsoft.AzureCLI"
+					"PackageIdentifier" : "GnuPG.GnuPG"
 				},
 				{
 					"PackageIdentifier" : "Starship.Starship"
@@ -25,7 +22,19 @@
 					"PackageIdentifier" : "Microsoft.PowerShell"
 				},
 				{
-					"PackageIdentifier" : "GnuPG.GnuPG"
+					"PackageIdentifier" : "GitHub.cli"
+				},
+				{
+					"PackageIdentifier" : "Microsoft.DotNet.SDK.10"
+				},
+				{
+					"PackageIdentifier" : "Microsoft.DotNet.DesktopRuntime.8"
+				},
+				{
+					"PackageIdentifier" : "Anki.Anki"
+				},
+				{
+					"PackageIdentifier" : "Ferdium.Ferdium"
 				},
 				{
 					"PackageIdentifier" : "Microsoft.VisualStudioCode.Insiders"
@@ -36,9 +45,6 @@
 				{
 					"PackageIdentifier" : "Microsoft.WindowsTerminal"
 				},
-				{
-					"PackageIdentifier": "Ferdium.Ferdium"
-				}
 			],
 			"SourceDetails" : 
 			{
@@ -49,5 +55,5 @@
 			}
 		}
 	],
-	"WinGetVersion" : "1.9.25200"
+	"WinGetVersion" : "1.12.440"
 }
