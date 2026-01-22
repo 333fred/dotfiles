@@ -6,6 +6,7 @@
   fscache = true
   preloadindex = true
   editor = vim
+  sshCommand = C:/Windows/System32/OpenSSH/ssh.exe
 [color]
   ui = auto
 [color "branch"]
@@ -166,3 +167,5 @@
 [pull]
   ff = only
   twohead = ort
+[gpg]
+  program = C:/Program Files/GnuPG/bin/gpg.exe
