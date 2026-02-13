@@ -42,8 +42,8 @@ zstyle ':prezto:load' pmodule \
   'git' \
   'ssh' \
   'gpg' \
-  'enhancd' \
   'completion' \
+  'enhancd' \
   'dotnet-completion' \
   'syntax-highlighting' \
   'history-substring-search' \
@@ -115,11 +115,6 @@ zstyle ':prezto:module:git:status:ignore' submodules 'all'
 
 #
 # Pacman
-#
-
-# Set the Pacman frontend.
-zstyle ':prezto:module:pacman' frontend 'yay'
-
 #
 # Prompt
 #

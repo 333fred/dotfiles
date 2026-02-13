@@ -3,3 +3,6 @@ vim/.vim/plugged
 **/ratiosplit.log
 qalc.history
 .netrwhist
+gnupg/.gnupg/pubring.kbx
+gnupg/.gnupg/pubring.kbx~
+gnupg/.gnupg/trustdb.gpg

@@ -160,7 +160,7 @@
   # http://gitfu.wordpress.com/2008/04/20/git-rerere-rereremember-what-you-did-last-time/
   enabled = true
 [include]
-  path = .gitconfig.local
+  path = ~/.gitconfig.local
 [commit]
   gpgsign = true
 [pager]
@@ -184,7 +184,9 @@
 [init]
   defaultBranch = main
 [credential]
-	helper = /home/fred/.dotnet/tools/git-credential-manager
-	credentialStore = cache
+	helper = osxkeychain
+	helper = 
+	helper = /usr/local/share/gcm-core/git-credential-manager
+	azreposCredentialType = oauth
 [credential "https://dev.azure.com"]
 	useHttpPath = true
