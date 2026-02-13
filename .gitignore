@@ -6,3 +6,4 @@ qalc.history
 gnupg/.gnupg/pubring.kbx
 gnupg/.gnupg/pubring.kbx~
 gnupg/.gnupg/trustdb.gpg
+gnupg/.gnupg/private-keys-v1.d/
