@@ -33,19 +33,34 @@ apt_install_packages() {
         return
     fi
 
-    if [ -z "${CODESPACES:-}" ] || ! command -v sudo >/dev/null 2>&1 || ! command -v apt-get >/dev/null 2>&1; then
+    if [ -z "${CODESPACES:-}" ] || ! command -v apt-get >/dev/null 2>&1; then
         log "Missing required packages: ${missing_packages[*]}"
         exit 1
     fi
 
     if [ "${apt_updated}" = false ]; then
         log "Updating apt package metadata"
-        sudo apt-get update
+        run_apt_get update
         apt_updated=true
     fi
 
     log "Installing packages: ${missing_packages[*]}"
-    sudo apt-get install -y "${missing_packages[@]}"
+    run_apt_get install -y "${missing_packages[@]}"
+}
+
+run_apt_get() {
+    if [ "$(id -u)" -eq 0 ]; then
+        apt-get "$@"
+        return
+    fi
+
+    if command -v sudo >/dev/null 2>&1; then
+        sudo apt-get "$@"
+        return
+    fi
+
+    log "apt-get requires root or sudo"
+    exit 1
 }
 
 install_latest_btm() {
@@ -110,7 +125,7 @@ raise SystemExit(f"Could not find {asset_name} in latest bottom release")
 
     log "Installing btm ${version} from GitHub releases"
     curl -fsSL "${deb_url}" -o "${deb_path}"
-    sudo apt-get install -y "${deb_path}"
+    run_apt_get install -y "${deb_path}"
     rm -rf "${tmpdir}"
 }
 
