@@ -65,9 +65,8 @@ fi
 
 if command -v batcat &> /dev/null; then
   alias bat='batcat'
+  alias cat='batcat'
 fi
-
-alias cat='batcat'
 
 if command -v code-insiders &> /dev/null; then
   alias code='code-insiders'
@@ -75,6 +74,8 @@ fi
 
 alias c='code'
 
-export ANDROID_HOME=/home/fred/Android/Sdk
-export ANDROID_SDK_ROOT=/home/fred/Android/Sdk
-export PATH=/home/fred/Android/Sdk/cmdline-tools/latest/bin:/home/fred/Android/Sdk/platform-tools:$PATH
+if [ -d "$HOME/Android/Sdk" ]; then
+  export ANDROID_HOME="$HOME/Android/Sdk"
+  export ANDROID_SDK_ROOT="$HOME/Android/Sdk"
+  export PATH="$HOME/Android/Sdk/cmdline-tools/latest/bin:$HOME/Android/Sdk/platform-tools:$PATH"
+fi

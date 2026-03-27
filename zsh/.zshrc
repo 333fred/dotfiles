@@ -41,6 +41,11 @@ if [ -f "$HOME/.local/share/dnvm/env" ]; then
     . "$HOME/.local/share/dnvm/env"
 fi
 
+if command -v batcat &> /dev/null; then
+  alias bat='batcat'
+  alias cat='batcat'
+fi
+
 if command -v code-insiders &> /dev/null; then
   alias code='code-insiders'
 fi

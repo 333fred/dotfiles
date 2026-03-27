@@ -8,11 +8,6 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
-# Copy from /etc/environment. See https://github.com/regolith-linux/regolith-desktop/issues/1042
-if [ -f  "/env/environment.back" ]; then
-    . "/env/environment.back"
-fi
-
 # if running bash
 if [ -n "$BASH_VERSION" ]; then
     # include .bashrc if it exists
@@ -31,9 +26,11 @@ if [ -d "$HOME/.local/bin" ]; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-. "$HOME/.cargo/env"
+if [ -f "$HOME/.cargo/env" ]; then
+    . "$HOME/.cargo/env"
+fi
 
-# Define  a `.profile.local` file for setting local globals, such as `PRIMARY_MONITOR`` and `SECONDARY_MONITOR``
+# Define a `.profile.local` file for machine-specific environment customizations.
 if [ -f "$HOME/.profile.local" ]; then
     . "$HOME/.profile.local"
 fi
@@ -41,5 +38,3 @@ fi
 if [ -f "$HOME/.local/share/dnvm/env" ]; then
     . "$HOME/.local/share/dnvm/env"
 fi
-
-export WLR_NO_HARDWARE_CURSORS=1

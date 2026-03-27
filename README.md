@@ -1,93 +1,48 @@
-# 333fred's Dotfiles
+# 333fred's Codespaces Dotfiles
 
-These are my dotfiles, designed to run on Regolith Linux 3. I manage them using GNU Stow.
+This branch is a Codespaces-focused subset of my personal dotfiles, managed with GNU Stow.
 
-Other branches are old customizations for other distros, or my Windows config.
+## Included packages
 
-## Monitor management
+The default bootstrap applies:
 
-I use two monitors, and make these files layout agnostic, I read values from Xresources to set my monitors correctly. Make a machine-specific `~/.Xresources` file and include the following:
+- `bash`
+- `git`
+- `profile`
+- `vim`
+- `zsh`
 
-```Xresources
-wm.mainOutput: DP-X
-wm.secondaryOutput: DP-Y
+## GitHub Codespaces behavior
+
+Codespaces dotfiles are account-level settings. GitHub clones your configured dotfiles repository into each new codespace and runs a supported root script such as `install.sh`.
+
+Codespaces uses the repository's default branch for dotfiles, so test this branch by making it the default branch first or by merging it before pointing Codespaces at the repo.
+
+The root `install.sh` is idempotent and does the following:
+
+1. Ensures required CLI utilities are installed in Codespaces, including `stow`, `git-delta`, `bat`, and `fzy`, and installs the latest `btm` release from GitHub.
+2. Backs up conflicting files from `$HOME` into `~/.dotfiles-backup/...`.
+3. Initializes submodules.
+4. Stows the default package set.
+
+You can rerun the installer with a custom package list:
+
+```sh
+DOTFILES_PACKAGES="bash git profile vim zsh" ./install.sh
 ```
 
-## `dotnet` management
+## Local overrides
 
-I use @agocke's [DN-VM](https://github.com/dn-vm/dnvm) to manage my `dotnet` installation, so there's nothing checked in this repo for it.
-Install instructions for this set of dotfiles:
+Machine-specific settings can go in:
 
-1. `curl --proto '=https' -sSf https://dnvm.net/install.sh | sh`
-2. Do not accept adding the helpers to environment files, it's already in `.zprofile` and `.profile` from this repo. Just make sure to `stow` as appropriate.
+- `~/.gitconfig.local`
+- `~/.profile.local`
 
-## `i3status-rust`
+The shell startup files also pick up Cargo and DNVM environment files if those tools are present.
 
-The version of i3status-rust in Regolith's repositories is quite old, so I uninstall it and manually depend on the git version. After
-updating all submodules, install with:
+## Setup
 
-1. `cd config/i3status-rust`
-2. `sudo apt install pandoc libpulse-dev libsensors-dev`
-3. `cargo install --path . --locked`
-4. `./install.sh`
-
-## Regolith overrides
-
-I override various regolith defaults in unsupported ways, so I maintain copies of the default regolith config files with my changes. Therefore, some packages need to be uninstalled from a default set:
-
-* `regolith-wm-navigation`
-* `regolith-wm-resize`
-* `regolith-i3-gaps`
-* `i3-swap-focus`
-* `i3xrocks`
-* `regolith-i3-control-center-regolith`
-* `regolith-i3-ftue`
-* `regolith-i3-gaps-partial`
-* `regolith-i3-i3xrocks`
-* `regolith-i3-ilia`
-* `regolith-i3-rofication-ilia`
-* `regolith-i3-swap-focus`
-* `regolith-sway-ilia`
-* `regolith-sway-control-center-regolith`
-* `regolith-control-center`
-* `regolith-sway-i3status-rs`
-* `regolith-sway-grimshot`
-
-Due to https://github.com/regolith-linux/regolith-desktop/issues/1042, rename `/etc/environment` to `/etc/environment.back`. Hopefully I can remove this hack at some point in the future.
-
-## Fonts
-
-I use Monaspace as my main font, with Noto as the backup/CJK font, and Hack as the backup monospace font. To install:
-
-1. Download Monaspace from https://github.com/githubnext/monaspace/releases.
-2. Download Hack Nerd Font from https://www.nerdfonts.com/font-downloads
-3. Copy the contents of the zips to `~/.fonts`, and run `fc-cache -fv`
-4. `sudo apt install fonts-noto`
-
-## Rofimoji
-
-I use [Rofimoji](https://github.com/fdw/rofimoji) to input emoji. This is a python package, and should be installed with pipx:
-
-1. `sudo apt install pipx`
-2. `pipx install rofimoji`
-
-## cd
-
-I used enhancd for navigation. This requires fzf or fzy being installed. I use fzy.
-
-## Other settings
-
-Make sure to turn off the ibus emoji shortcut, or `ctrl+.` will be globally hooked and will mess up vscode.
-
-`gsettings set org.freedesktop.ibus.panel.emoji hotkey "[]"`
-
-https://stackoverflow.com/questions/71997823/ctrl-dot-makes-e-appear-instead-of-showing-suggestions-in-vscode-on-gnome
-
-If you need to enable both analog and digital spdif on the same audio card, edit `/usr/share/alsa-card-profile/mixer/profile-sets/9999-custom.conf` to add (or possibly uncomment, why is this profile commented if maintainers know it's wanted!) this:
-
-```
-[Profile output:analog-stereo+output:iec958-stereo+input:analog-stereo]
-description = Analog + Digital Output + Analog Input
-output-mappings = analog-stereo iec958-stereo
-input-mappings = analog-stereo
-```
+1. Open GitHub **Settings**.
+2. Go to **Codespaces**.
+3. Set your **Dotfiles** repository to this repo.
+4. Create a new codespace.

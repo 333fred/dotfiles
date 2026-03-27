@@ -41,7 +41,6 @@ zstyle ':prezto:load' pmodule \
   'utility' \
   'git' \
   'ssh' \
-  'gpg' \
   'enhancd' \
   'completion' \
   'dotnet-completion' \
@@ -112,13 +111,6 @@ zstyle ':prezto:module:git:status:ignore' submodules 'all'
 
 # Set the keyword used by `mand` to open man pages in Dash.app
 # zstyle ':prezto:module:osx:man' dash-keyword 'manpages'
-
-#
-# Pacman
-#
-
-# Set the Pacman frontend.
-zstyle ':prezto:module:pacman' frontend 'yay'
 
 #
 # Prompt
