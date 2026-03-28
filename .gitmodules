@@ -7,6 +7,9 @@
 [submodule "zsh/.modules/zsh-vi-mode"]
 	path = zsh/.modules/zsh-vi-mode
 	url = https://github.com/jeffreytse/zsh-vi-mode.git
+[submodule "zsh/.modules/spaceship-prompt"]
+	path = zsh/.modules/spaceship-prompt
+	url = https://github.com/spaceship-prompt/spaceship-prompt.git
 [submodule "zsh/.modules/spaceship-vi-mode"]
 	path = zsh/.modules/spaceship-vi-mode
 	url = https://github.com/spaceship-prompt/spaceship-vi-mode.git

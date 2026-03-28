@@ -63,6 +63,21 @@ run_apt_get() {
     exit 1
 }
 
+run_with_privileges() {
+    if [ "$(id -u)" -eq 0 ]; then
+        "$@"
+        return
+    fi
+
+    if command -v sudo >/dev/null 2>&1; then
+        sudo "$@"
+        return
+    fi
+
+    log "Command requires root or sudo: $*"
+    exit 1
+}
+
 install_latest_btm() {
     local arch
     local current_version=""
@@ -135,6 +150,33 @@ ensure_stow() {
     fi
 
     apt_install_packages stow
+}
+
+ensure_zsh_shell() {
+    local user_name
+    local zsh_path
+
+    if [ -z "${CODESPACES:-}" ]; then
+        return
+    fi
+
+    apt_install_packages zsh
+    zsh_path="$(command -v zsh)"
+    user_name="$(id -un)"
+
+    if [ -z "${zsh_path}" ]; then
+        log "zsh was not found after installation"
+        exit 1
+    fi
+
+    if ! grep -Fxq "${zsh_path}" /etc/shells; then
+        printf '%s\n' "${zsh_path}" | run_with_privileges tee -a /etc/shells >/dev/null
+    fi
+
+    if [ "${SHELL:-}" != "${zsh_path}" ]; then
+        log "Setting default shell for ${user_name} to ${zsh_path}"
+        run_with_privileges chsh -s "${zsh_path}" "${user_name}"
+    fi
 }
 
 ensure_codespaces_utilities() {
@@ -213,13 +255,33 @@ stow_package() {
     stow --restow --target="${HOME}" --dir="${repo_root}" "${package}"
 }
 
+ensure_spaceship_prompt() {
+    local prompt_functions_dir="${HOME}/.zprezto/modules/prompt/functions"
+    local prompt_link="${prompt_functions_dir}/prompt_spaceship_setup"
+    local prompt_source="${HOME}/.modules/spaceship-prompt/spaceship.zsh"
+
+    if [ ! -f "${prompt_source}" ]; then
+        log "Skipping spaceship prompt setup; ${prompt_source} is missing"
+        return
+    fi
+
+    mkdir -p "${prompt_functions_dir}"
+    ln -sfn "${prompt_source}" "${prompt_link}"
+    log "Linked spaceship prompt into Prezto"
+}
+
 ensure_stow
+ensure_zsh_shell
 ensure_codespaces_utilities
 update_submodules
 
 for package in "${packages[@]}"; do
     stow_package "${package}"
 done
+
+if printf '%s\n' "${packages[@]}" | grep -Fxq 'zsh'; then
+    ensure_spaceship_prompt
+fi
 
 log "Applied packages: ${packages[*]}"
 if [ -n "${backup_dir}" ]; then
