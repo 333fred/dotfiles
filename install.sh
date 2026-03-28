@@ -50,12 +50,18 @@ apt_install_packages() {
 
 run_apt_get() {
     if [ "$(id -u)" -eq 0 ]; then
-        apt-get "$@"
+        DEBIAN_FRONTEND=noninteractive apt-get \
+            -o Dpkg::Options::=--force-confdef \
+            -o Dpkg::Options::=--force-confold \
+            "$@"
         return
     fi
 
     if command -v sudo >/dev/null 2>&1; then
-        sudo apt-get "$@"
+        sudo DEBIAN_FRONTEND=noninteractive apt-get \
+            -o Dpkg::Options::=--force-confdef \
+            -o Dpkg::Options::=--force-confold \
+            "$@"
         return
     fi
 
