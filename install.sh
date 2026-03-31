@@ -150,6 +150,29 @@ raise SystemExit(f"Could not find {asset_name} in latest bottom release")
     rm -rf "${tmpdir}"
 }
 
+ensure_copilot_cli() {
+    local install_prefix="${DOTFILES_COPILOT_PREFIX:-/usr/local}"
+
+    if [ -z "${CODESPACES:-}" ]; then
+        return
+    fi
+
+    if command -v copilot >/dev/null 2>&1; then
+        log "GitHub Copilot CLI already installed"
+        return
+    fi
+
+    apt_install_packages ca-certificates curl
+
+    log "Installing GitHub Copilot CLI"
+    if [ "${install_prefix}" = "/usr/local" ]; then
+        curl -fsSL https://gh.io/copilot-install | run_with_privileges env PREFIX="${install_prefix}" bash
+    else
+        mkdir -p "${install_prefix}/bin"
+        curl -fsSL https://gh.io/copilot-install | env PREFIX="${install_prefix}" bash
+    fi
+}
+
 ensure_stow() {
     if command -v stow >/dev/null 2>&1; then
         return
@@ -192,6 +215,7 @@ ensure_codespaces_utilities() {
 
     apt_install_packages bat fzy gh git-delta
     install_latest_btm
+    ensure_copilot_cli
 }
 
 update_submodules() {

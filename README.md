@@ -21,7 +21,7 @@ Codespaces uses the repository's default branch for dotfiles, so test this branc
 The root `install.sh` is idempotent and does the following:
 
 1. Installs `zsh` and sets it as the default shell for the Codespaces user.
-2. Ensures required CLI utilities are installed in Codespaces, including `stow`, `git-delta`, `bat`, and `fzy`, and installs the latest `btm` release from GitHub.
+2. Ensures required CLI utilities are installed in Codespaces, including `stow`, `git-delta`, `bat`, `fzy`, GitHub CLI, and GitHub Copilot CLI, and installs the latest `btm` release from GitHub.
 3. Backs up conflicting files from `$HOME` into `~/.dotfiles-backup/...`.
 4. Initializes submodules.
 5. Stows the default package set.
