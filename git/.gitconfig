@@ -1,5 +1,6 @@
 [user]
-  name = Fredric Silberberg
+  name = Fred Silberberg
+  email = frsilb@microsoft.com
 [core]
   fscache = true
   preloadindex = true
