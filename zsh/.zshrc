@@ -46,3 +46,9 @@ if command -v code-insiders &> /dev/null; then
 fi
 
 alias c='code'
+
+# BEGIN Agency MANAGED BLOCK
+if [[ ":${PATH}:" != *":/home/fred/.config/agency/CurrentVersion:"* ]]; then
+    export PATH="/home/fred/.config/agency/CurrentVersion:${PATH}"
+fi
+# END Agency MANAGED BLOCK

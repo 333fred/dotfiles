@@ -34,3 +34,6 @@
 [submodule "zsh/.modules/spaceship-vi-mode"]
 	path = zsh/.modules/spaceship-vi-mode
 	url = git@github.com:spaceship-prompt/spaceship-vi-mode.git
+[submodule "tools/.tools/libinput-gestures"]
+	path = tools/.tools/libinput-gestures
+	url = https://github.com/bulletmark/libinput-gestures.git

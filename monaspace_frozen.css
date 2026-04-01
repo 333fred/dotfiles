@@ -1,0 +1,23 @@
+@-moz-document domain("github.com"), domain("github.dev"), domain("microsoft.com") {
+/* GitHub code blocks, diffs, syntax highlighting */
+  code, pre, .blob-code, .blob-code-inner, .highlight, .pl-s, .pl-c, .pl-k, .pl-en, .pl-smi, .pl-pds, .pl-s1, .pl-s2, .text-mono, .input-monospace {
+    font-family: 'Monaspace Neon Frozen', monospace !important;
+    line-height: 1.4 !important;
+    font-variant-ligatures: none !important;
+    font-feature-settings: "liga" 0, "calt" 0 !important;
+  }
+
+  /* GitHub.dev Monaco editor */
+  .monaco-editor .view-lines, .monaco-editor .sticky-line-content {
+    font-family: 'Monaspace Neon Frozen', monospace !important;
+    line-height: 1.4 !important;
+    font-feature-settings: "liga" 0, "calt" 0 !important;
+  }
+
+  /* Microsoft.com developer docs and code samples */
+  code, pre, .font-mono, .monospace, .code-block, .highlighted-code, .font-code, .font-family-monospace, .scriptor-code-editor {
+    font-family: 'Monaspace Neon Frozen', monospace !important;
+    line-height: 1.4 !important;
+    font-feature-settings: "liga" 0, "calt" 0 !important;
+  }
+}
