@@ -64,7 +64,7 @@ wm.bar.workspace.urgent.background.color: base08
 wm.bar.workspace.urgent.text.color base00
 
 gnome.wallpaper: ""
-rofi.theme: /usr/share/rofi/themes/Arc-Dark.rasi
+rofi.theme: /home/fred/.config/rofi/colors/arc.rasi
 
 regolith.sway.unsupported_gpu: true
 regolith.look.path: /usr/share/regolith-look/default
