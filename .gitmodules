@@ -37,3 +37,6 @@
 [submodule "tools/.tools/libinput-gestures"]
 	path = tools/.tools/libinput-gestures
 	url = https://github.com/bulletmark/libinput-gestures.git
+[submodule "tools/.tools/rofi"]
+	path = tools/.tools/rofi
+	url = git@github.com:adi1090x/rofi.git

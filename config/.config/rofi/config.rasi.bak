@@ -1,0 +1,5 @@
+configuration {
+  matching: "fuzzy";
+  font: "Noto Sans 14";
+}
+@theme "/usr/share/rofi/themes/Arc-Dark.rasi"
