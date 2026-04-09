@@ -150,6 +150,68 @@ raise SystemExit(f"Could not find {asset_name} in latest bottom release")
     rm -rf "${tmpdir}"
 }
 
+install_latest_git_delta() {
+    local arch
+    local current_version=""
+    local deb_path
+    local deb_url
+    local release_json
+    local tmpdir
+    local version
+
+    if [ -z "${CODESPACES:-}" ]; then
+        return
+    fi
+
+    apt_install_packages ca-certificates curl python3
+
+    arch="$(dpkg --print-architecture)"
+    case "${arch}" in
+        amd64|arm64)
+            ;;
+        *)
+            log "Unsupported architecture for git-delta release install: ${arch}"
+            exit 1
+            ;;
+    esac
+
+    release_json="$(curl -fsSL https://api.github.com/repos/dandavison/delta/releases/latest)"
+    version="$(python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"].lstrip("v"))' <<<"${release_json}")"
+
+    if command -v delta >/dev/null 2>&1; then
+        current_version="$(delta --version | awk 'NR == 1 { print $2 }')"
+    fi
+
+    if [ "${current_version}" = "${version}" ]; then
+        log "git-delta ${version} already installed"
+        return
+    fi
+
+    deb_url="$(python3 -c '
+import json
+import sys
+
+arch = sys.argv[1]
+release = json.load(sys.stdin)
+
+for asset in release["assets"]:
+    name = asset["name"]
+    if name.startswith("git-delta_") and name.endswith(f"_{arch}.deb"):
+        print(asset["browser_download_url"])
+        raise SystemExit(0)
+
+raise SystemExit(f"Could not find a git-delta Debian package for {arch} in the latest release")
+' "${arch}" <<<"${release_json}")"
+
+    tmpdir="$(mktemp -d)"
+    deb_path="${tmpdir}/git-delta.deb"
+
+    log "Installing git-delta ${version} from GitHub releases"
+    curl -fsSL "${deb_url}" -o "${deb_path}"
+    run_apt_get install -y "${deb_path}"
+    rm -rf "${tmpdir}"
+}
+
 ensure_copilot_cli() {
     local install_prefix="${DOTFILES_COPILOT_PREFIX:-/usr/local}"
 
@@ -213,7 +275,8 @@ ensure_codespaces_utilities() {
         return
     fi
 
-    apt_install_packages bat fzy gh git-delta
+    apt_install_packages bat fzy gh
+    install_latest_git_delta
     install_latest_btm
     ensure_copilot_cli
 }
