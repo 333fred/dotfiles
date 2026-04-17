@@ -47,6 +47,8 @@ fi
 
 alias c='code'
 
+alias gar='gh auth refresh -c'
+
 # BEGIN Agency MANAGED BLOCK
 if [[ ":${PATH}:" != *":/home/fred/.config/agency/CurrentVersion:"* ]]; then
     export PATH="/home/fred/.config/agency/CurrentVersion:${PATH}"
