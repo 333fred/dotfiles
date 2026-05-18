@@ -49,6 +49,13 @@ alias c='code'
 
 alias gar='gh auth refresh -c'
 
+scratch() {
+  local dir
+  dir=$(mktemp -d /tmp/scratch.XXXXXX) || return
+  touch "$dir/test.cs"
+  code "$dir"
+}
+
 # BEGIN Agency MANAGED BLOCK
 if [[ ":${PATH}:" != *":/home/fred/.config/agency/CurrentVersion:"* ]]; then
     export PATH="/home/fred/.config/agency/CurrentVersion:${PATH}"
