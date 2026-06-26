@@ -37,9 +37,11 @@ export NVM_DIR="$HOME/.nvm"
 
 export ENHANCD_ENABLE_DOUBLE_DOT=false
 
-if [ -f "$HOME/.local/share/dnvm/env" ]; then
-    . "$HOME/.local/share/dnvm/env"
-fi
+# if [ -f "$HOME/.local/share/dnvm/env" ]; then
+#     . "$HOME/.local/share/dnvm/env"
+# fi
+
+export PATH="/home/fred/.dotnetup:$PATH"
 
 if command -v code-insiders &> /dev/null; then
   alias code='code-insiders'

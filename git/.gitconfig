@@ -31,7 +31,7 @@
   bD = branch -D                    # branch (force delete)
   bf = branch -f
   # delete all branches that are gone on the remote
-  bda = "!git remote prune origin && git branch -vv | grep ': gone]' | awk '{print $1}' | xargs git branch -d"
+  bda = "!git remote prune origin && git branch -vv | grep ': gone]' | awk '{print $1}' | xargs git branch -D"
 
   # commit
   c = commit                     # commit
