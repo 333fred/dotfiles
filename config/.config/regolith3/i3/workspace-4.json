@@ -1,12 +1,12 @@
 // vim:ts=4:sw=4:et
 {
-   // this is a manually added container to restore the vertical split
+   // Manually added root container to restore the vertical split.
    "layout": "splitv",
    "percent": 0.7,
    "type": "con",
    "nodes": [
       {
-         // tabbed split container with 7 children
+         // Tabbed chat container with five children.
          "border": "pixel",
          "floating": "auto_off",
          "layout": "tabbed",
@@ -19,14 +19,14 @@
                "current_border_width": 2,
                "floating": "auto_off",
                "geometry": {
-                  "height": 1691,
-                  "width": 1428,
-                  "x": 6,
-                  "y": 57
+                  "height": 1696,
+                  "width": 1426,
+                  "x": 7,
+                  "y": 49
                },
                "marks": [],
                "name": "Discord",
-               "percent": 0.131665569453588,
+               "percent": 0.198404005632921,
                "swallows": [
                   {
                      "class": "^discord$"
@@ -39,17 +39,17 @@
                "current_border_width": 2,
                "floating": "auto_off",
                "geometry": {
-                  "height": 1691,
-                  "width": 1428,
-                  "x": 6,
-                  "y": 57
+                  "height": 1712,
+                  "width": 1426,
+                  "x": 7,
+                  "y": 49
                },
                "marks": [],
                "name": "Slack",
-               "percent": 0.131665569453588,
+               "percent": 0.198404005632921,
                "swallows": [
                   {
-                     "class": "^Slack$"
+                  "class": "^[Ss]lack$"
                   }
                ],
                "type": "con"
@@ -59,14 +59,14 @@
                "current_border_width": 2,
                "floating": "auto_off",
                "geometry": {
-                  "height": 1691,
-                  "width": 1428,
+                  "height": 1696,
+                  "width": 1426,
                   "x": 0,
                   "y": 0
                },
                "marks": [],
                "name": "Volume Control",
-               "percent": 0.176431863067808,
+               "percent": 0.201063996244719,
                "swallows": [
                   {
                      "class": "^Pavucontrol$"
@@ -79,17 +79,17 @@
                "current_border_width": 2,
                "floating": "auto_off",
                "geometry": {
-                  "height": 1691,
-                  "width": 1428,
-                  "x": 6,
-                  "y": 57
+                  "height": 1712,
+                  "width": 1426,
+                  "x": 7,
+                  "y": 49
                },
                "marks": [],
                "name": "Teams",
-               "percent": 0.142857142857143,
+               "percent": 0.201063996244719,
                "swallows": [
                   {
-                     "class": "^crx__cifhbcnohmdccbgoicgdjpfamggdegmo$"
+                     "title": "^Microsoft Teams \\(PWA\\)"
                   }
                ],
                "type": "con"
@@ -99,17 +99,17 @@
                "current_border_width": 2,
                "floating": "auto_off",
                "geometry": {
-                  "height": 1691,
-                  "width": 1428,
-                  "x": 6,
-                  "y": 57
+                  "height": 1712,
+                  "width": 1426,
+                  "x": 7,
+                  "y": 49
                },
                "marks": [],
                "name": "Outlook",
-               "percent": 0.142857142857143,
+               "percent": 0.201063996244719,
                "swallows": [
                   {
-                     "class": "^crx__pkooggnaalmfkidjmlhoelhdllpphaga$"
+                     "title": "^Outlook \\(PWA\\)$"
                   }
                ],
                "type": "con"
@@ -117,33 +117,63 @@
          ]
       },
       {
-         // tabbed split container with 1 children
          "border": "pixel",
          "floating": "auto_off",
-         "layout": "tabbed",
+         "layout": "splith",
          "marks": [],
          "percent": 0.32,
          "type": "con",
          "nodes": [
             {
+               // Tabbed media container with two children.
                "border": "pixel",
-               "current_border_width": 2,
                "floating": "auto_off",
-               "geometry": {
-                  "height": 798,
-                  "width": 1428,
-                  "x": 3446,
-                  "y": 1756
-               },
+               "layout": "tabbed",
                "marks": [],
-               "name": "Spotify",
                "percent": 1,
-               "swallows": [
+               "type": "con",
+               "nodes": [
                   {
-                     "class": "^Spotify$"
+                     "border": "pixel",
+                     "current_border_width": 2,
+                     "floating": "auto_off",
+                     "geometry": {
+                        "height": 798,
+                        "width": 1428,
+                        "x": 3446,
+                        "y": 1756
+                     },
+                     "marks": [],
+                     "name": "Spotify",
+                     "percent": 0.390243902439024,
+                     "swallows": [
+                        {
+                           "class": "^Spotify$"
+                        }
+                     ],
+                     "type": "con"
+                  },
+                  {
+                     "border": "pixel",
+                     "current_border_width": 2,
+                     "floating": "auto_off",
+                     "geometry": {
+                        "height": 768,
+                        "width": 1426,
+                        "x": 7,
+                        "y": 1785
+                     },
+                     "marks": [],
+                     "name": "YouTube",
+                     "percent": 0.609756097560976,
+                     "swallows": [
+                        {
+                           "title": "^YouTube - "
+                        }
+                     ],
+                     "type": "con"
                   }
-               ],
-               "type": "con"
+               ]
             }
          ]
       }
