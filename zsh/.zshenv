@@ -12,3 +12,4 @@ fi
 . "$HOME/.cargo/env"
 
 export MSBUILDLIVELOGGER=auto
+export EDITOR=nvim VISUAL=nvim

@@ -48,6 +48,8 @@ if command -v code-insiders &> /dev/null; then
 fi
 
 alias c='code'
+alias vim='nvim'
+alias v='nvim'
 
 alias gar='gh auth refresh -c'
 
@@ -63,3 +65,9 @@ if [[ ":${PATH}:" != *":/home/fred/.config/agency/CurrentVersion:"* ]]; then
     export PATH="/home/fred/.config/agency/CurrentVersion:${PATH}"
 fi
 # END Agency MANAGED BLOCK
+
+# dotnetup: begin
+if [ -x '/home/fred/.dotnetup/dotnetup' ]; then
+    eval "$('/home/fred/.dotnetup/dotnetup' print-env-script --shell zsh)"
+fi
+# dotnetup: end

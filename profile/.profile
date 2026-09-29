@@ -45,3 +45,4 @@ fi
 export PATH="/home/fred/.dotnetup:$PATH"
 
 export WLR_NO_HARDWARE_CURSORS=1
+export EDITOR=nvim VISUAL=nvim

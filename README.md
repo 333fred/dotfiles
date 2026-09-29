@@ -21,6 +21,26 @@ Install instructions for this set of dotfiles:
 1. `curl --proto '=https' -sSf https://dnvm.net/install.sh | sh`
 2. Do not accept adding the helpers to environment files, it's already in `.zprofile` and `.profile` from this repo. Just make sure to `stow` as appropriate.
 
+## Neovim
+
+Install Neovim 0.12 or newer, then run `stow -t ~ config` from the repository root to link `~/.config/nvim`. The first launch downloads the plugins with lazy.nvim; building the native fuzzy-search sorter and C# Tree-sitter parser also requires `make`, a C compiler, `curl`, `tar`, and `tree-sitter` CLI 0.26.1 or newer on `PATH`. The config keeps my Vim navigation, search, indentation, and folding settings; folds start open and `<Space>` toggles them. Neo-tree has Files, Buffers, and Git tabs at the top of the sidebar; Buffers lists open files separately from the file tree. Click a tab or press `<` / `>` in Neo-tree to switch sources. `,e` toggles the file browser, `,b` focuses the Buffers view from anywhere, and `,g` opens Git status. Press Enter on a changed file there to open its side-by-side diff (`:DiffviewClose` returns to the previous view); Enter on a directory still expands or collapses it.
+
+The colors use the Ocean Dark Extended palette from my VS Code profile, including its C# semantic token overrides, blue namespace segments in using aliases, and bold control keywords. C# Tree-sitter highlighting also enables colored nesting for brackets. The status line shows mode, Git branch, file path, diagnostics, attached LSP, file type, and cursor position.
+
+For GitHub PR reviews, authenticate `gh` (`gh auth login`) and open Neovim in a checkout of the repository. Press `,p` (or run `:GHOpenPR`) to choose a PR with the fuzzy picker; `:GHOpenPR 123` opens a specific PR, and `:GHRequestedReview` lists PRs requesting your review. In the gh.nvim panel, press Enter on a commit to browse its changed files and diffs; use `:GHStartReview` to collect pending comments, `:GHCreateThread` to comment on a changed line, and `:GHSubmitReview` to submit the review. gh.nvim fetches the PR and checks out its branch locally, so use a clean, dedicated Git worktree for reviews if you don't want it changing your working branch.
+
+VSCodeVim-style navigation: `gd` jumps to a sole definition or opens a fuzzy picker for multiple targets; `gr` finds references, `gi` goes to implementation, `,m` searches document symbols, `,,` searches workspace symbols, `,f` finds files, and `,h` / `,l` move backward / forward through the jump list. The Telescope pickers update fuzzy matches as you type; workspace-symbol results also depend on Roslyn's responses.
+
+For C# support, install the Roslyn language server as a global .NET tool (or use `dotnet tool update -g` if already installed):
+
+```sh
+dotnet tool install -g roslyn-language-server --prerelease --source https://pkgs.dev.azure.com/azure-public/vside/_packaging/vs-impl/nuget/v3/index.json
+```
+
+Make sure `~/.dotnet/tools` and `dotnet` are on `PATH` when launching Neovim. Opening a folder with a `.sln`, `.slnx`, or `.csproj` at its root (for example, `nvim .`) starts a dedicated Roslyn server with `--autoLoadProjects` immediately, even before opening a C# file. C# buffers in that folder reuse the project-loaded server. If a directly opened C# file has multiple possible solution targets, Roslyn automatically loads projects from their common folder instead of attaching to an empty workspace. The dedicated server ensures an already-running daemon cannot ignore the startup flag; use `:Roslyn target` to select a particular solution when needed.
+
+`vim` and `v` alias to `nvim` in interactive Bash and Zsh. `EDITOR` and `VISUAL` are `nvim` in shell startup files and the user environment; restart your shell (or sign in again for desktop apps) to pick up the change.
+
 ## `i3status-rust`
 
 The version of i3status-rust in Regolith's repositories is quite old, so I uninstall it and manually depend on the git version. After
