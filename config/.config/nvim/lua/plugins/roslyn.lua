@@ -3,12 +3,6 @@ return {
     opts = {},
     config = function(_, opts)
         require("roslyn").setup(opts)
-        -- Use a dedicated server so each workspace owns its project-loading state.
-        vim.lsp.config("roslyn", {
-            cmd = vim.tbl_filter(function(arg)
-                return arg ~= "--daemon-mode"
-            end, vim.lsp.config.roslyn.cmd),
-        })
         local roslyn_root_dir = vim.lsp.config.roslyn.root_dir
 
         local function start_roslyn_folder(root)

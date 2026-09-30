@@ -27,6 +27,9 @@ for key, direction in pairs({ h = "left", j = "below", k = "above", l = "right" 
     vim.keymap.set({ "n", "i" }, "<M-" .. key .. ">", command, opts)
     vim.keymap.set("t", "<M-" .. key .. ">", "<C-\\><C-n>" .. command, opts)
 end
+vim.keymap.set({ "n", "i", "t" }, "<C-`>", function()
+    Snacks.terminal()
+end, { desc = "Toggle terminal pane" })
 vim.keymap.set("n", "<leader>e", function()
     Snacks.explorer()
 end, { desc = "Toggle file browser" })
@@ -48,8 +51,12 @@ vim.keymap.set("n", "<leader>p", function()
     Snacks.picker.gh_pr({ limit = 100, live = false })
 end, { desc = "Open pull request for review" })
 vim.keymap.set("n", "<leader>P", function()
-    Snacks.picker.gh_pr({ search = "user-review-requested:@me", limit = 100, live = false })
-end, { desc = "Pull requests requesting your review" })
+    Snacks.picker.gh_pr({
+        search = "(mentions:@me OR assignee:@me OR team-review-requested:dotnet/roslyn-compiler OR user-review-requested:@me)",
+        limit = 100,
+        live = false,
+    })
+end, { desc = "Pull requests mentioning, assigned to, or requesting review from you or your team" })
 vim.keymap.set("n", "<leader>r", function()
     require("plugins.octo.review").open()
 end, { desc = "Review PR with local code" })

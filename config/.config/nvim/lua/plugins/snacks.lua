@@ -15,6 +15,21 @@ return {
                             vim.cmd.stopinsert()
                             vim.cmd.nohlsearch()
                         end,
+                        toggle_terminal = function()
+                            Snacks.terminal()
+                        end,
+                    },
+                    win = {
+                        input = {
+                            keys = {
+                                ["<C-`>"] = { "toggle_terminal", mode = { "n", "i" } },
+                            },
+                        },
+                        list = {
+                            keys = {
+                                ["<C-`>"] = "toggle_terminal",
+                            },
+                        },
                     },
                 },
                 gh_pr = {
@@ -34,6 +49,7 @@ return {
         },
         gh = { enabled = true },
         explorer = { enabled = true },
+        terminal = { enabled = true },
         lazygit = {
             enabled = true,
             config = {
