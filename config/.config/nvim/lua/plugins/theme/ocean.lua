@@ -20,6 +20,7 @@ local function apply()
     set(0, "StatusLineNC", { fg = "#6e7d88", bg = "#1d2027" })
     set(0, "Visual", { bg = "#3f5570" })
     set(0, "MatchParen", { fg = foreground, bg = "#4f5b66", bold = true })
+    -- Shade diff backgrounds without overriding syntax or Roslyn semantic foregrounds.
     set(0, "DiffAdd", { bg = "#304038" })
     set(0, "DiffDelete", { bg = "#442f35" })
     set(0, "DiffChange", { bg = "#353e4a" })
@@ -33,13 +34,11 @@ local function apply()
     end
 
     for _, group in ipairs({ "Delimiter", "Operator", "@punctuation", "@punctuation.delimiter",
-        "@punctuation.bracket", "@operator", "@variable.cs", "@variable.parameter.cs",
+        "@punctuation.bracket", "@operator",
         "@lsp.type.local", "@lsp.type.variable", "@lsp.type.parameter" }) do
         set(0, group, { fg = foreground })
     end
 
-    set(0, "@variable.member.cs", { fg = blue, bold = true })
-    set(0, "@module.c_sharp", { fg = blue })
     set(0, "@lsp.type.namespace.cs", { fg = blue })
     set(0, "@lsp.type.interface", { fg = yellow })
     set(0, "@lsp.type.typeParameter", { fg = yellow })
@@ -50,18 +49,6 @@ local function apply()
     set(0, "@lsp.type.enumMember", { fg = orange, bold = true })
 
     set(0, "@lsp.typemod.variable.readonly", { fg = orange, bold = true })
-
-    for group, color in pairs({
-        RainbowDelimiterBlue = blue,
-        RainbowDelimiterYellow = yellow,
-        RainbowDelimiterViolet = purple,
-        RainbowDelimiterGreen = "#a3be8c",
-        RainbowDelimiterOrange = orange,
-        RainbowDelimiterCyan = "#96b5b4",
-        RainbowDelimiterRed = "#bf616a",
-    }) do
-        set(0, group, { fg = color })
-    end
 end
 
 function M.statusline_theme()

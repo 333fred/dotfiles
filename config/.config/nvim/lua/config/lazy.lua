@@ -14,4 +14,13 @@ if not vim.uv.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup({ { import = "plugins" } })
+require("lazy").setup({
+    spec = { { import = "plugins" } },
+    performance = {
+        rtp = {
+            -- Ubuntu's PPA puts vimdoc in an architecture-specific library directory.
+            -- Keep that runtime path entry or plugin helptag generation fails.
+            reset = false,
+        },
+    },
+})

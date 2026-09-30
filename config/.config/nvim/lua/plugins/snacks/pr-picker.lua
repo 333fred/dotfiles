@@ -1,6 +1,7 @@
 local M = {}
 
 function M.finder(opts, ctx)
+    -- Bulk merge-status queries are slow in large repos; fetch details only for previews.
     local fields = { "number", "title", "author", "url", "state", "isDraft", "labels" }
     local args = { "pr", "list", "--limit", tostring(opts.limit or 100), "--state", opts.state or "open" }
     for _, option in ipairs({ "search", "base", "author", "assignee", "label" }) do

@@ -3,6 +3,7 @@ return {
     opts = {},
     config = function(_, opts)
         require("roslyn").setup(opts)
+        -- Use a dedicated server so each workspace owns its project-loading state.
         vim.lsp.config("roslyn", {
             cmd = vim.tbl_filter(function(arg)
                 return arg ~= "--daemon-mode"
@@ -15,6 +16,7 @@ return {
             config.root_dir = root
             local solutions, projects = require("roslyn.sln.discovery").find_target_files(root)
             if #solutions == 0 and #projects > 0 then
+                -- Standalone projects need an explicit open request during initialization.
                 config.on_init = function(client)
                     require("roslyn.lsp.on_init").project(client, projects)
                 end
@@ -28,6 +30,7 @@ return {
         vim.api.nvim_create_autocmd("User", {
             pattern = "ReviewCheckout",
             callback = function(event)
+                -- A branch checkout can change projects; reload the server and reattach buffers.
                 local root = event.data.root
                 local has_roslyn = false
                 for _, client in ipairs(vim.lsp.get_clients({ name = "roslyn" })) do
@@ -82,6 +85,7 @@ return {
                     return
                 end
                 if decision.kind == "ambiguous" then
+                    -- Load from the common folder rather than attach to an empty workspace.
                     local root = vim.fs.dirname(decision.targets[1])
                     for _, target in ipairs(decision.targets) do
                         while not vim.fs.relpath(root, target) do
@@ -100,6 +104,7 @@ return {
 
         vim.api.nvim_create_autocmd("VimEnter", {
             callback = function()
+                -- Starting with `nvim .` should load projects before any C# buffer is opened.
                 if vim.fn.argc() ~= 1 or vim.fn.isdirectory(vim.fn.argv(0)) ~= 1 then
                     return
                 end

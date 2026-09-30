@@ -4,6 +4,7 @@ vim.keymap.set("n", "k", "gk")
 vim.keymap.set("n", "<Esc>", "<Cmd>nohlsearch<CR>")
 vim.keymap.set("n", "<Space>", "za")
 vim.keymap.set({ "i", "c" }, "<C-BS>", "<C-w>", { desc = "Delete previous word" })
+-- Older terminals encode Ctrl+Space as Ctrl+@ (NUL).
 for _, key in ipairs({ "<C-Space>", "<C-@>" }) do
     vim.keymap.set("i", key, vim.lsp.completion.get, { desc = "Show completions" })
 end
@@ -32,12 +33,16 @@ end, { desc = "Toggle file browser" })
 vim.keymap.set("n", "<leader>b", function()
     Snacks.picker.buffers()
 end, { desc = "Find open buffer" })
+local lazygit_cwd = vim.fn.getcwd()
+if vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.argv(0)) == 1 then
+    lazygit_cwd = vim.fn.fnamemodify(vim.fn.argv(0), ":p")
+end
 vim.keymap.set("n", "<leader>g", function()
     if vim.fn.executable("lazygit") ~= 1 then
         vim.notify("Install lazygit to use the Git interface", vim.log.levels.ERROR)
         return
     end
-    Snacks.lazygit()
+    Snacks.lazygit({ cwd = lazygit_cwd })
 end, { desc = "Toggle Lazygit" })
 vim.keymap.set("n", "<leader>p", function()
     Snacks.picker.gh_pr({ limit = 100, live = false })

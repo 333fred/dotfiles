@@ -10,6 +10,7 @@ return {
                     hidden = true,
                     ignored = true,
                     actions = {
+                        -- Escape should leave the sidebar open, not use the picker's close action.
                         cancel = function()
                             vim.cmd.stopinsert()
                             vim.cmd.nohlsearch()
@@ -35,10 +36,24 @@ return {
         explorer = { enabled = true },
         lazygit = {
             enabled = true,
+            config = {
+                -- Let Lazygit dismiss inner dialogs before exiting at the top level.
+                quitOnTopLevelReturn = true,
+            },
+            theme = {
+                inactiveBorderColor = { fg = "StatusLineNC" },
+                inactiveViewSelectedLineBgColor = { bg = "NormalFloat" },
+            },
             win = {
                 keys = {
                     term_normal = false,
-                    ["<Esc>"] = { "hide", mode = { "n", "t" } },
+                    ["<Esc>"] = {
+                        function(self)
+                            vim.api.nvim_chan_send(vim.bo[self.buf].channel, "\27")
+                            vim.cmd.startinsert()
+                        end,
+                        mode = "n",
+                    },
                 },
             },
         },
