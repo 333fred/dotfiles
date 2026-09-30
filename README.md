@@ -21,6 +21,16 @@ Install instructions for this set of dotfiles:
 1. `curl --proto '=https' -fsSL https://aka.ms/dotnetup/get-dotnetup.sh | bash`
 2. `stow -t ~ profile zsh` from the repository root, then restart your shell.
 
+## Copilot CLI
+
+I keep my Copilot CLI instructions, settings, and Roslyn LSP config in `copilot/.copilot`.
+
+Install instructions:
+
+1. Make sure `dnx` is on `PATH`.
+2. Back up any existing files in `~/.copilot` that match the files in `copilot/.copilot`.
+3. Run `stow --no-folding -t ~ copilot` from the repository root. `--no-folding` keeps runtime data outside the repo.
+
 ## Neovim
 
 I use Neovim with Roslyn for C#, Snacks for file navigation, Lazygit for Git, and Octo for PR reviews.

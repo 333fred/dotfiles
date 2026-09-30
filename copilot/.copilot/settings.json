@@ -1,0 +1,49 @@
+{
+  "companyAnnouncements": [],
+  "enabledMcpServers": [
+    "computer-use"
+  ],
+  "enabledPlugins": {
+    "connect-copilot@agency-playground": true,
+    "dotnet-dnceng@dotnet-arcade-skills": true,
+    "dotnet-msbuild@dotnet-agent-skills": true,
+    "dotnet-test@dotnet-skills": true,
+    "dotnet@dotnet-agent-skills": true,
+    "dotnet@dotnet-skills": true,
+    "workiq@copilot-plugins": true
+  },
+  "experimental": true,
+  "extraKnownMarketplaces": {
+    "agency-playground": {
+      "source": {
+        "repo": "agency-microsoft/playground",
+        "source": "github"
+      }
+    },
+    "dotnet-agent-skills": {
+      "source": {
+        "repo": "dotnet/skills",
+        "source": "github"
+      }
+    }
+  },
+  "footer": {
+    "showAgent": true,
+    "showBranch": true,
+    "showCodeChanges": false,
+    "showContextWindow": true,
+    "showDirectory": true,
+    "showModelEffort": true,
+    "showQuota": false
+  },
+  "logLevel": "all",
+  "renderMarkdown": true,
+  "screenReader": false,
+  "streamerMode": false,
+  "theme": "default",
+  "editorMode": "vim",
+  "beep": true,
+  "defaultPermissionMode": "assisted",
+  "autoTier": "balance",
+  "model": "gpt-6.1-sol"
+}
