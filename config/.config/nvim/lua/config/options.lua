@@ -3,6 +3,7 @@ vim.g.mapleader = ","
 vim.opt.termguicolors = true
 vim.opt.number = true
 vim.opt.cursorline = true
+vim.opt.scrolloff = 5
 vim.opt.wrap = true
 vim.opt.linebreak = true
 vim.opt.diffopt:append("followwrap")
