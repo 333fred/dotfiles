@@ -2,6 +2,10 @@ return {
     "pwntester/octo.nvim",
     cmd = "Octo",
     dependencies = { "nvim-lua/plenary.nvim", "nvim-tree/nvim-web-devicons", "folke/snacks.nvim" },
+    config = function(_, opts)
+        require("octo").setup(opts)
+        require("plugins.octo.context").setup()
+    end,
     opts = {
         picker = "snacks",
         -- Local right-side buffers let Roslyn attach; historical left-side buffers cannot.

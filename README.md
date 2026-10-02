@@ -86,6 +86,12 @@ For PR reviews:
 
 `]q` / `[q` switch changed files; `\e` focuses the file panel. Octo uses backslash as its local leader.
 
+C# review panes automatically open unchanged diff folds within the method containing the cursor,
+including its signature. Opened context stays expanded as you navigate; a diff fold may also
+reveal neighboring methods. This works on both sides of the review and uses the `c_sharp`
+Tree-sitter parser, installed automatically. Parser installation requires a C compiler and
+`tree-sitter` CLI 0.26.1 or newer; use `:TSInstall c_sharp` to retry it.
+
 ## `i3status-rust`
 
 The version of i3status-rust in Regolith's repositories is quite old, so I uninstall it and manually depend on the git version. After
