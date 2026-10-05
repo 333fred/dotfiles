@@ -5,6 +5,7 @@ return {
     config = function(_, opts)
         require("octo").setup(opts)
         require("plugins.octo.context").setup()
+        require("plugins.octo.since-review").setup()
     end,
     opts = {
         picker = "snacks",

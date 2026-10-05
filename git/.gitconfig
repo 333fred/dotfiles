@@ -188,3 +188,5 @@
 	credentialStore = cache
 [credential "https://dev.azure.com"]
 	useHttpPath = true
+[credential "azrepos:org/devdiv"]
+	username = frsilb@microsoft.com

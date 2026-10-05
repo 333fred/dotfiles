@@ -1,5 +1,4 @@
 /.copilot/*
 !/.copilot/AGENTS.md
-!/.copilot/copilot-instructions.md
 !/.copilot/settings.json
 !/.copilot/lsp-config.json

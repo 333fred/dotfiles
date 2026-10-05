@@ -20,7 +20,9 @@ local function checkout_is_clean(root)
     return true
 end
 
-function M.open()
+M.checkout_is_clean = checkout_is_clean
+
+function M.open(on_open)
     local utils = require("octo.utils")
     local buffer = utils.get_current_buffer()
     if not buffer or not buffer:isPullRequest() then
@@ -41,8 +43,15 @@ function M.open()
         head_repo = node.headRepository.nameWithOwner,
         head_ref_name = node.headRefName,
     }
+    local function open_review()
+        if on_open then
+            buffer:get_pr(on_open)
+        else
+            require("octo.reviews").browse_review()
+        end
+    end
     if utils.in_pr_branch(pr) then
-        require("octo.reviews").browse_review()
+        open_review()
         return
     end
 
@@ -85,7 +94,7 @@ function M.open()
                 vim.notify("Octo cannot recognize the checked-out PR branch", vim.log.levels.ERROR)
                 return
             end
-            require("octo.reviews").browse_review()
+            open_review()
         end))
     end)
 end

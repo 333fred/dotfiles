@@ -1,12 +1,13 @@
 {
-  "companyAnnouncements": [],
   "enabledMcpServers": [
     "computer-use"
   ],
   "enabledPlugins": {
     "connect-copilot@agency-playground": true,
+    "dotnet-diag@dotnet-agent-skills": true,
     "dotnet-dnceng@dotnet-arcade-skills": true,
     "dotnet-msbuild@dotnet-agent-skills": true,
+    "dotnet-test@dotnet-agent-skills": true,
     "dotnet-test@dotnet-skills": true,
     "dotnet@dotnet-agent-skills": true,
     "dotnet@dotnet-skills": true,

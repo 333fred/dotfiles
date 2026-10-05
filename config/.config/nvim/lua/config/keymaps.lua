@@ -4,6 +4,7 @@ vim.keymap.set("n", "k", "gk")
 vim.keymap.set("n", "<Esc>", "<Cmd>nohlsearch<CR>")
 vim.keymap.set("n", "<Space>", "za")
 vim.keymap.set({ "i", "c" }, "<C-BS>", "<C-w>", { desc = "Delete previous word" })
+vim.keymap.set("x", "<C-S-c>", '"+y', { desc = "Copy selection" })
 -- Older terminals encode Ctrl+Space as Ctrl+@ (NUL).
 for _, key in ipairs({ "<C-Space>", "<C-@>" }) do
     vim.keymap.set("i", key, vim.lsp.completion.get, { desc = "Show completions" })

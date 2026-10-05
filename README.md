@@ -92,6 +92,16 @@ reveal neighboring methods. This works on both sides of the review and uses the 
 Tree-sitter parser, installed automatically. Parser installation requires a C compiler and
 `tree-sitter` CLI 0.26.1 or newer; use `:TSInstall c_sharp` to retry it.
 
+Use `:Octo review since` from a PR buffer or an open review to see the combined diff from your last
+submitted review to the current PR head. It uses the signed-in GitHub user's reviews, ignores pending
+reviews, and compares the two snapshots directly (including after a force-push). The checkout must be
+clean and at the current PR head; update it with `gh pr checkout <number> --repo <owner/repo>` if needed.
+The old reviewed commit is fetched if missing. Start/resume and submit reviews with the usual Octo
+commands; the custom range is retained when starting or resuming. No prior review or no changes is
+reported explicitly rather than falling back to the full PR diff.
+The historical left side is read-only. Comments and suggestions on the right use the current PR's
+commentable lines, so they retain GitHub's normal coordinates and multiline support.
+
 ## `i3status-rust`
 
 The version of i3status-rust in Regolith's repositories is quite old, so I uninstall it and manually depend on the git version. After
