@@ -75,7 +75,9 @@ vim.keymap.set("n", "<leader>,", function()
     Snacks.picker.lsp_workspace_symbols()
 end, { desc = "Find workspace symbol" })
 vim.keymap.set("n", "<leader>f", function()
-    Snacks.picker.files()
+    Snacks.picker.files({
+        main = { current = vim.bo.filetype == "octo" and vim.bo.buftype == "acwrite" },
+    })
 end, { desc = "Find file" })
 vim.keymap.set("n", "<leader>h", "<C-o>", { desc = "Jump back" })
 vim.keymap.set("n", "<leader>l", "<C-i>", { desc = "Jump forward" })

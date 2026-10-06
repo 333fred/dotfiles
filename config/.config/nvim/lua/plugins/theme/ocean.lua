@@ -27,6 +27,10 @@ local function apply()
     set(0, "DiffText", { bg = "#43556a" })
     set(0, "OctoReviewDiffAddText", { bg = "#43563f" })
     set(0, "OctoReviewDiffDeleteText", { bg = "#604047" })
+    set(0, "GitSignsAdd", { fg = "#a3be8c" })
+    set(0, "GitSignsChange", { fg = blue })
+    set(0, "GitSignsDelete", { fg = "#bf616a" })
+    set(0, "GitReviewComment", { fg = purple, bold = true })
 
     for _, group in ipairs({ "Conditional", "Repeat", "Exception", "Label", "Statement",
         "@keyword.conditional", "@keyword.repeat", "@keyword.return", "@keyword.exception" }) do
@@ -49,6 +53,27 @@ local function apply()
     set(0, "@lsp.type.enumMember", { fg = orange, bold = true })
 
     set(0, "@lsp.typemod.variable.readonly", { fg = orange, bold = true })
+end
+
+function M.bufferline_theme()
+    local background = "#1d2027"
+    local inactive = { fg = "#6e7d88", bg = background }
+    local visible = { fg = "#a7adba", bg = "#323843", italic = false }
+    local selected = { fg = "#dfe1e8", bg = "#343d46", bold = true, italic = false }
+
+    return {
+        fill = { bg = background },
+        background = inactive,
+        buffer_visible = visible,
+        buffer_selected = selected,
+        close_button = inactive,
+        close_button_visible = visible,
+        close_button_selected = selected,
+        separator = { fg = background, bg = background },
+        separator_visible = { fg = background, bg = visible.bg },
+        separator_selected = { fg = background, bg = selected.bg },
+        indicator_selected = { fg = "#518cc7", bg = selected.bg },
+    }
 end
 
 function M.statusline_theme()

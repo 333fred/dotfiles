@@ -1,5 +1,10 @@
 {
+  "async.nvim": { "branch": "main", "commit": "15f28ec323a75f34f317336831c00c2d1b0a7192" },
   "base16-vim": { "branch": "master", "commit": "3be3cd82cd31acfcab9a41bad853d9c68d30478d" },
+  "bufferline.nvim": { "branch": "main", "commit": "655133c3b4c3e5e05ec549b9f8cc2894ac6f51b3" },
+  "codediff.nvim": { "branch": "main", "commit": "09d9ebef2cc5a5c04db7a349cd6c61bdf84ecc8e" },
+  "ghlite.nvim": { "branch": "main", "commit": "5361e58d359c62345ae9550c0bf253626590998e" },
+  "gitsigns.nvim": { "branch": "main", "commit": "851a051e2bd2caba97e23314c68d69f1b1cf5d19" },
   "lazy.nvim": { "branch": "main", "commit": "85c7ff3711b730b4030d03144f6db6375044ae82" },
   "lualine.nvim": { "branch": "master", "commit": "221ce6b2d999187044529f49da6554a92f740a96" },
   "nvim-treesitter": { "branch": "main", "commit": "728e031f6b11d03d1f0708b7dc4fb0f1d9c8a137" },

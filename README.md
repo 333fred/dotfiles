@@ -33,7 +33,8 @@ Install instructions:
 
 ## Neovim
 
-I use Neovim with Roslyn for C#, Snacks for file navigation, Lazygit for Git, and Octo for PR reviews.
+I use Neovim with Roslyn for C#, Snacks for file navigation, Bufferline for open files,
+Gitsigns/CodeDiff/GHLite for integrated Git and PR review, and Lazygit/Octo as alternative interfaces.
 The config is in `config/.config/nvim`, with the Ocean Dark Extended colors from my VS Code profile.
 
 Install instructions:
@@ -62,6 +63,8 @@ Shortcuts (`,` is the leader):
 | --- | --- |
 | `,e` | Toggle the file tree |
 | `,f` / `,b` | Find a file / open buffer |
+| `[b` / `]b` | Previous / next buffer in the top bar |
+| `,x` | Close the buffer without closing its pane (prompts for unsaved changes) |
 | `,g` | Toggle Lazygit in the folder opened at startup (or the launch directory if none) |
 | `gd` / `gr` / `gi` | Definition / references / implementation |
 | `,m` / `,,` | Document / workspace symbols |
@@ -73,10 +76,71 @@ Shortcuts (`,` is the leader):
 | `Ctrl+Backspace` | Delete the previous word in Insert or command-line mode |
 
 Use Up / Down and Enter to select and accept completions or code actions.
+The top buffer bar shows open files and LSP diagnostic counts. Click a file to switch to it;
+its close button, right-click, or middle-click closes it with the same unsaved-change prompt as `,x`.
+Octo PR descriptions remain in the bar with a `repo#number` label, alongside local files used in reviews.
+Picker, terminal, and Octo auxiliary review buffers are excluded.
 In the file tree, `H` / `I` toggle hidden / ignored files, and `Esc` exits search without closing the tree.
 In Lazygit, `Esc` dismisses the current dialog or exits at the top level; `q` quits.
 
-For PR reviews:
+### Integrated Git and PR prototype
+
+Gitsigns displays working-tree and staged changes in the gutter. CodeDiff provides a
+tree of changed files with editable working-tree buffers and Ocean-colored diffs.
+CodeDiff downloads its native diff library automatically on first use.
+Revision buffers keep UTF-8 BOMs as buffer metadata, matching ordinary file buffers
+instead of displaying a spurious first-line change.
+
+| Key | Action |
+| --- | --- |
+| `,Gd` | Open local Git changes explorer; close the current CodeDiff view when already inside it |
+| `,Gf` | Diff the current file against HEAD |
+| `,Gb` | Toggle current-line Git blame |
+| `,Gh` | Preview the current Git hunk inline (move the cursor to dismiss) |
+| `[c` / `]c` | Previous / next Git hunk |
+| `,Gp` | Open the current branch's PR changed-files explorer; close when already inside CodeDiff |
+| `,Gc` | Load/refresh and show PR comment signs, or hide them |
+| `,Gt` | Open current-line PR comments in a floating window |
+| `,Ga` | Add a PR comment/reply at the cursor or visual selection |
+| `,Gr` | Resolve the PR comment thread at the cursor |
+| `,Gs` / `,Gu` | Start / submit a pending PR review |
+
+Inside CodeDiff, Enter selects a file, `,Ge` focuses the changed-files pane, `,GE`
+toggles it, `t` toggles inline/side-by-side layout, `gf` returns to the file in the
+previous tab, and `q` closes the diff tab. `-` stages/unstages the current file;
+the explorer's `S` / `U` stage/unstage all files. `g?` shows the available actions.
+
+For PRs, run `gh auth login` and open the checked-out PR branch. `,Gp` resolves the
+PR from the branch and compares against its merge base, not just uncommitted changes.
+The checkout can include locally merged or rebased main changes, but must have no
+tracked or unsaved file changes. When local HEAD differs from the PR head, the explorer
+compares the remote PR snapshots so main-only local changes are not included; its PR
+buffers are read-only. Missing snapshots are fetched from the PR's repository rather
+than assuming `origin` is the upstream repository. This never changes your branch or
+working tree, and the prototype does not automatically publish reviews.
+
+`,Gc` loads comments without jumping to a quickfix entry. Purple `C` signs mark
+commented lines; comment text is hidden until `,Gt` (press it again or Esc to close).
+Compiler diagnostic counts in
+the statusline and buffer bar exclude these comments. Changing checkout/repository
+or editing local files clears the comment context to avoid stale GitHub line coordinates.
+The comment loader paginates GitHub responses and excludes outdated threads.
+Enable comments again once the checkout is clean. Refresh remote comments by toggling
+`,Gc` off and on; background polling is disabled for this prototype.
+With local merges/rebases, comments and selections map between local and PR lines only
+where the entire range remains unchanged and contiguous. Comments on locally changed
+or deleted lines are omitted with a warning; view or comment on their original PR
+version in `,Gp`. New local lines cannot receive PR comments. Replies and new comments
+always use the PR's original coordinates. If the checkout changes while drafting a
+comment, sending is blocked and the draft is retained.
+
+Use `,Gs` before commenting to batch a review; otherwise GHLite posts comments immediately.
+In the comment editor, `c` then Enter sends the comment; `,Gu` publishes a pending review.
+GHLite's native `:GHLitePR*` commands remain available, but bypass the prototype's
+checkout guards and local-to-PR line mapping; use the shortcuts for locally
+merged/rebased checkouts. Octo and the existing review-since workflow are unchanged.
+
+### Octo PR reviews
 
 1. Run `gh auth login` and open Neovim in a clean, dedicated review checkout.
 2. Use `,p` for open PRs or `,P` for PRs requesting your review (up to 100 results). The picker uses `gh`'s default repo; set it with `gh repo set-default upstream` if needed.
@@ -85,6 +149,9 @@ For PR reviews:
 5. Run `:Octo review submit` to publish the pending review, or `:Octo review close` to return to the PR.
 
 `]q` / `[q` switch changed files; `\e` focuses the file panel. Octo uses backslash as its local leader.
+From an Octo PR description, `,f` opens the selected file in that same pane, keeping the
+description as a hidden buffer rather than targeting a different editing pane. Click its
+buffer-bar entry or use `[b` / `]b` to return to the description.
 
 C# review panes automatically open unchanged diff folds within the method containing the cursor,
 including its signature. Opened context stays expanded as you navigate; a diff fold may also
