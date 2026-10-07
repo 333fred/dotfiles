@@ -37,37 +37,38 @@ end, { desc = "Toggle file browser" })
 vim.keymap.set("n", "<leader>b", function()
     Snacks.picker.buffers()
 end, { desc = "Find open buffer" })
-local lazygit_cwd = vim.fn.getcwd()
-if vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.argv(0)) == 1 then
-    lazygit_cwd = vim.fn.fnamemodify(vim.fn.argv(0), ":p")
-end
-vim.keymap.set("n", "<leader>g", function()
-    if vim.fn.executable("lazygit") ~= 1 then
-        vim.notify("Install lazygit to use the Git interface", vim.log.levels.ERROR)
-        return
-    end
-    Snacks.lazygit({ cwd = lazygit_cwd })
-end, { desc = "Toggle Lazygit" })
-vim.keymap.set("n", "<leader>p", function()
+vim.keymap.set("n", "<leader>?", function()
+    require("ui.cheatsheet").open()
+end, { desc = "Open Neovim cheat sheet" })
+vim.keymap.set("n", "<localleader>o", function()
     Snacks.picker.gh_pr({ limit = 100, live = false })
 end, { desc = "Open pull request for review" })
-vim.keymap.set("n", "<leader>P", function()
+vim.keymap.set("n", "<localleader>O", function()
     Snacks.picker.gh_pr({
         search = "(mentions:@me OR assignee:@me OR team-review-requested:dotnet/roslyn-compiler OR user-review-requested:@me)",
         limit = 100,
         live = false,
     })
 end, { desc = "Pull requests mentioning, assigned to, or requesting review from you or your team" })
-vim.keymap.set("n", "<leader>r", function()
-    require("plugins.octo.review").open()
-end, { desc = "Review PR with local code" })
+for key, direction in pairs({ j = "next", k = "prev" }) do
+    vim.keymap.set("n", "<localleader>" .. key, function()
+        if vim.wo.diff then
+            local motion = direction == "next" and "]c" or "[c"
+            vim.cmd.normal({ vim.v.count1 .. motion, bang = true })
+        else
+            require("gitsigns").nav_hunk(direction)
+        end
+    end, { desc = direction .. " Git/review change" })
+end
 vim.keymap.set("n", "gd", function()
-    Snacks.picker.lsp_definitions()
+    Snacks.picker.lsp_definitions({ auto_confirm = true, layout = { preset = "default", preview = true } })
 end, { desc = "Go to definition" })
 vim.keymap.set("n", "gr", function()
     Snacks.picker.lsp_references()
 end, { desc = "Find references" })
-vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to implementation" })
+vim.keymap.set("n", "gi", function()
+    Snacks.picker.lsp_implementations({ auto_confirm = true, layout = { preset = "default", preview = true } })
+end, { desc = "Go to implementation" })
 vim.keymap.set("n", "<leader>m", function()
     Snacks.picker.lsp_symbols({ tree = false })
 end, { desc = "Find document symbol" })
@@ -76,7 +77,9 @@ vim.keymap.set("n", "<leader>,", function()
 end, { desc = "Find workspace symbol" })
 vim.keymap.set("n", "<leader>f", function()
     Snacks.picker.files({
-        main = { current = vim.bo.filetype == "octo" and vim.bo.buftype == "acwrite" },
+        hidden = true,
+        ignored = false,
+        main = { current = vim.b.git_review_pr_url ~= nil },
     })
 end, { desc = "Find file" })
 vim.keymap.set("n", "<leader>h", "<C-o>", { desc = "Jump back" })

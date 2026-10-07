@@ -3,7 +3,7 @@ local utf8_bom = "\239\187\191"
 -- Normalize once: a second leading U+FEFF is source text, not another BOM.
 local normalized_boms = setmetatable({}, { __mode = "k" })
 
-local function normalize_bom(lines)
+function M.normalize_bom(lines)
     if normalized_boms[lines] ~= nil then
         return lines, normalized_boms[lines]
     end
@@ -25,7 +25,7 @@ function M.setup()
                 callback(err, lines)
                 return
             end
-            local normalized = normalize_bom(lines)
+            local normalized = M.normalize_bom(lines)
             callback(nil, normalized)
         end)
     end
@@ -33,7 +33,7 @@ function M.setup()
     local virtual = require("codediff.core.virtual_file")
     local set_content = virtual.set_content
     virtual.set_content = function(buf, lines, path)
-        local normalized, bomb = normalize_bom(lines)
+        local normalized, bomb = M.normalize_bom(lines)
         local result = set_content(buf, normalized, path)
         if result then
             vim.bo[buf].bomb = bomb

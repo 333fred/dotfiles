@@ -3,9 +3,9 @@ local function close_buffer(bufnr)
 end
 
 local function pull_request_name(path)
-    local repo, number = path:match("^octo://(.+)/pull/(%d+)$")
+    local host, repo, number = path:match("^git%-review://([^/]+)/([^/]+/[^/]+)/pull/(%d+)%?")
     if repo then
-        return repo .. "#" .. number
+        return (host == "github.com" and "" or host .. "/") .. repo .. "#" .. number
     end
 end
 
@@ -24,7 +24,7 @@ return {
             diagnostics = "nvim_lsp",
             diagnostics_indicator = function(_, _, _, ctx)
                 local count = 0
-                for _, value in ipairs(require("config.git-diagnostics").counts(ctx.buffer.id)) do
+                for _, value in ipairs(require("ui.diagnostics").counts(ctx.buffer.id)) do
                     count = count + value
                 end
                 return count > 0 and " (" .. count .. ")" or ""
@@ -39,10 +39,10 @@ return {
             end,
             custom_filter = function(bufnr)
                 local name = vim.api.nvim_buf_get_name(bufnr)
-                if vim.bo[bufnr].filetype == "octo" and vim.bo[bufnr].buftype == "acwrite" then
+                if vim.b[bufnr].git_review_pr_url and vim.bo[bufnr].buftype == "nofile" then
                     return pull_request_name(name) ~= nil
                 end
-                return vim.bo[bufnr].buftype == "" and not name:match("^octo://")
+                return vim.bo[bufnr].buftype == ""
             end,
             offsets = {
                 {

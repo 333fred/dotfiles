@@ -1,3 +1,11 @@
+vim.diagnostic.config({
+    virtual_text = {
+        severity = { min = vim.diagnostic.severity.WARN },
+        source = "if_many",
+    },
+    severity_sort = true,
+})
+
 vim.api.nvim_create_autocmd("LspAttach", {
     callback = function(event)
         local client = vim.lsp.get_client_by_id(event.data.client_id)

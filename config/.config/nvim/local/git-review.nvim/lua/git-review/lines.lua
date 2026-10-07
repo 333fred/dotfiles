@@ -53,10 +53,34 @@ function M.new(original, current)
         return mapped_first, previous
     end
 
+    local function anchor_local(first, last)
+        last = last or first
+        if first < 1 or last < first or last > #original_lines then
+            return nil
+        end
+        local _, exact = map_range(first, last, false)
+        if exact then
+            return exact, false
+        end
+        local mapped = map_line(last, false)
+        if mapped then
+            return mapped, true, "edited"
+        end
+        for _, hunk in ipairs(hunks) do
+            if last >= hunk[1] and last < hunk[1] + hunk[2] then
+                if hunk[4] > 0 then
+                    return hunk[3] + math.min(last - hunk[1], hunk[4] - 1), true, "edited"
+                end
+                return math.max(1, math.min(#current_lines, hunk[3] + 1)), true, "deleted"
+            end
+        end
+    end
+
     return {
         original_lines = original_lines,
         to_local = function(first, last) return map_range(first, last, false) end,
         to_pr = function(first, last) return map_range(first, last, true) end,
+        anchor_local = anchor_local,
     }
 end
 

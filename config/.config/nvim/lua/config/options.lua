@@ -1,6 +1,11 @@
 vim.g.mapleader = ","
+vim.g.maplocalleader = "\\"
 
 vim.opt.termguicolors = true
+vim.opt.showmode = false
+vim.opt.showcmd = false
+vim.opt.ruler = false
+vim.opt.shortmess:append("S")
 vim.opt.number = true
 vim.opt.signcolumn = "yes:3"
 vim.opt.cursorline = true

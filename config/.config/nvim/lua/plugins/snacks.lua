@@ -34,7 +34,7 @@ return {
                 },
                 gh_pr = {
                     finder = function(opts, ctx)
-                        return require("plugins.snacks.pr-picker").finder(opts, ctx)
+                        return require("git-review.picker").finder(opts, ctx)
                     end,
                     show_delay = 0,
                     confirm = function(picker, item)
@@ -42,7 +42,7 @@ return {
                             return
                         end
                         picker:close()
-                        vim.cmd("Octo " .. item.url)
+                        require("git-review").select_pr(item.url)
                     end,
                 },
             },
