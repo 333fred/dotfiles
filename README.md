@@ -52,8 +52,8 @@ Install instructions:
 Open `nvim .` at a solution or project root for C# support. Use `:Roslyn target` to choose a solution if needed.
 `vim` and `v` alias to `nvim`; it is also the default `EDITOR` and `VISUAL`.
 
-See the [Neovim cheat sheet](NEOVIM-CHEATSHEET.md) for keyboard shortcuts and Git/PR
-workflows, or press `,?` in Neovim to open it.
+Pause after `,` or `\` for shortcut hints, or press `,?` for available keymaps.
+See the [PR review notes](NEOVIM-REVIEW.md) for workflow and safety details.
 
 ## `i3status-rust`
 
