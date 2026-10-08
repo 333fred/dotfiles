@@ -780,6 +780,17 @@ function M.setup()
     require("git-review.description").setup(group)
     vim.api.nvim_create_autocmd("User", {
         group = group,
+        pattern = { "PersistenceLoadPre", "PersistenceClearPost" },
+        callback = function()
+            request_id = request_id + 1
+            selection = nil
+            if context then
+                clear_comments()
+            end
+        end,
+    })
+    vim.api.nvim_create_autocmd("User", {
+        group = group,
         pattern = "CodeDiffOpen",
         callback = function(args)
             local tab = args.data.tabpage

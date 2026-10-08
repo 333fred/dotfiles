@@ -6,6 +6,7 @@ return {
         win = { border = "rounded" },
         spec = {
             { "<leader>", group = "Editor", mode = { "n", "x" } },
+            { "<leader>s", group = "Sessions" },
             { "<localleader>", group = "Git/review", mode = { "n", "x" } },
         },
     },
