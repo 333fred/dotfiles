@@ -3,12 +3,20 @@ return {
     priority = 900,
     lazy = false,
     opts = {
+        dashboard = { enabled = true },
         picker = {
             enabled = true,
+            matcher = {
+                smartcase = false,
+                ignorecase = true,
+            },
             sources = {
                 explorer = {
                     hidden = true,
                     ignored = true,
+                    on_show = function(picker)
+                        require("ui.editor").on_explorer_show(picker)
+                    end,
                     actions = {
                         -- Escape should leave the sidebar open, not use the picker's close action.
                         cancel = function()

@@ -1,6 +1,13 @@
 return {
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
+    dependencies = {
+        {
+            "SmiteshP/nvim-navic",
+            lazy = false,
+            opts = { lsp = { auto_attach = true } },
+        },
+    },
     opts = {
         options = {
             theme = require("plugins.theme.ocean").statusline_theme(),
@@ -11,7 +18,13 @@ return {
         sections = {
             lualine_a = { "mode" },
             lualine_b = { "branch", "diff" },
-            lualine_c = { { "filename", path = 1, symbols = { modified = " ●", readonly = " " } } },
+            lualine_c = {
+                { "filename", path = 1, symbols = { modified = " ●", readonly = " " } },
+                {
+                    function() return require("nvim-navic").get_location() end,
+                    cond = function() return require("nvim-navic").is_available() end,
+                },
+            },
             lualine_x = {
                 {
                     "diagnostics",

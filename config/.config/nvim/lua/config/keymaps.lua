@@ -37,6 +37,13 @@ end, { desc = "Toggle file browser" })
 vim.keymap.set("n", "<leader>b", function()
     Snacks.picker.buffers()
 end, { desc = "Find open buffer" })
+vim.keymap.set("n", "<leader>d", function()
+    Snacks.picker.diagnostics({
+        transform = function(item)
+            return require("ui.diagnostics").is_visible(item.item)
+        end,
+    })
+end, { desc = "Find diagnostics" })
 vim.keymap.set("n", "<localleader>o", function()
     Snacks.picker.gh_pr({ limit = 100, live = false })
 end, { desc = "Open pull request for review" })
