@@ -7,6 +7,7 @@ local function apply()
     local yellow = "#ebcb8b"
     local purple = "#b48ead"
     local blue = "#8fa1b3"
+    local cyan = "#96b5b4"
 
     set(0, "LineNr", { fg = "#47525c" })
     set(0, "CursorLine", { bg = "#323843" })
@@ -41,7 +42,6 @@ local function apply()
         set(0, group, { fg = foreground })
     end
 
-    set(0, "@lsp.type.namespace.cs", { fg = blue })
     set(0, "@lsp.type.interface", { fg = yellow })
     set(0, "@lsp.type.typeParameter", { fg = yellow })
     set(0, "@lsp.type.struct", { fg = "#ab7976" })
@@ -51,6 +51,65 @@ local function apply()
     set(0, "@lsp.type.enumMember", { fg = orange, bold = true })
 
     set(0, "@lsp.typemod.variable.readonly", { fg = orange, bold = true })
+
+    for _, group in ipairs({ "@module.c_sharp", "@lsp.type.namespace.cs",
+        "@lsp.type.punctuation.cs" }) do
+        set(0, group, { fg = foreground })
+    end
+    set(0, "@keyword.modifier.c_sharp", { fg = purple })
+    set(0, "@lsp.type.modifier.cs", { fg = purple })
+    set(0, "@lsp.type.controlKeyword.cs", { fg = purple, bold = true })
+    set(0, "@lsp.type.event.cs", { fg = "#bf616a" })
+    set(0, "@lsp.type.decorator.cs", { fg = foreground })
+    set(0, "@string.escape.c_sharp", { fg = cyan })
+    set(0, "@string.regexp.c_sharp", { fg = cyan })
+    set(0, "@lsp.type.regexp.cs", { fg = cyan })
+
+    -- Mirror the C# extension's semantic inheritance and TextMate fallback scopes.
+    local roslyn_links = {
+        extensionMethod = "@lsp.type.method.cs",
+        field = "@lsp.type.property.cs",
+        module = "@lsp.type.namespace.cs",
+        recordClass = "@lsp.type.class.cs",
+        recordStruct = "@lsp.type.struct.cs",
+        operatorOverloaded = "@lsp.type.method.cs",
+        macro = "@lsp.type.function.cs",
+        stringVerbatim = "@lsp.type.string.cs",
+        stringEscapeCharacter = "@string.escape.c_sharp",
+        xmlDocCommentAttributeName = "Comment",
+        xmlDocCommentAttributeQuotes = "Comment",
+        xmlDocCommentAttributeValue = "Comment",
+        xmlDocCommentCDataSection = "Comment",
+        xmlDocCommentComment = "Comment",
+        xmlDocCommentDelimiter = "Comment",
+        xmlDocCommentEntityReference = "Comment",
+        xmlDocCommentName = "Comment",
+        xmlDocCommentProcessingInstruction = "Comment",
+        xmlDocCommentText = "Comment",
+        regexComment = "@lsp.type.regexp.cs",
+        regexCharacterClass = "@lsp.type.number.cs",
+        regexAnchor = "@lsp.type.controlKeyword.cs",
+        regexQuantifier = "@lsp.type.operator.cs",
+        regexGrouping = "@lsp.type.punctuation.cs",
+        regexAlternation = "@lsp.type.operator.cs",
+        regexText = "@lsp.type.regexp.cs",
+        regexSelfEscapedCharacter = "@lsp.type.regexp.cs",
+        regexOtherEscape = "@lsp.type.regexp.cs",
+        jsonComment = "Comment",
+        jsonNumber = "@lsp.type.number.cs",
+        jsonString = "@lsp.type.string.cs",
+        jsonKeyword = "@lsp.type.number.cs",
+        jsonText = "@lsp.type.string.cs",
+        jsonOperator = "@lsp.type.string.cs",
+        jsonPunctuation = "@lsp.type.punctuation.cs",
+        jsonArray = "@lsp.type.punctuation.cs",
+        jsonObject = "@lsp.type.punctuation.cs",
+        jsonPropertyName = "@lsp.type.method.cs",
+        jsonConstructorName = "@lsp.type.method.cs",
+    }
+    for token, group in pairs(roslyn_links) do
+        set(0, "@lsp.type." .. token .. ".cs", { link = group })
+    end
 end
 
 function M.bufferline_theme()

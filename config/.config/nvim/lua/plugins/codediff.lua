@@ -4,6 +4,7 @@ return {
     cmd = "CodeDiff",
     keys = {
         { "<localleader>g", function() require("git-review").local_diff() end, desc = "Toggle Git changes explorer" },
+        { "<localleader>G", "<Cmd>CodeDiff history<CR>", desc = "Git history for current branch" },
         { "<localleader>d", function() require("git-review").local_diff() end, desc = "Toggle Git changes explorer" },
         { "<localleader>f", "<Cmd>CodeDiff file HEAD<CR>", desc = "Diff current file against HEAD" },
     },
