@@ -57,6 +57,7 @@ local function apply()
         set(0, group, { fg = foreground })
     end
     set(0, "@keyword.modifier.c_sharp", { fg = purple })
+    set(0, "@type.builtin.c_sharp", { fg = purple })
     set(0, "@lsp.type.modifier.cs", { fg = purple })
     set(0, "@lsp.type.controlKeyword.cs", { fg = purple, bold = true })
     set(0, "@lsp.type.event.cs", { fg = "#bf616a" })
