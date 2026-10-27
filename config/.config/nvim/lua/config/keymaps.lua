@@ -49,7 +49,7 @@ vim.keymap.set("n", "<localleader>o", function()
 end, { desc = "Open pull request for review" })
 vim.keymap.set("n", "<localleader>O", function()
     Snacks.picker.gh_pr({
-        search = "(mentions:@me OR assignee:@me OR team-review-requested:dotnet/roslyn-compiler OR user-review-requested:@me)",
+        search = "(mentions:@me OR assignee:@me OR team-review-requested:dotnet/roslyn-compiler OR user-review-requested:@me OR label:Area-Compilers)",
         limit = 100,
         live = false,
     })

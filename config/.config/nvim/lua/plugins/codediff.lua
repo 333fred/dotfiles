@@ -43,5 +43,25 @@ return {
     config = function(_, opts)
         require("git-review.content").setup()
         require("codediff").setup(opts)
+        local group = vim.api.nvim_create_augroup("CodeDiffMarkdownWrap", { clear = true })
+        vim.api.nvim_create_autocmd("User", {
+            group = group,
+            pattern = { "CodeDiffOpen", "CodeDiffFileSelect" },
+            callback = function(event)
+                local tab = event.data.tabpage
+                vim.schedule(function()
+                    if not tab or not vim.api.nvim_tabpage_is_valid(tab) then
+                        return
+                    end
+                    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
+                        local buf = vim.api.nvim_win_get_buf(win)
+                        if vim.bo[buf].filetype == "markdown" then
+                            vim.wo[win].wrap = true
+                            vim.wo[win].linebreak = true
+                        end
+                    end
+                end)
+            end,
+        })
     end,
 }
