@@ -44,10 +44,10 @@ vim.keymap.set("n", "<leader>d", function()
         end,
     })
 end, { desc = "Find diagnostics" })
-vim.keymap.set("n", "<localleader>o", function()
+vim.keymap.set("n", "<localleader>po", function()
     Snacks.picker.gh_pr({ limit = 100, live = false })
 end, { desc = "Open pull request for review" })
-vim.keymap.set("n", "<localleader>O", function()
+vim.keymap.set("n", "<localleader>pO", function()
     Snacks.picker.gh_pr({
         search = "(mentions:@me OR assignee:@me OR team-review-requested:dotnet/roslyn-compiler OR user-review-requested:@me OR label:Area-Compilers)",
         limit = 100,

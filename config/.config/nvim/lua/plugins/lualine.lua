@@ -19,6 +19,7 @@ return {
             lualine_a = { "mode" },
             lualine_b = { "branch", "diff" },
             lualine_c = {
+                function() return require("git-review.workflow").status() end,
                 { "filename", path = 1, symbols = { modified = " ●", readonly = " " } },
                 {
                     function() return require("nvim-navic").get_location() end,

@@ -2,8 +2,8 @@ return {
     "lewis6991/gitsigns.nvim",
     event = { "BufReadPre", "BufNewFile" },
     keys = {
-        { "<localleader>b", function() require("gitsigns").toggle_current_line_blame() end, desc = "Toggle line blame" },
-        { "<localleader>h", function() require("gitsigns").preview_hunk_inline() end, desc = "Preview Git hunk inline" },
+        { "<localleader>gb", function() require("gitsigns").toggle_current_line_blame() end, desc = "Toggle line blame" },
+        { "<localleader>hp", function() require("gitsigns").preview_hunk_inline() end, desc = "Preview Git hunk inline" },
     },
     opts = {
         signs = {

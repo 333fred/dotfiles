@@ -164,8 +164,11 @@ local function run_pr(action, require_clean, with_comments, target, metadata_onl
     local win = vim.api.nvim_get_current_win()
     local buf = vim.api.nvim_get_current_buf()
     local view = require("git-review.description").view()
+    local review_target = require("git-review.workflow").target()
     target = target or vim.b.git_review_pr_url
         or (view and view.root == checkout.root and view.pr.url)
+        or (review_target and review_target.kind == "pr" and review_target.root == checkout.root
+            and review_target.branch == checkout.branch and review_target.url)
         or (selection and selection.root == checkout.root and selection.branch == checkout.branch and selection.url)
     request_id = request_id + 1
     local id = request_id
@@ -255,7 +258,8 @@ function M.description()
         return
     end
     return run_pr(function(pr)
-        if require("codediff.ui.lifecycle").get_session(tab) then
+        local target = require("git-review.workflow").target(tab)
+        if require("codediff.ui.lifecycle").get_session(tab) and target and target.kind == "pr" then
             require("git-review.description").attach(tab, pr, context.root)
         else
             require("git-review.description").open(pr, context.root)
@@ -316,7 +320,8 @@ function M.checkout_pr()
                     selection = { root = updated.root, branch = updated.branch, url = pr.url }
                     vim.cmd.checktime()
                     vim.api.nvim_exec_autocmds("User", { pattern = "ReviewCheckout", data = { root = updated.root } })
-                    notify("Checked out " .. pr.url .. "; use \\p to review", vim.log.levels.INFO)
+                    require("git-review.workflow").set_target("pr", updated.root, pr.url)
+                    notify("Checked out " .. pr.url .. "; use \\rp to review", vim.log.levels.INFO)
                 end)
             end)
         end)
@@ -340,7 +345,8 @@ end
 
 function M.pr_diff()
     local lifecycle = require("codediff.ui.lifecycle")
-    if lifecycle.get_session(vim.api.nvim_get_current_tabpage()) then
+    local target = require("git-review.workflow").target()
+    if lifecycle.get_session(vim.api.nvim_get_current_tabpage()) and target and target.kind == "pr" then
         lifecycle.close()
         return
     end
@@ -484,7 +490,7 @@ function M.show_comment()
         return
     end
     if not comments_enabled then
-        notify("Enable PR comments with \\c first")
+        notify("Enable PR comments with \\ct first")
         return
     end
     if not same_checkout(context, snapshot()) then
@@ -520,13 +526,17 @@ local function dispatch_line_action(command, first, last)
     local name = vim.api.nvim_buf_get_name(buf)
     local virtual = require("codediff.core.virtual_file")
     local root, revision = virtual.parse_url(name)
+    if not root and (vim.bo[buf].buftype ~= "" or not vim.fs.relpath(context.root, name)) then
+        notify("Open a file or the right-hand PR snapshot before acting on a comment")
+        return
+    end
     if root then
         if root ~= context.root or revision ~= context.pr_head then
             notify("Comment on the PR head (right side), not a historical revision")
             return
         end
     elseif not context.on_pr_branch then
-        notify("Check out this PR with \\C before commenting in local files, or use its right-hand snapshot in \\p")
+        notify("Check out this PR with \\pc before commenting in local files, or use its right-hand snapshot in \\rp")
         return
     elseif context.head ~= context.pr_head or context.branch ~= context.pr_branch then
         local path = vim.fs.relpath(context.root, name)
@@ -536,14 +546,14 @@ local function dispatch_line_action(command, first, last)
             mapped_first, mapped_last = mapping.to_pr(first, last)
         end
         if not mapped_first then
-            notify("These lines differ from the PR head; comment on their original version in \\p")
+            notify("These lines differ from the PR head; comment on their original version in \\rp")
             return
         end
         for _, thread in ipairs(require("ghlite.state").comments_list[name] or {}) do
             local start = type(thread.start_line) == "number" and thread.start_line or thread.line
             local anchor, approximate = mapping.anchor_local(start, thread.line)
             if approximate and anchor >= first and anchor <= last then
-                notify("This is an approximate local comment anchor; reply or resolve on its original PR version in \\p")
+                notify("This is an approximate local comment anchor; reply or resolve on its original PR version in \\rp")
                 return
             end
         end
@@ -581,10 +591,14 @@ local function dispatch_line_action(command, first, last)
     end
     vim.api.nvim_buf_set_mark(0, "<", first, 0, {})
     vim.api.nvim_buf_set_mark(0, ">", last, 0, {})
-    if command == "GHLitePRAddComment" then
-        return require("ghlite.comments").comment_on_line()
-    end
-    return require("ghlite.comments").resolve_comment()
+    local actions = {
+        GHLitePRAddComment = "comment_on_line",
+        GHLitePRUpdateComment = "update_comment",
+        GHLitePRDeleteComment = "delete_comment",
+        GHLitePRResolveComment = "resolve_comment",
+        GHLitePRUnresolveComment = "unresolve_comment",
+    }
+    return require("ghlite.comments")[assert(actions[command], "Unknown PR line action")]()
 end
 
 function M.add_comment()
@@ -611,6 +625,85 @@ function M.review_command(command)
             vim.cmd(command)
         end
     end, true, command == "GHLitePRResolveComment")
+end
+
+function M.comment_action(action)
+    if action == "add" then
+        return M.add_comment()
+    elseif action == "toggle" then
+        return M.toggle_comments()
+    elseif action == "open" then
+        return run_pr(M.show_comment, false, true)
+    end
+    local line_commands = {
+        edit = "GHLitePRUpdateComment", delete = "GHLitePRDeleteComment",
+        resolve = "GHLitePRResolveComment", unresolve = "GHLitePRUnresolveComment",
+    }
+    return run_pr(function()
+        if line_commands[action] then
+            local line = vim.api.nvim_win_get_cursor(0)[1]
+            dispatch_line_action(line_commands[action], line, line)
+            return
+        end
+        local entries, markdown = {}, { "# PR review comments", "" }
+        local virtual = require("codediff.core.virtual_file")
+        for filename, threads in pairs(require("ghlite.state").comments_list) do
+            local path = vim.fs.relpath(context.root, filename)
+            if path then
+                for _, thread in ipairs(threads) do
+                    if #thread.comments > 0 then
+                        entries[#entries + 1] = {
+                            filename = virtual.create_url(context.root, context.pr_head, path),
+                            lnum = thread.line, text = thread.content,
+                        }
+                        vim.list_extend(markdown, { "## " .. path .. ":" .. thread.line, thread.content, "" })
+                    end
+                end
+            end
+        end
+        if action == "yank" then
+            vim.fn.setreg("+", table.concat(markdown, "\n"))
+        elseif action == "list" then
+            if #entries == 0 then
+                notify("No PR comments")
+                return
+            end
+            table.sort(entries, function(a, b)
+                return a.filename == b.filename and a.lnum < b.lnum or a.filename < b.filename
+            end)
+            vim.fn.setqflist({}, " ", { title = "PR review comments", items = entries })
+            vim.cmd.copen()
+        elseif action == "next" or action == "prev" then
+            local buf, name = vim.api.nvim_get_current_buf(), vim.api.nvim_buf_get_name(0)
+            local root, revision, path = virtual.parse_url(name)
+            if root and (root ~= context.root or revision ~= context.pr_head) then
+                notify("Navigate PR comments on the right-hand PR snapshot")
+                return
+            end
+            local relative = not root and vim.fs.relpath(context.root, name)
+            if not root and (vim.bo[buf].buftype ~= "" or not relative) then
+                notify("Open a file or the right-hand PR snapshot to navigate comments")
+                return
+            end
+            local filename = root and (root .. "/" .. path) or name
+            local mapping = relative and file_map(relative, buf)
+            local cursor, candidate = vim.api.nvim_win_get_cursor(0)[1], nil
+            for _, thread in ipairs(require("ghlite.state").comments_list[filename] or {}) do
+                local line = root and thread.line
+                    or (mapping and mapping.anchor_local(
+                        type(thread.start_line) == "number" and thread.start_line or thread.line, thread.line))
+                if line and ((action == "next" and line > cursor and (not candidate or line < candidate))
+                    or (action == "prev" and line < cursor and (not candidate or line > candidate))) then
+                    candidate = line
+                end
+            end
+            if candidate then
+                vim.api.nvim_win_set_cursor(0, { candidate, 0 })
+            else
+                notify("No " .. action .. " PR comment in this file")
+            end
+        end
+    end, line_commands[action] ~= nil, true)
 end
 
 local function load_all_comments(pr_number, pending_review)
@@ -703,7 +796,7 @@ local function render_comments(bufnr, filename)
             checkout.unmapped = checkout.unmapped or {}
             if not checkout.unmapped[filename] then
                 checkout.unmapped[filename] = true
-                notify(skipped .. " PR thread(s) could not be anchored in this buffer; view them in \\p")
+                notify(skipped .. " PR thread(s) could not be anchored in this buffer; view them in \\rp")
             end
         end
         if is_pr_head then
@@ -731,10 +824,12 @@ function M.setup_ghlite()
     local get_comment = utils.get_comment
     utils.get_comment = function(name, split, prompt, content, key, send)
         local checkout = context
-        return get_comment(name, split, prompt, content, key, function(input)
+        local destination = require("git-review.workflow").target()
+        local result = get_comment(name, split, prompt, content, key, function(input)
             if checkout and (not same_checkout(checkout, context)
                 or checkout.pr ~= context.pr or checkout.pr_head ~= context.pr_head
-                or not same_checkout(checkout, snapshot()) or not clean_checkout(checkout)) then
+                or not same_checkout(checkout, snapshot()) or not clean_checkout(checkout)
+                or not require("git-review.workflow").valid(destination)) then
                 vim.cmd.new()
                 vim.bo.buftype = "nofile"
                 vim.bo.bufhidden = "hide"
@@ -746,6 +841,13 @@ function M.setup_ghlite()
             end
             send(input)
         end)
+        local buf = vim.api.nvim_get_current_buf()
+        vim.wo.wrap = true
+        vim.wo.linebreak = true
+        vim.keymap.set("n", "<Esc>", function()
+            vim.api.nvim_buf_delete(buf, { force = true })
+        end, { buffer = buf, desc = "Cancel comment draft" })
+        return result
     end
     for _, ns in ipairs(namespaces) do
         vim.diagnostic.config({
@@ -799,11 +901,14 @@ function M.setup()
             if pending and git and git.git_root == pending.root and git.original_revision == pending.left
                 and (git.modified_revision or "WORKING") == pending.right then
                 pending_diff = nil
+                require("git-review.workflow").set_target("pr", pending.root, pending.pr.url, tab)
                 vim.schedule(function()
                     if vim.api.nvim_tabpage_is_valid(tab) and require("codediff.ui.lifecycle").get_session(tab) then
                         require("git-review.description").attach(tab, pending.pr, pending.root)
                     end
                 end)
+            elseif git then
+                require("git-review.workflow").set_target("local", git.git_root, nil, tab)
             end
         end,
     })

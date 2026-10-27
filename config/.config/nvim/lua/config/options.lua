@@ -6,6 +6,12 @@ vim.opt.showmode = false
 vim.opt.showcmd = false
 vim.opt.ruler = false
 vim.opt.shortmess:append("S")
+-- Forward terminal alerts without ringing for editor errors.
+vim.opt.belloff = {
+    "backspace", "cursor", "complete", "copy", "ctrlg", "error", "esc", "hangul",
+    "lang", "mess", "showmatch", "operator", "register", "shell", "spell", "wildmode",
+}
+vim.opt.visualbell = false
 vim.opt.number = true
 vim.opt.signcolumn = "yes:3"
 vim.opt.cursorline = true

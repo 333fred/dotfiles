@@ -131,7 +131,7 @@ local function buffer(pr, root)
         "",
         pr.url,
         "",
-        "Actions: \\C checkout | \\p PR changes | \\S since last review | \\v description | gx browser",
+        "Actions: \\pc checkout | \\rp all PR changes | \\rP since last review | \\pv description | gx browser",
         "",
     }
     vim.list_extend(lines, status_lines(pr))
@@ -157,7 +157,7 @@ local function buffer(pr, root)
         vim.keymap.set("n", "<localleader>" .. key, function()
             local _, win = require("codediff.ui.lifecycle").get_windows(vim.api.nvim_get_current_tabpage())
             if not win or not vim.api.nvim_win_is_valid(win) then
-                vim.notify("Open PR changes with \\p first", vim.log.levels.WARN)
+                vim.notify("Open PR changes with \\rp first", vim.log.levels.WARN)
                 return
             end
             vim.api.nvim_set_current_win(win)
@@ -186,6 +186,7 @@ function M.open(pr, root)
         win = vim.api.nvim_get_current_win()
     end
     vim.api.nvim_win_set_buf(win, buffer(pr, root))
+    require("git-review.workflow").set_target("pr", root, pr.url)
 end
 
 function M.attach(tab, pr, root)

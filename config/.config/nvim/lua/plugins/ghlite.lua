@@ -19,6 +19,7 @@ return {
         html_comments_command = false,
         refresh_interval = 0,
         pr_commands = {},
+        keymaps = { comment = { send_comment = "<C-s>" } },
     },
     config = function(_, opts)
         require("ghlite").setup(opts)
