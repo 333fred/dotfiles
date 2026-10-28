@@ -26,6 +26,7 @@ exec --no-startup-id pavucontrol
 
 # Startup Dunst
 exec --no-startup-id /usr/bin/dunst
+exec --no-startup-id /usr/bin/python3 /home/fred/.config/dunst/pause-while-locked.py
 
 # Startup polkit. Various authentication issues will occur without this (such as azurevpn not working)
 # Make sure policykit-1-gnome is installed on Ubuntu
