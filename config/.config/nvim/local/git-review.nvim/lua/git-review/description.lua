@@ -1,12 +1,61 @@
 local M = {}
 local views = {}
+local namespace = vim.api.nvim_create_namespace("git-review.summary")
+local styles = {
+    good = { "✓", "DiagnosticOk" },
+    bad = { "✗", "DiagnosticError" },
+    pending = { "◷", "DiagnosticWarn" },
+    info = { "●", "DiagnosticInfo" },
+    muted = { "○", "Comment" },
+    unknown = { "?", "DiagnosticWarn" },
+}
+local states = {
+    APPROVED = { "Approved", "good" },
+    CHANGES_REQUESTED = { "Changes requested", "bad" },
+    REVIEW_REQUIRED = { "Review required", "pending" },
+    COMMENTED = { "Commented", "info" },
+    DISMISSED = { "Dismissed", "muted" },
+    PENDING = { "Pending", "pending" },
+    OPEN = { "Open", "good" },
+    CLOSED = { "Closed", "bad" },
+    MERGED = { "Merged", "info" },
+    DRAFT = { "Draft", "muted" },
+    MERGEABLE = { "No conflicts", "good" },
+    CONFLICTING = { "Conflicts present", "bad" },
+    CLEAN = { "Ready to merge", "good" },
+    BLOCKED = { "Blocked", "pending" },
+    BEHIND = { "Branch behind base", "pending" },
+    DIRTY = { "Conflicts present", "bad" },
+    UNSTABLE = { "Checks not passing", "pending" },
+    HAS_HOOKS = { "Merge hooks pending", "pending" },
+}
+
+local function append(lines, highlights, prefix, text, style)
+    if style then
+        local badge = styles[style]
+        text = badge[1] .. " " .. text
+        highlights[#highlights + 1] = {
+            row = #lines, col = #prefix, end_col = #prefix + #text, group = badge[2],
+        }
+    end
+    lines[#lines + 1] = prefix .. text
+end
 
 function M.view(tab)
     return views[tab or vim.api.nvim_get_current_tabpage()]
 end
 
+function M.foldexpr(lnum)
+    local range = vim.b.git_review_checks_fold
+    return range and lnum >= range[1] and lnum <= range[2] and 1 or 0
+end
+
 local function reported(value, fallback)
     return type(value) == "string" and value ~= "" and value or (fallback or "Unknown")
+end
+
+local function local_time(value)
+    return type(value) == "number" and os.date("%b %d, %Y at %I:%M %p %Z", value) or "Unknown"
 end
 
 local function names(items, prefix)
@@ -43,8 +92,19 @@ local function check_state(check)
     return reported(check.state)
 end
 
-local function status_lines(pr)
+local function status_lines(pr, lines, highlights)
+    local function add(prefix, text, style)
+        append(lines, highlights, prefix, text, style)
+    end
+    local function status(prefix, value, fallback)
+        local state = states[value or ""]
+        add(prefix, state and state[1] or reported(value, fallback), state and state[2] or "unknown")
+    end
     local counts = { passing = 0, failing = 0, pending = 0, neutral = 0, skipped = 0, cancelled = 0, unknown = 0 }
+    local check_styles = {
+        passing = "good", failing = "bad", pending = "pending",
+        neutral = "muted", skipped = "muted", cancelled = "muted", unknown = "unknown",
+    }
     local checks = {}
     for _, check in ipairs(type(pr.statusCheckRollup) == "table" and pr.statusCheckRollup or {}) do
         local state = check_state(check)
@@ -54,59 +114,110 @@ local function status_lines(pr)
         if type(check.workflowName) == "string" and check.workflowName ~= "" then
             name = check.workflowName .. " / " .. name
         end
-        checks[#checks + 1] = "- " .. name .. ": " .. state
+        checks[#checks + 1] = { name .. ": " .. state:gsub("_", " "):lower(), check_styles[bucket] }
     end
-    local summary = pr.statusCheckRollup == nil and "Unavailable" or "None reported"
+    local summary = type(pr.statusCheckRollup) ~= "table" and "Unavailable" or "None reported"
+    local parts = {}
     if #checks > 0 then
-        local parts = {}
+        local texts = {}
         for _, bucket in ipairs({ "passing", "failing", "pending", "neutral", "skipped", "cancelled", "unknown" }) do
             if counts[bucket] > 0 then
-                parts[#parts + 1] = counts[bucket] .. " " .. bucket
+                local style = styles[check_styles[bucket]]
+                local text = style[1] .. " " .. counts[bucket] .. " " .. bucket
+                texts[#texts + 1] = text
+                parts[#parts + 1] = { text, style[2] }
             end
         end
-        summary = table.concat(parts, ", ")
+        summary = table.concat(texts, ", ")
     end
     local auto_merge = pr.autoMergeRequest == vim.NIL and "Disabled" or "Unknown"
     if type(pr.autoMergeRequest) == "table" then
         auto_merge = "Enabled (" .. reported(pr.autoMergeRequest.mergeMethod) .. ")"
     end
-    local lines = {
-        "## PR status",
-        "",
-        "Review/signoff: " .. reported(pr.reviewDecision, "No decision reported"),
-        "Checks: " .. summary,
-        "Merge conflicts: " .. (({ MERGEABLE = "None", CONFLICTING = "Present" })[pr.mergeable or ""] or "Unknown"),
-        "Merge readiness: " .. reported(pr.mergeStateStatus),
-        "Auto-merge: " .. auto_merge,
-        ("Changes: %s files (+%s / -%s)"):format(
-            pr.changedFiles or "Unknown", pr.additions or "Unknown", pr.deletions or "Unknown"),
-        "Awaiting review: " .. names(pr.reviewRequests, "@"),
-        "Assignees: " .. names(pr.assignees, "@"),
-        "Labels: " .. names(pr.labels),
-        "Created: " .. reported(pr.createdAt),
-        "Updated: " .. reported(pr.updatedAt),
-        "",
-        "### Latest reviews",
-        "",
+    add("", "## PR status")
+    add("", "")
+    status("Review/signoff: ", pr.reviewDecision, "No decision reported")
+    local approved, changes_requested = {}, {}
+    if type(pr.currentReviews) == "table" then
+        for _, review in ipairs(pr.currentReviews) do
+            local author = type(review.author) == "table" and review.author or { login = "unknown" }
+            if review.state == "APPROVED" then
+                approved[#approved + 1] = author
+            elseif review.state == "CHANGES_REQUESTED" then
+                changes_requested[#changes_requested + 1] = author
+            end
+        end
+    end
+    -- This connection is fully paginated, unlike gh pr view's capped metadata lists.
+    local function reviewers(items)
+        table.sort(items, function(a, b) return (a.login or ""):lower() < (b.login or ""):lower() end)
+        return table.concat(vim.tbl_map(function(author) return "@" .. (author.login or "unknown") end, items), ", ")
+    end
+    add("Approved by: ", type(pr.currentReviews) ~= "table" and "Unavailable"
+        or (#approved > 0 and reviewers(approved) or "None"),
+        type(pr.currentReviews) ~= "table" and "unknown" or (#approved > 0 and "good" or "muted"))
+    if #changes_requested > 0 then
+        add("Changes requested by: ", reviewers(changes_requested), "bad")
+    end
+    add("Checks: ", summary, type(pr.statusCheckRollup) ~= "table" and "unknown"
+        or (#checks == 0 and "muted" or nil))
+    local col = #"Checks: "
+    for _, part in ipairs(parts) do
+        highlights[#highlights + 1] = {
+            row = #lines - 1, col = col, end_col = col + #part[1], group = part[2],
+        }
+        col = col + #part[1] + #", "
+    end
+    status("Merge conflicts: ", pr.mergeable)
+    status("Merge readiness: ", pr.mergeStateStatus)
+    add("Auto-merge: ", auto_merge, type(pr.autoMergeRequest) == "table" and "good"
+        or (pr.autoMergeRequest == vim.NIL and "muted" or "unknown"))
+    local changes_prefix = ("Changes: %s files ("):format(pr.changedFiles or "Unknown")
+    local additions, deletions = "+" .. (pr.additions or "Unknown"), "-" .. (pr.deletions or "Unknown")
+    add("", changes_prefix .. additions .. " / " .. deletions .. ")")
+    highlights[#highlights + 1] = {
+        row = #lines - 1, col = #changes_prefix, end_col = #changes_prefix + #additions, group = "GitSignsAdd",
     }
+    highlights[#highlights + 1] = {
+        row = #lines - 1, col = #changes_prefix + #additions + 3,
+        end_col = #changes_prefix + #additions + 3 + #deletions, group = "GitSignsDelete",
+    }
+    add("Awaiting review: ", names(pr.reviewRequests, "@"),
+        type(pr.reviewRequests) ~= "table" and "unknown" or (#pr.reviewRequests > 0 and "pending" or "muted"))
+    add("Assignees: ", names(pr.assignees, "@"))
+    add("Labels: ", names(pr.labels))
+    add("Created: ", local_time(pr.createdAtEpoch))
+    add("Updated: ", local_time(pr.updatedAtEpoch))
+    add("", "")
+    add("", "### Latest reviews")
+    add("", "")
     if type(pr.latestReviews) ~= "table" then
-        lines[#lines + 1] = "Unavailable"
+        add("", "Unavailable", "unknown")
     elseif #pr.latestReviews == 0 then
-        lines[#lines + 1] = "None submitted"
+        add("", "None submitted", "muted")
     else
         for _, review in ipairs(pr.latestReviews) do
             local author = type(review.author) == "table" and reported(review.author.login, "unknown") or "unknown"
-            lines[#lines + 1] = "- @" .. author .. ": " .. reported(review.state)
+            status("- @" .. author .. ": ", review.state)
         end
         if #pr.latestReviews == 100 then
-            lines[#lines + 1] = "First 100 reviewers shown; more may exist."
+            add("", "First 100 reviewers shown; more may exist.", "pending")
         end
     end
     if #checks > 0 then
-        vim.list_extend(lines, { "", "### Checks", "" })
-        vim.list_extend(lines, checks)
+        add("", "")
+        local first = #lines + 1
+        local style = counts.failing > 0 and "bad"
+            or (counts.pending > 0 or counts.cancelled > 0) and "pending"
+            or counts.unknown > 0 and "unknown"
+            or counts.passing == #checks and "good" or "muted"
+        add("### Checks: ", ("%d/%d passed (Space to toggle)"):format(counts.passing, #checks), style)
+        add("", "")
+        for _, check in ipairs(checks) do
+            add("- ", check[1], check[2])
+        end
+        return { first, #lines }
     end
-    return lines
 end
 
 local function buffer(pr, root)
@@ -122,11 +233,15 @@ local function buffer(pr, root)
     vim.b[buf].git_review_root = root
     vim.b[buf].git_review_pr_url = pr.url
     local author = type(pr.author) == "table" and pr.author.login or "unknown"
+    local reference = pr.url:match("^https://[^/]+/(.-)/pull/%d+$") .. "#" .. pr.number
+    local state = states[pr.isDraft and pr.state == "OPEN" and "DRAFT" or pr.state]
+    local style = styles[state and state[2] or "unknown"]
+    local label = style[1] .. " " .. pr.state .. (pr.isDraft and " (draft)" or "")
+    local highlights = {}
     local lines = {
         "# " .. pr.title,
         "",
-        pr.url:match("^https://[^/]+/(.-)/pull/%d+$") .. "#" .. pr.number
-            .. " | " .. pr.state .. (pr.isDraft and " (draft)" or "") .. " | @" .. author,
+        reference .. " | " .. label .. " | @" .. author,
         pr.headRefName .. " -> " .. pr.baseRefName,
         "",
         pr.url,
@@ -134,16 +249,26 @@ local function buffer(pr, root)
         "Actions: \\pc checkout | \\rp all PR changes | \\rP since last review | \\pv description | gx browser",
         "",
     }
-    vim.list_extend(lines, status_lines(pr))
+    highlights[#highlights + 1] = {
+        row = 2, col = #reference + 3, end_col = #reference + 3 + #label, group = style[2],
+    }
+    vim.b[buf].git_review_checks_fold = status_lines(pr, lines, highlights)
     vim.list_extend(lines, { "", "## Description", "" })
     vim.list_extend(lines, vim.split((pr.body or ""):gsub("\r\n", "\n"), "\n", { plain = true }))
     vim.bo[buf].modifiable = true
     vim.bo[buf].readonly = false
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+    vim.api.nvim_buf_clear_namespace(buf, namespace, 0, -1)
+    for _, highlight in ipairs(highlights) do
+        vim.api.nvim_buf_set_extmark(buf, namespace, highlight.row, highlight.col, {
+            end_col = highlight.end_col, hl_group = highlight.group, priority = 200,
+        })
+    end
     vim.bo[buf].modified = false
     vim.bo[buf].modifiable = false
     vim.bo[buf].readonly = true
     vim.bo[buf].filetype = "markdown"
+    vim.keymap.set("n", "<Space>", "za", { buffer = buf, desc = "Toggle check details" })
     vim.keymap.set("n", "gx", function() vim.ui.open(pr.url) end, { buffer = buf, desc = "Open PR on GitHub" })
     vim.keymap.set("n", "q", function()
         local lifecycle = require("codediff.ui.lifecycle")
@@ -167,14 +292,24 @@ local function buffer(pr, root)
     return buf
 end
 
+local function configure_folds(win)
+    vim.wo[win].foldexpr = "v:lua.require'git-review.description'.foldexpr(v:lnum)"
+    vim.wo[win].foldmethod = "expr"
+    vim.wo[win].foldtext = ""
+    vim.wo[win].foldminlines = 0
+    vim.wo[win].foldlevel = 0
+    vim.wo[win].foldenable = true
+end
+
 local function configure_window(win)
     for option, value in pairs({
         diff = false, scrollbind = false, cursorbind = false,
         number = false, relativenumber = false, wrap = true,
-        foldenable = false, winfixheight = true,
+        winfixheight = true,
     }) do
         vim.wo[win][option] = value
     end
+    configure_folds(win)
     vim.w[win].codediff_restore = nil
 end
 
@@ -186,6 +321,7 @@ function M.open(pr, root)
         win = vim.api.nvim_get_current_win()
     end
     vim.api.nvim_win_set_buf(win, buffer(pr, root))
+    configure_folds(win)
     require("git-review.workflow").set_target("pr", root, pr.url)
 end
 
@@ -198,6 +334,7 @@ function M.attach(tab, pr, root)
     local buf = buffer(pr, root)
     if view.win and vim.api.nvim_win_is_valid(view.win) and vim.api.nvim_win_get_buf(view.win) == view.buf then
         vim.api.nvim_win_set_buf(view.win, buf)
+        configure_folds(view.win)
         view.buf = buf
         return
     end

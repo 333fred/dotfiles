@@ -177,7 +177,10 @@ local function run_pr(action, require_clean, with_comments, target, metadata_onl
         if target then
             command[#command + 1] = target
         end
-        vim.list_extend(command, { "--json", pr_fields })
+        vim.list_extend(command, {
+            "--json", pr_fields,
+            "--jq", ". + {createdAtEpoch: (.createdAt | fromdateiso8601), updatedAtEpoch: (.updatedAt | fromdateiso8601)}",
+        })
         local result = require("async").await(3, vim.system, command, { cwd = checkout.root, text = true })
         require("ghlite.ui").schedule()
         if id ~= request_id or not vim.api.nvim_win_is_valid(win) or vim.api.nvim_get_current_win() ~= win
@@ -203,6 +206,32 @@ local function run_pr(action, require_clean, with_comments, target, metadata_onl
             require("ghlite.ui").schedule()
             notify("Open this PR's repository first, or set gh repo set-default to " .. repository)
             return
+        end
+        local host, owner, name = repository:match("^https://([^/]+)/([^/]+)/([^/]+)$")
+        local reviews = require("async").await(3, vim.system, {
+            "gh", "api", "graphql", "--hostname", host, "--paginate", "--slurp",
+            "-f", "query=" .. [[
+                query($owner: String!, $name: String!, $number: Int!, $endCursor: String) {
+                    repository(owner: $owner, name: $name) {
+                        pullRequest(number: $number) {
+                            latestOpinionatedReviews(first: 100, after: $endCursor) {
+                                nodes { author { login } state }
+                                pageInfo { hasNextPage endCursor }
+                            }
+                        }
+                    }
+                }
+            ]],
+            "-f", "owner=" .. owner, "-f", "name=" .. name, "-F", "number=" .. pr.number,
+        }, { cwd = checkout.root, text = true })
+        if reviews.code ~= 0 then
+            require("ghlite.ui").schedule()
+            notify("Could not load current PR signoffs: " .. vim.trim(reviews.stderr))
+            return
+        end
+        pr.currentReviews = {}
+        for _, page in ipairs(vim.json.decode(reviews.stdout)) do
+            vim.list_extend(pr.currentReviews, page.data.repository.pullRequest.latestOpinionatedReviews.nodes)
         end
         if not metadata_only then
             ensure_pr_commits(pr, checkout.root)
