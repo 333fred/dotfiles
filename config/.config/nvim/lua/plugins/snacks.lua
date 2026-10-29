@@ -1,3 +1,28 @@
+local function update_preview_context(win)
+    local context = package.loaded["treesitter-context"]
+    if not (context and context.enabled() and win and vim.api.nvim_win_is_valid(win)) then
+        return
+    end
+    local buf = vim.api.nvim_win_get_buf(win)
+    local highlighter = vim.treesitter.highlighter.active[buf]
+    if vim.bo[buf].filetype == "snacks_picker_preview" and highlighter then
+        vim.api.nvim_win_call(win, function()
+            vim.cmd("noautocmd setlocal filetype=" .. highlighter.tree:lang())
+        end)
+    end
+    if highlighter then
+        -- Context calculation needs a completed parse of newly populated previews.
+        highlighter.tree:parse()
+    end
+    vim.api.nvim_exec_autocmds("FileType", {
+        group = "treesitter_context_update",
+        buffer = buf,
+    })
+    vim.api.nvim_win_call(win, function()
+        vim.api.nvim_exec_autocmds("CursorMoved", { group = "treesitter_context_update" })
+    end)
+end
+
 return {
     "folke/snacks.nvim",
     priority = 900,
@@ -6,6 +31,27 @@ return {
         dashboard = { enabled = true },
         picker = {
             enabled = true,
+            on_change = function(picker)
+                -- Preview buffers suppress FileType events and are not the current window.
+                vim.schedule(function()
+                    local win = picker.preview and picker.preview.win.win
+                    update_preview_context(win)
+                end)
+            end,
+            actions = {
+                preview_scroll_up = function(picker)
+                    Snacks.picker.actions.preview_scroll_up(picker)
+                    update_preview_context(picker.preview.win.win)
+                end,
+                preview_scroll_down = function(picker)
+                    Snacks.picker.actions.preview_scroll_down(picker)
+                    update_preview_context(picker.preview.win.win)
+                end,
+            },
+            win = {
+                -- Leave room above the cursor for context while paging the preview.
+                preview = { wo = { scrolloff = 3 } },
+            },
             matcher = {
                 smartcase = false,
                 ignorecase = true,
