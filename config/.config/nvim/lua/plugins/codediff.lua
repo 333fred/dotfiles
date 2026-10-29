@@ -41,24 +41,44 @@ return {
     config = function(_, opts)
         require("git-review.content").setup()
         require("codediff").setup(opts)
-        local group = vim.api.nvim_create_augroup("CodeDiffMarkdownWrap", { clear = true })
+        local group = vim.api.nvim_create_augroup("CodeDiffWrap", { clear = true })
+        local function wrap_diff(tab)
+            vim.schedule(function()
+                if not tab or not vim.api.nvim_tabpage_is_valid(tab) then
+                    return
+                end
+                local original, modified = require("codediff.ui.lifecycle").get_windows(tab)
+                for _, win in pairs({ original, modified }) do
+                    if vim.api.nvim_win_is_valid(win) then
+                        if not vim.wo[win].wrap then
+                            vim.wo[win].wrap = true
+                        end
+                        vim.wo[win].linebreak = true
+                    end
+                end
+            end)
+        end
         vim.api.nvim_create_autocmd("User", {
             group = group,
             pattern = { "CodeDiffOpen", "CodeDiffFileSelect" },
             callback = function(event)
-                local tab = event.data.tabpage
-                vim.schedule(function()
-                    if not tab or not vim.api.nvim_tabpage_is_valid(tab) then
-                        return
-                    end
-                    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
-                        local buf = vim.api.nvim_win_get_buf(win)
-                        if vim.bo[buf].filetype == "markdown" then
-                            vim.wo[win].wrap = true
-                            vim.wo[win].linebreak = true
-                        end
-                    end
-                end)
+                wrap_diff(event.data.tabpage)
+            end,
+        })
+        vim.api.nvim_create_autocmd({ "BufWinEnter", "BufEnter", "WinEnter", "FileType" }, {
+            group = group,
+            callback = function()
+                wrap_diff(vim.api.nvim_get_current_tabpage())
+            end,
+        })
+        -- CodeDiff also resets wrap during asynchronous renders and pane focus.
+        vim.api.nvim_create_autocmd("OptionSet", {
+            group = group,
+            pattern = "wrap",
+            callback = function()
+                if vim.v.option_new == false then
+                    wrap_diff(vim.api.nvim_get_current_tabpage())
+                end
             end,
         })
     end,
