@@ -362,6 +362,14 @@ local function open_pr_diff(left, right, pr)
     vim.cmd("CodeDiff " .. left .. (right and " " .. right or ""))
 end
 
+local function enable_comments()
+    comments_enabled = true
+    for _, ns in ipairs(namespaces) do
+        vim.diagnostic.enable(true, { ns_id = ns })
+    end
+    require("ghlite.comments").load_comments_on_visible_buffers()
+end
+
 function M.local_diff()
     pending_diff = nil
     local lifecycle = require("codediff.ui.lifecycle")
@@ -395,6 +403,7 @@ function M.pr_diff()
             notify("The active pane or checkout changed while preparing the PR diff; retry")
             return
         end
+        enable_comments()
         if context.head == pr.headRefOid then
             open_pr_diff(vim.trim(result.stdout), nil, pr)
         else
@@ -504,11 +513,7 @@ function M.toggle_comments()
             notify("Checkout changed while loading comments; retry")
             return
         end
-        comments_enabled = true
-        for _, ns in ipairs(namespaces) do
-            vim.diagnostic.enable(true, { ns_id = ns })
-        end
-        require("ghlite.comments").load_comments_on_visible_buffers()
+        enable_comments()
         notify("PR comments enabled", vim.log.levels.INFO)
     end, false)
 end

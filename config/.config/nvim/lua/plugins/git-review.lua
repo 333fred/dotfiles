@@ -4,7 +4,7 @@ return {
     lazy = false,
     dependencies = { "folke/snacks.nvim" },
     keys = {
-        { "<localleader>rp", function() require("git-review").pr_diff() end, desc = "Review PR changes" },
+        { "<localleader>rp", function() require("git-review").pr_diff() end, desc = "Review PR changes and comments" },
         { "<localleader>rP", function() require("git-review").since_review() end, desc = "PR changes since last review" },
         { "<localleader>pv", function() require("git-review").description() end, desc = "View/toggle PR description" },
         { "<localleader>pc", function() require("git-review").checkout_pr() end, desc = "Check out selected PR" },

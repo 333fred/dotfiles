@@ -33,10 +33,6 @@ Install instructions:
 
 ## Neovim
 
-> [!NOTE]
-> My neovim config is heavily created with Copilot, and I am not a lua expert. If you think something in it is bad practice, it probably
-> is, and I just haven't been bitten by it yet.
-
 I use Neovim with Roslyn for C#, Snacks for file navigation, Bufferline for open files,
 and Gitsigns/CodeDiff/GHLite for integrated Git and PR review. Sidekick provides
 Copilot CLI and next-edit suggestions, with review.nvim for local feedback.
@@ -54,10 +50,7 @@ Open `nvim .` at a solution or project root for C# support. Use `:Roslyn target`
 `vim` and `v` alias to `nvim`; it is also the default `EDITOR` and `VISUAL`.
 
 Pause after `,` or `\` for shortcut hints, or press `,?` for available keymaps.
-Review and comment actions are shared between PR and local/Copilot reviews:
-`\r...` reviews, `\c...` comments, `\p...` PR selection/checkout, `\d...` diffs,
-`\h...` hunks, and `\x...` merge conflicts. `\j/k/J/K` retain change/file navigation.
-See the [review notes](NEOVIM-REVIEW.md) for Copilot feedback, PR workflows, and safety details.
+See the [review notes](NEOVIM-REVIEW.md) for PR and Copilot workflows.
 
 ## `i3status-rust`
 

@@ -31,3 +31,5 @@ vim.opt.foldmethod = "indent"
 vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 99
 vim.opt.completeopt = { "menu", "menuone", "noselect", "popup" }
+vim.opt.wildoptions:append("fuzzy")
+vim.opt.wildignorecase = true

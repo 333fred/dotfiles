@@ -24,6 +24,14 @@ guidance.
 - Branch creation, checkout, and local-only operations like `git status`,
   `git diff`, `git log`, and `git stash` are fine without asking.
 
+## Code comments and documentation
+
+- Do not include point-in-time comments in committed code.
+- Focus comments and documentation on why, not what. Avoid elaboration unless
+  the detail is useful and not obvious from the implementation.
+- When documentation describes what exists, keep it to a basic inventory rather
+  than restating every bit of functionality in the code.
+
 ## Comments and replies on my behalf
 
 - Never, under any circumstances, post a comment, review, reply, reaction, or
