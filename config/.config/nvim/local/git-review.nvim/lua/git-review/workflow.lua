@@ -35,19 +35,20 @@ function M.status()
     return "Local -> Copilot"
 end
 
-function M.set_target(kind, root, url, tab)
+function M.set_target(kind, root, url, tab, implicit)
     local state = checkout()
     if not state or (vim.uv.fs_realpath(root) or root) ~= state.root then
         notify("Open this review's repository first")
         return
     end
     targets[tab or vim.api.nvim_get_current_tabpage()] = {
-        kind = kind, root = state.root, branch = state.branch, url = url,
+        kind = kind, root = state.root, branch = state.branch, url = url, implicit = implicit,
     }
     if package.loaded["review.marks"] then
         require("review.marks").clear_all()
     end
     vim.cmd.redrawstatus()
+    return M.target(tab)
 end
 
 function M.valid(target)
@@ -73,6 +74,26 @@ local function checked_target()
         return nil
     end
     return target
+end
+
+local function with_target(pr_action, local_action)
+    local target = M.target()
+    if target and target.implicit and not M.valid(target) then
+        targets[vim.api.nvim_get_current_tabpage()] = nil
+        vim.cmd.redrawstatus()
+        target = nil
+    end
+    if not target then
+        return pr_action()
+    end
+    target = checked_target()
+    if not target then
+        return
+    end
+    if target.kind == "pr" then
+        return pr_action()
+    end
+    return local_action(target)
 end
 
 local function load_local(target)
@@ -114,7 +135,7 @@ function M.open_local(action)
     end
 end
 
-local function confirm(prompt, target, action)
+function M.confirm(prompt, target, action)
     local win, buf = vim.api.nvim_get_current_win(), vim.api.nvim_get_current_buf()
     vim.ui.select({ "Confirm", "Cancel" }, { prompt = prompt }, function(choice)
         if choice ~= "Confirm" then
@@ -179,20 +200,8 @@ local function submit_local(target)
     end, { attach = true, filter = { name = "copilot" }, focus = true, show = true })
 end
 
-function M.review(action)
-    local target = checked_target()
-    if not target then
-        return
-    end
-    local commands = {
-        start = "GHLitePRStartReview", submit = "GHLitePRSubmitReview",
-        approve = "GHLitePRApprove", discard = "GHLitePRDiscardReview",
-    }
+local function review_local(action, target)
     local function run()
-        if target.kind == "pr" then
-            require("git-review").review_command(commands[action])
-            return
-        end
         prepare_local(target)
         if action == "approve" then
             notify("Approval is a GitHub PR action; this review targets Copilot")
@@ -205,10 +214,22 @@ function M.review(action)
         end
     end
     if action == "discard" then
-        confirm("Discard pending " .. M.status() .. " feedback?", target, run)
+        M.confirm("Discard pending " .. M.status() .. " feedback?", target, run)
     else
         run()
     end
+end
+
+function M.review(action)
+    return with_target(function()
+        local commands = {
+            start = "GHLitePRStartReview", submit = "GHLitePRSubmitReview",
+            approve = "GHLitePRApprove", discard = "GHLitePRDiscardReview",
+        }
+        return require("git-review").review_command(commands[action])
+    end, function(target)
+        return review_local(action, target)
+    end)
 end
 
 local function change_local_comment(action, target, comment, buf, after)
@@ -238,7 +259,7 @@ local function change_local_comment(action, target, comment, buf, after)
         end
     end
     if action == "delete" then
-        confirm("Delete this local comment?", target, change)
+        M.confirm("Delete this local comment?", target, change)
     else
         change()
     end
@@ -271,23 +292,7 @@ local function open_local_comment(comment, target)
     end
 end
 
-function M.comment(action)
-    local target = checked_target()
-    if not target then
-        return
-    end
-    if target.kind == "pr" then
-        if action == "file" then
-            notify("File-level PR comments are not supported by GHLite; select a line with \\ca")
-        elseif action == "delete" then
-            confirm("Delete your PR comment?", target, function()
-                require("git-review").comment_action(action)
-            end)
-        else
-            require("git-review").comment_action(action)
-        end
-        return
-    end
+local function comment_local(action, target)
     prepare_local(target)
     local comments = require("review.comments")
     if action == "add" then
@@ -312,10 +317,27 @@ function M.comment(action)
             return
         end
         change_local_comment(action, target, comment, vim.api.nvim_get_current_buf())
-    elseif action == "list" then
+    elseif action == "list" or action == "list_window" then
         local items = require("review.store").get_all()
         if #items == 0 then
             notify("No local comments")
+            return
+        end
+        if action == "list_window" then
+            local entries = vim.tbl_map(function(comment)
+                local side = comment.side == "old" and "~" or ""
+                return {
+                    filename = target.root .. "/" .. comment.file,
+                    lnum = math.max(comment.line, 1),
+                    text = ("[%s] %s%s: %s"):format(require("git-review.feedback").status(comment),
+                        side, comment.line, comment.text:gsub("%s+", " ")),
+                }
+            end, items)
+            table.sort(entries, function(a, b)
+                return a.filename == b.filename and a.lnum < b.lnum or a.filename < b.filename
+            end)
+            vim.fn.setqflist({}, " ", { title = "Local review comments", items = entries })
+            vim.cmd.copen()
             return
         end
         vim.ui.select(items, {
@@ -360,6 +382,14 @@ function M.comment(action)
         end
         open_local_comment(comment, target)
     end
+end
+
+function M.comment(action)
+    return with_target(function()
+        return require("git-review").comment_action(action)
+    end, function(target)
+        return comment_local(action, target)
+    end)
 end
 
 function M.mark_reviewed()

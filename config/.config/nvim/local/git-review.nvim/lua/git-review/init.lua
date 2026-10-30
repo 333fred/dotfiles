@@ -275,6 +275,35 @@ local function run_pr(action, require_clean, with_comments, target, metadata_onl
     end)
 end
 
+local function run_pr_action(action, require_clean, with_comments)
+    local workflow = require("git-review.workflow")
+    local destination = workflow.target()
+    return run_pr(function(pr)
+        if not vim.deep_equal(destination, workflow.target()) then
+            notify("Review target changed; retry the PR action")
+            return
+        end
+        local target = workflow.set_target("pr", context.root, pr.url, nil, not destination or destination.implicit)
+        if target then
+            return action(pr, target)
+        end
+    end, require_clean, with_comments)
+end
+
+local function confirm_pr(prompt, target, action)
+    local checkout = context
+    require("git-review.workflow").confirm(prompt, target, function()
+        if not same_checkout(checkout, context) or checkout.pr_url ~= context.pr_url
+            or checkout.pr_head ~= context.pr_head or not same_checkout(checkout, snapshot()) then
+            notify("Checkout or PR changed; retry the action")
+            return
+        end
+        if clean_checkout(checkout) then
+            return action()
+        end
+    end)
+end
+
 function M.select_pr(url)
     return run_pr(function(pr)
         require("git-review.description").open(pr, context.root)
@@ -493,7 +522,7 @@ function M.since_review()
 end
 
 function M.toggle_comments()
-    if comments_enabled then
+    if comments_enabled and same_checkout(context, snapshot()) then
         if comment_win and vim.api.nvim_win_is_valid(comment_win) then
             vim.api.nvim_win_close(comment_win, true)
         end
@@ -504,7 +533,7 @@ function M.toggle_comments()
         notify("PR comments hidden", vim.log.levels.INFO)
         return
     end
-    return run_pr(function(pr)
+    return run_pr_action(function(pr)
         local checkout = context
         require("ghlite.comments").load_comments_only(pr.number)
         require("ghlite.ui").schedule()
@@ -643,7 +672,7 @@ function M.add_comment()
         first = vim.fn.line("v")
         vim.cmd.normal({ vim.api.nvim_replace_termcodes("<Esc>", true, false, true), bang = true })
     end
-    return run_pr(function()
+    return run_pr_action(function()
         dispatch_line_action("GHLitePRAddComment", math.min(first, last), math.max(first, last))
     end, true, true)
 end
@@ -651,32 +680,110 @@ end
 function M.review_command(command)
     vim.api.nvim_buf_del_mark(0, "<")
     vim.api.nvim_buf_del_mark(0, ">")
-    return run_pr(function()
-        if command == "GHLitePRResolveComment" then
-            local line = vim.api.nvim_win_get_cursor(0)[1]
-            dispatch_line_action(command, line, line)
+    return run_pr_action(function(_, target)
+        local function run()
+            if command == "GHLitePRResolveComment" then
+                local line = vim.api.nvim_win_get_cursor(0)[1]
+                dispatch_line_action(command, line, line)
+            else
+                vim.cmd(command)
+            end
+        end
+        if command == "GHLitePRDiscardReview" then
+            local workflow = require("git-review.workflow")
+            confirm_pr("Discard pending " .. workflow.status() .. " feedback?", target, run)
         else
-            vim.cmd(command)
+            run()
         end
     end, true, command == "GHLitePRResolveComment")
 end
 
+local function open_comment_location(entry, target, checkout)
+    local function valid()
+        return require("git-review.workflow").valid(target) and same_checkout(checkout, context)
+            and checkout.pr_url == context.pr_url and checkout.pr_head == context.pr_head
+            and same_checkout(checkout, snapshot())
+    end
+    if not valid() then
+        notify("Checkout or PR changed; reopen the comment picker")
+        return
+    end
+    local win = vim.api.nvim_get_current_win()
+    local loaded = vim.fn.bufloaded(entry.filename) == 1
+    local group = vim.api.nvim_create_augroup("GitReviewCommentJump", { clear = true })
+    local function clear()
+        vim.api.nvim_clear_autocmds({ group = group })
+    end
+    vim.api.nvim_create_autocmd("User", {
+        group = group,
+        pattern = "CodeDiffVirtualFileLoaded",
+        callback = function(event)
+            local buf = event.data.buf
+            if not vim.api.nvim_buf_is_valid(buf) or vim.api.nvim_buf_get_name(buf) ~= entry.filename then
+                return
+            end
+            clear()
+            if not vim.api.nvim_win_is_valid(win) or vim.api.nvim_get_current_win() ~= win
+                or vim.api.nvim_win_get_buf(win) ~= buf then
+                return
+            end
+            if not valid() then
+                notify("Checkout or PR changed; reopen the comment picker")
+                return
+            end
+            if entry.lnum > vim.api.nvim_buf_line_count(buf) then
+                notify("PR snapshot has no line " .. entry.lnum .. "; reload PR comments", vim.log.levels.ERROR)
+                return
+            end
+            vim.api.nvim_win_set_cursor(win, { entry.lnum, 0 })
+        end,
+    })
+    vim.api.nvim_create_autocmd("BufWipeout", {
+        group = group,
+        callback = function(event)
+            if vim.api.nvim_buf_get_name(event.buf) == entry.filename then
+                clear()
+            end
+        end,
+    })
+    vim.api.nvim_create_autocmd("WinClosed", {
+        group = group,
+        pattern = tostring(win),
+        callback = clear,
+    })
+    vim.cmd.edit({ args = { entry.filename } })
+    if loaded then
+        -- Cached buffers also need a completion event before positioning the cursor.
+        require("codediff.core.virtual_file").refresh_buffer(vim.api.nvim_get_current_buf())
+    end
+end
+
 function M.comment_action(action)
-    if action == "add" then
+    if action == "file" then
+        notify("File-level PR comments are not supported by GHLite; select a line with \\ca")
+        return
+    elseif action == "add" then
         return M.add_comment()
     elseif action == "toggle" then
         return M.toggle_comments()
     elseif action == "open" then
-        return run_pr(M.show_comment, false, true)
+        return run_pr_action(M.show_comment, false, true)
     end
     local line_commands = {
         edit = "GHLitePRUpdateComment", delete = "GHLitePRDeleteComment",
         resolve = "GHLitePRResolveComment", unresolve = "GHLitePRUnresolveComment",
     }
-    return run_pr(function()
+    return run_pr_action(function(_, target)
         if line_commands[action] then
             local line = vim.api.nvim_win_get_cursor(0)[1]
-            dispatch_line_action(line_commands[action], line, line)
+            local function run()
+                dispatch_line_action(line_commands[action], line, line)
+            end
+            if action == "delete" then
+                confirm_pr("Delete your PR comment?", target, run)
+            else
+                run()
+            end
             return
         end
         local entries, markdown = {}, { "# PR review comments", "" }
@@ -688,7 +795,7 @@ function M.comment_action(action)
                     if #thread.comments > 0 then
                         entries[#entries + 1] = {
                             filename = virtual.create_url(context.root, context.pr_head, path),
-                            lnum = thread.line, text = thread.content,
+                            path = path, lnum = thread.line, text = thread.content, resolved = thread.resolved,
                         }
                         vim.list_extend(markdown, { "## " .. path .. ":" .. thread.line, thread.content, "" })
                     end
@@ -697,7 +804,7 @@ function M.comment_action(action)
         end
         if action == "yank" then
             vim.fn.setreg("+", table.concat(markdown, "\n"))
-        elseif action == "list" then
+        elseif action == "list" or action == "list_window" then
             if #entries == 0 then
                 notify("No PR comments")
                 return
@@ -705,8 +812,23 @@ function M.comment_action(action)
             table.sort(entries, function(a, b)
                 return a.filename == b.filename and a.lnum < b.lnum or a.filename < b.filename
             end)
-            vim.fn.setqflist({}, " ", { title = "PR review comments", items = entries })
-            vim.cmd.copen()
+            if action == "list_window" then
+                vim.fn.setqflist({}, " ", { title = "PR review comments", items = entries })
+                vim.cmd.copen()
+                return
+            end
+            local checkout = context
+            vim.ui.select(entries, {
+                prompt = "PR review comments:",
+                format_item = function(entry)
+                    return ("%s:%s [%s] %s"):format(entry.path, entry.lnum,
+                        entry.resolved and "Resolved" or "Open", entry.text:gsub("%s+", " "))
+                end,
+            }, function(entry)
+                if entry then
+                    open_comment_location(entry, target, checkout)
+                end
+            end)
         elseif action == "next" or action == "prev" then
             local buf, name = vim.api.nvim_get_current_buf(), vim.api.nvim_buf_get_name(0)
             local root, revision, path = virtual.parse_url(name)
