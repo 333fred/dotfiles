@@ -26,12 +26,13 @@ end
 
 local function snapshot(root)
     local name = vim.api.nvim_buf_get_name(0)
-    local path = name:sub(1, 1) == "/" and name or vim.fn.getcwd()
+    local path = name ~= "" and vim.fn.fnamemodify(name, ":p") or vim.fn.getcwd()
     local view = require("git-review.description").view()
     root = root or vim.b.git_review_root or (view and view.root) or vim.fs.root(path, ".git")
     if not root then
         return nil
     end
+    root = vim.uv.fs_realpath(root) or root
     local result = vim.system({
         "git", "-C", root, "rev-parse", "HEAD", "--abbrev-ref", "HEAD",
     }, { text = true }):wait()

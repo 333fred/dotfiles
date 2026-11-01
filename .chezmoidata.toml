@@ -1,0 +1,11 @@
+[monitorOutputs.default]
+main = "DP-4"
+secondary = "DP-2"
+
+[monitorOutputs.fred-desk]
+main = "DP-4"
+secondary = "DP-2"
+
+[monitorOutputs.frsilb-desk]
+main = "DP-2"
+secondary = "DP-0"

@@ -33,7 +33,7 @@ fi
 
 . "$HOME/.cargo/env"
 
-# Define  a `.profile.local` file for setting local globals, such as `PRIMARY_MONITOR`` and `SECONDARY_MONITOR``
+# Load optional machine-specific shell settings.
 if [ -f "$HOME/.profile.local" ]; then
     . "$HOME/.profile.local"
 fi

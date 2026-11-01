@@ -15,7 +15,7 @@ return {
         view_split = "",
         comment_split = "split",
         comment_hunk = false,
-        open_command = "xdg-open",
+        open_command = vim.fn.has("win32") == 1 and 'cmd.exe /c start ""' or "xdg-open",
         html_comments_command = false,
         refresh_interval = 0,
         pr_commands = {},

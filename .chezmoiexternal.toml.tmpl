@@ -1,42 +1,86 @@
-[submodule "zsh/.zprezto"]
-	path = zsh/.zprezto
-	url = git@github.com:sorin-ionescu/prezto.git
-[submodule "config/.config/base16-shell"]
-	path = config/.config/base16-shell
-	url = git@github.com:chriskempson/base16-shell.git
-[submodule "tmux/.tmux-themepack"]
-	path = tmux/.tmux-themepack
-	url = git@github.com:jimeh/tmux-themepack.git
-[submodule "tools/.tools/i3-ratiosplit"]
-	path = tools/.tools/i3-ratiosplit
-	url = git@github.com:333fred/i3-ratiosplit.git
-[submodule "zsh/.prezto-contrib"]
-	path = zsh/.prezto-contrib
-	url = git@github.com:belak/prezto-contrib.git
-[submodule "tools/.tools/roslynpad"]
-	path = tools/.tools/roslynpad
-	url = git@github.com:roslynpad/roslynpad.git
-[submodule "tools/.tools/rofi-calc"]
-	path = tools/.tools/rofi-calc
-	url = git@github.com:svenstaro/rofi-calc.git
-[submodule "zsh/.modules/zsh-vi-mode"]
-	path = zsh/.modules/zsh-vi-mode
-	url = git@github.com:jeffreytse/zsh-vi-mode.git
-[submodule "tools/.tools/MSBuildStructuredLog"]
-	path = tools/.tools/MSBuildStructuredLog
-	url = git@github.com:KirillOsenkov/MSBuildStructuredLog.git
-[submodule "tools/.tools/rofi-power-menu"]
-	path = tools/.tools/rofi-power-menu
-	url = git@github.com:jluttine/rofi-power-menu.git
-[submodule "config/i3status-rust"]
-	path = config/i3status-rust
-	url = git@github.com:greshake/i3status-rust.git
-[submodule "zsh/.modules/spaceship-vi-mode"]
-	path = zsh/.modules/spaceship-vi-mode
-	url = git@github.com:spaceship-prompt/spaceship-vi-mode.git
-[submodule "tools/.tools/libinput-gestures"]
-	path = tools/.tools/libinput-gestures
-	url = https://github.com/bulletmark/libinput-gestures.git
-[submodule "tools/.tools/rofi"]
-	path = tools/.tools/rofi
-	url = git@github.com:adi1090x/rofi.git
+{{ if eq .chezmoi.os "linux" }}
+[".config/base16-shell"]
+type = "git-repo"
+url = "git@github.com:chriskempson/base16-shell.git"
+refreshPeriod = "168h"
+clone.args = ["--depth", "1", "--branch", "master", "--single-branch", "--recurse-submodules", "--shallow-submodules"]
+pull.args = ["--ff-only", "--recurse-submodules"]
+
+[".tools/i3status-rust"]
+type = "git-repo"
+url = "git@github.com:greshake/i3status-rust.git"
+refreshPeriod = "168h"
+clone.args = ["--depth", "1", "--branch", "master", "--single-branch", "--recurse-submodules", "--shallow-submodules"]
+pull.args = ["--ff-only", "--recurse-submodules"]
+
+[".tools/MSBuildStructuredLog"]
+type = "git-repo"
+url = "git@github.com:KirillOsenkov/MSBuildStructuredLog.git"
+refreshPeriod = "168h"
+clone.args = ["--depth", "1", "--branch", "main", "--single-branch", "--recurse-submodules", "--shallow-submodules"]
+pull.args = ["--ff-only", "--recurse-submodules"]
+
+[".tools/i3-ratiosplit"]
+type = "git-repo"
+url = "git@github.com:333fred/i3-ratiosplit.git"
+refreshPeriod = "168h"
+clone.args = ["--depth", "1", "--branch", "main", "--single-branch", "--recurse-submodules", "--shallow-submodules"]
+pull.args = ["--ff-only", "--recurse-submodules"]
+
+[".tools/libinput-gestures"]
+type = "git-repo"
+url = "https://github.com/bulletmark/libinput-gestures.git"
+refreshPeriod = "168h"
+clone.args = ["--depth", "1", "--branch", "master", "--single-branch", "--recurse-submodules", "--shallow-submodules"]
+pull.args = ["--ff-only", "--recurse-submodules"]
+
+[".tools/rofi"]
+type = "git-repo"
+url = "git@github.com:adi1090x/rofi.git"
+refreshPeriod = "168h"
+clone.args = ["--depth", "1", "--branch", "master", "--single-branch", "--recurse-submodules", "--shallow-submodules"]
+pull.args = ["--ff-only", "--recurse-submodules"]
+
+[".tools/rofi-calc"]
+type = "git-repo"
+url = "git@github.com:svenstaro/rofi-calc.git"
+refreshPeriod = "168h"
+clone.args = ["--depth", "1", "--branch", "master", "--single-branch", "--recurse-submodules", "--shallow-submodules"]
+pull.args = ["--ff-only", "--recurse-submodules"]
+
+[".tools/roslynpad"]
+type = "git-repo"
+url = "git@github.com:roslynpad/roslynpad.git"
+refreshPeriod = "168h"
+clone.args = ["--depth", "1", "--branch", "main", "--single-branch", "--recurse-submodules", "--shallow-submodules"]
+pull.args = ["--ff-only", "--recurse-submodules"]
+
+[".modules/spaceship-vi-mode"]
+type = "git-repo"
+url = "git@github.com:spaceship-prompt/spaceship-vi-mode.git"
+refreshPeriod = "168h"
+clone.args = ["--depth", "1", "--branch", "main", "--single-branch", "--recurse-submodules", "--shallow-submodules"]
+pull.args = ["--ff-only", "--recurse-submodules"]
+
+[".modules/zsh-vi-mode"]
+type = "git-repo"
+url = "git@github.com:jeffreytse/zsh-vi-mode.git"
+refreshPeriod = "168h"
+clone.args = ["--depth", "1", "--branch", "master", "--single-branch", "--recurse-submodules", "--shallow-submodules"]
+pull.args = ["--ff-only", "--recurse-submodules"]
+
+[".prezto-contrib"]
+type = "git-repo"
+url = "git@github.com:belak/prezto-contrib.git"
+refreshPeriod = "168h"
+clone.args = ["--depth", "1", "--branch", "master", "--single-branch", "--recurse-submodules", "--shallow-submodules"]
+pull.args = ["--ff-only", "--recurse-submodules"]
+
+[".zprezto"]
+type = "git-repo"
+url = "git@github.com:sorin-ionescu/prezto.git"
+refreshPeriod = "168h"
+clone.args = ["--depth", "1", "--branch", "master", "--single-branch", "--recurse-submodules", "--shallow-submodules"]
+pull.args = ["--ff-only", "--recurse-submodules"]
+
+{{ end }}

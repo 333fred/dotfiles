@@ -1,0 +1,43 @@
+.gitignore
+README.md
+NEOVIM-REVIEW.md
+MIGRATION-LINUX.md
+MIGRATION-WINDOWS.md
+LICENSE
+installed_packages.txt
+monaspace_frozen.css
+gnupg
+gnupg/**
+powertoys
+powertoys/**
+winget
+winget/**
+tests
+tests/**
+
+{{ if eq .chezmoi.os "windows" }}
+.config
+.fonts
+.gnupg
+.local
+.tools
+.bashrc
+.profile
+.vim
+.vimrc
+.dir_colors
+.modules
+.prezto-contrib
+.zlogin
+.zlogout
+.zprezto
+.zpreztorc
+.zprofile
+.zshenv
+.zshrc
+{{ else if eq .chezmoi.os "linux" }}
+AppData
+Documents
+{{ else }}
+{{ fail "This prototype supports native Windows and Linux only" }}
+{{ end }}

@@ -1,3 +1,4 @@
+{{- $outputs := index .monitorOutputs (lower .chezmoi.hostname) | default .monitorOutputs.default -}}
 # Define names for default workspaces for which we configure key bindings later on.
 # We use variables to avoid repeating the names in multiple places.
 set $ws1 "1:"
@@ -11,14 +12,11 @@ set $ws8 "8:八"
 set $ws9 "9:九"
 set $ws10 "10:十"
 
-set_from_resource $wm.mainOutput wm.mainOutput DP-4
-set_from_resource $wm.secondaryOutput wm.secondaryOutput DP-2
-
 # Configure default workspace monitors
-workspace $ws1 output $wm.mainOutput
-workspace $ws2 output $wm.mainOutput
-workspace $ws3 output $wm.mainOutput
-workspace $ws4 output $wm.secondaryOutput
+workspace $ws1 output {{ $outputs.main }}
+workspace $ws2 output {{ $outputs.main }}
+workspace $ws3 output {{ $outputs.main }}
+workspace $ws4 output {{ $outputs.secondary }}
 
 # bring up screenshot gui
 bindsym $mod+Shift+s exec "flameshot gui"

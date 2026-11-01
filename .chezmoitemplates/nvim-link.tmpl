@@ -1,0 +1,5 @@
+{{- $existing := lstat .chezmoi.targetFile -}}
+{{- if and $existing (ne $existing.type "symlink") -}}
+{{- fail (printf "Refusing to replace existing Neovim target %s; back it up and move it before applying" .chezmoi.targetFile) -}}
+{{- end -}}
+{{- joinPath .chezmoi.sourceDir ".chezmoitemplates" "nvim" -}}

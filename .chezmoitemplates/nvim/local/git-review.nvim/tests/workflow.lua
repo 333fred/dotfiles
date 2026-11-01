@@ -1,6 +1,19 @@
--- Run from the repository root: nvim --headless -u NONE -l config/.config/nvim/local/git-review.nvim/tests/workflow.lua
-local plugin = vim.fn.getcwd() .. "/config/.config/nvim/local/git-review.nvim"
+-- Run with: nvim --headless -u NONE -l <path-to-this-file>
+local plugin = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h:h")
 package.path = plugin .. "/lua/?.lua;" .. plugin .. "/lua/?/init.lua;" .. package.path
+
+local clipboard = {}
+vim.g.clipboard = {
+    name = "Workflow test clipboard",
+    copy = {
+        ["+"] = function(lines) clipboard = lines end,
+        ["*"] = function(lines) clipboard = lines end,
+    },
+    paste = {
+        ["+"] = function() return { clipboard, "v" } end,
+        ["*"] = function() return { clipboard, "v" } end,
+    },
+}
 
 local cases = 0
 local function fixture()
@@ -19,6 +32,7 @@ local function fixture()
     env.buf = vim.api.nvim_get_current_buf()
     env.file = env.root .. "/review-workflow-test-" .. cases .. ".lua"
     vim.api.nvim_buf_set_name(env.buf, env.file)
+    env.file = vim.api.nvim_buf_get_name(env.buf)
     vim.api.nvim_buf_set_lines(env.buf, 0, -1, false, { "one", "two", "three", "four", "five" })
     vim.bo.modified = false
     vim.notify = function(message) env.notices[#env.notices + 1] = message end

@@ -9,24 +9,25 @@ YubiKeys, not in this repository or in the computer's GnuPG home.
 ## Set up another computer
 
 Install GnuPG, a suitable pinentry program, and smartcard/PC/SC support. On
-Linux, `stow -t ~ gnupg` from the repository root installs the GnuPG agent
-settings; on another OS, adapt `gpg-agent.conf` to the local pinentry path and
+Linux, chezmoi deploys the agent settings from `private_dot_gnupg`; the files
+in this `gnupg` directory are excluded from deployment. On another OS, adapt
+`gpg-agent.conf` to the local pinentry path and
 smartcard setup instead. Then, with either YubiKey inserted:
 
 ```sh
 gpg --import gnupg/public-key.asc
 gpg --card-status
 gpg --list-secret-keys --keyid-format long
-git config --file ~/.gitconfig.local user.signingkey 4305D17549D17C130E4F4FEE855E17DE1D09184F
 ```
 
 `gpg --card-status` associates the public key with the inserted card; `sec>`
 and `ssb>` in the secret-key listing indicate card-backed stubs, **not**
 exportable private keys on the computer. The public key must be imported before
 Git can sign with it. This repository's Git configuration enables signed
-commits and includes `~/.gitconfig.local` for machine-specific settings; avoid
-`git config --global` when `~/.gitconfig` is symlinked to the tracked dotfiles
-file. Do not import a private-key backup onto another computer.
+commits; avoid `git config --global` when `~/.gitconfig` is symlinked to the
+tracked dotfiles file. Do not import a private-key backup onto another computer.
+The Git template selects this YubiKey on `fred-desk` and a different signing
+key on other machines.
 
 After switching between the two YubiKeys, refresh the local card stubs:
 

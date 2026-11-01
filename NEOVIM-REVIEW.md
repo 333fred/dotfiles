@@ -1,6 +1,6 @@
 # Neovim review
 
-[Installation](README.md#neovim).
+[Setup and prerequisites](README.md#neovim).
 
 ## Shortcuts
 
