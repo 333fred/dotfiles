@@ -31,8 +31,8 @@ set number
 set vsvim_useeditordefaults
 
 let mapleader=","
-nnoremap <leader>rs :source C:\Users\frsilb\.vsvimrc<CR>
-nnoremap <leader>vs :edit C:\Users\frsilb\.vsvimrc<CR>
+nnoremap <leader>rs :source ~/.vsvimrc<CR>
+nnoremap <leader>vs :edit ~/.vsvimrc<CR>
 nnoremap <leader>o :vsc File.OpenFile<CR>
 map <Leader>wg :vsc Team.Git.GoToGitChanges<CR>
 map <Leader>wp :vsc Team.Git.CompareWithPrevious<CR>

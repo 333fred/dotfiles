@@ -1,0 +1,13 @@
+{{- $config := dict -}}
+{{- if stat .chezmoi.configFile -}}
+  {{- if ne (lower (ext .chezmoi.configFile)) ".json" -}}
+    {{- fail "Existing chezmoi configuration is not JSON; migrate it to chezmoi.json before initializing" -}}
+  {{- end -}}
+  {{- $config = include .chezmoi.configFile | fromJsonc -}}
+{{- end -}}
+{{- $data := get $config "data" | default (dict) -}}
+{{- $host := lower .chezmoi.hostname -}}
+{{- $user := lower .chezmoi.username -}}
+{{- $_ := set $data "work" (or (contains "frsilb" $host) (contains "frsilb" $user) (and (eq .chezmoi.os "linux") (eq $host "fred-desk"))) -}}
+{{- $_ := set $config "data" $data -}}
+{{ $config | toPrettyJson }}

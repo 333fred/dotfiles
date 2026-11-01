@@ -25,7 +25,9 @@ says how.
    Inspect existing chezmoi configuration and state without exposing secrets.
    If the configured source is nonstandard or the standard location already
    contains another installation, stop and ask how to reconcile it. Do not
-   overwrite or move existing files automatically.
+   overwrite or move existing files automatically. The source config template
+   expects JSON and refuses to initialize over an existing non-JSON chezmoi
+   configuration; agree on any format migration before proceeding.
 5. If the standard source exists, inspect it with `git -C "$SOURCE" status
    --short --branch` and `git -C "$SOURCE" worktree list`, preserving unrelated
    changes. Ask whether it is the intended reviewed revision; do not
@@ -38,7 +40,9 @@ says how.
    Verify the resulting branch, origin, and status before proceeding.
 
 Keep this standard source directory in place: the Neovim link points into it.
-Commands below assume a native Linux shell and do not require changing directories.
+The global `work` value is computed during `chezmoi init`; rerun initialization
+after a hostname or login change. Commands below assume a native Linux shell
+and do not require changing directories.
 
 ## 2. Inspect the existing installation
 
@@ -56,6 +60,9 @@ Commands below assume a native Linux shell and do not require changing directori
    in particular, account for the old `AGENTS.md` versus the new
    `copilot-instructions.md`. Never replace or link the whole runtime directory,
    or expose authentication, permissions, sessions, or secrets.
+   The settings template accepts the machine-specific agent-host block as
+   `data.copilotAhpEnvironment` in the local chezmoi configuration; preserve
+   it locally where needed, without committing machine identifiers.
 4. Compare effective Git email, signing key, credential helper, GPG, and
    pager with the rendered template. The new template does **not** include
    `.gitconfig.local`. Ask how to preserve any needed local settings; do not
@@ -77,9 +84,9 @@ Commands below assume a native Linux shell and do not require changing directori
 
 **Confirm with the user** the source of truth for differing files, the target
 scope, a backup location, and file mode versus symlink mode. Neovim is always
-a directory link. Symlink mode also links eligible regular files such as
-Copilot settings; templates remain copies. Explain that editing through the
-Neovim link changes the checkout immediately.
+a directory link. Symlink mode also links eligible regular files; templated
+Copilot settings remain a copy. Explain that editing through the Neovim link
+changes the checkout immediately.
 
 After the user approves disposable test files and available disk space, stage
 the source in a unique directory. The temporary path overrides isolate the

@@ -24,7 +24,9 @@ system settings, or modify the live home merely because this guide says how.
    configuration and state without exposing secrets. If the configured source
    is nonstandard or the standard location already contains another
    installation, stop and ask how to reconcile it. Do not overwrite or move
-   existing files automatically.
+   existing files automatically. The source config template expects JSON and
+   refuses to initialize over an existing non-JSON chezmoi configuration;
+   agree on any format migration before proceeding.
 4. If the standard source already exists, inspect it with `git -C "$Source"
    status --short --branch` and `git -C "$Source" worktree list`, preserving
    unrelated changes. Ask whether it is the intended reviewed revision; do
@@ -37,7 +39,8 @@ system settings, or modify the live home merely because this guide says how.
    Verify the resulting branch, origin, and status before proceeding.
 
 Keep this standard source directory in place: the Neovim link points into it.
-Use PowerShell natively.
+The global `work` value is computed during `chezmoi init`; rerun initialization
+after a hostname or login change. Use PowerShell natively.
 
 ## 2. Check destinations and local behavior
 
@@ -71,18 +74,26 @@ keep. Leave the rest of `.copilot` alone.
   `$HOME\Documents\PowerShell\Profile.ps1`, and Terminal to the packaged
   `Microsoft.WindowsTerminal_8wekyb3d8bbwe` LocalState. Compare those with
   `%LOCALAPPDATA%`, Neovim's reported path, `$PROFILE.CurrentUserAllHosts`,
-  redirected/OneDrive Documents, and the actual Terminal installation. If
-  they differ, stop and agree on source changes or a different rollout.
-- The Git template selects email by OS and signing key by hostname. It no
-  longer includes the old `.gitconfig.user` or `.gitconfig.local` files.
+  redirected Documents, and the actual Terminal installation. If they differ,
+  stop and agree on source changes or a different rollout.
+- The Git template selects email by work classification and signing key by
+  hostname. It no longer includes the old `.gitconfig.user` or
+  `.gitconfig.local` files.
   Compare the effective settings, confirm which values should win, and
   preserve and reconcile any needed settings from those files before applying.
-- Check the configured Windows GPG and OpenSSH paths, and Delta. In the
-  prototype, GPG is `C:\Program Files (x86)\gnupg\bin\gpg.exe`; it may not
-  exist on this machine. Do not deploy a known-broken signing configuration.
+  Machine-specific trusted directories can be supplied as
+  `data.gitSafeDirectories` in the local chezmoi configuration.
+- Check the configured Windows GPG and OpenSSH paths, and Delta. The template
+  locates GPG through `PATH`. Do not deploy a known-broken signing configuration.
+- The Copilot settings template accepts the machine-specific agent-host block
+  as `data.copilotAhpEnvironment` in the local chezmoi configuration.
+  Preserve it locally where needed, without committing machine identifiers.
+  Compare the rendered result with the live file, including permission,
+  tool-availability, and privacy settings.
 - Confirm normal file mode versus chezmoi symlink mode. Neovim is always a
-  directory link; in symlink mode eligible Copilot files also link to source.
-  The whole `.copilot` directory must remain a real runtime directory.
+  directory link; templated Copilot settings remain a copy, while other
+  eligible files may link to source. The whole `.copilot` directory must
+  remain a real runtime directory.
 
 ## 3. Preview in an isolated destination
 

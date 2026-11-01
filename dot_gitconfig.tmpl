@@ -1,10 +1,10 @@
 # Note: my aliases assume all commits will be signed with a gpg key. To not sign with a gpg key, remove the -S from the commit aliases
 [user]
   name = Fredric Silberberg
-{{ if eq .chezmoi.os "windows" }}
-  email = fred@silberberg.xyz
-{{ else }}
+{{ if .work }}
   email = frsilb@microsoft.com
+{{ else }}
+  email = fred@silberberg.xyz
 {{ end }}
 [core]
   fscache = true
@@ -192,13 +192,23 @@
 [core]
   sshCommand = C:/Windows/System32/OpenSSH/ssh.exe
 [gpg]
-  program = "C:\\Program Files (x86)\\gnupg\\bin\\gpg.exe"
+  program = {{ lookPath "gpg" | quote }}
 {{ else if eq .chezmoi.os "linux" }}
 [credential]
   helper = {{ printf "%s/.dotnet/tools/git-credential-manager" .chezmoi.homeDir | quote }}
   credentialStore = cache
+{{ end }}
+
+{{ if .work }}
 [credential "azrepos:org/devdiv"]
   username = frsilb@microsoft.com
+{{ end }}
+
+{{ if hasKey . "gitSafeDirectories" }}
+[safe]
+{{ range .gitSafeDirectories }}
+  directory = {{ . | quote }}
+{{ end }}
 {{ end }}
 
 [user]

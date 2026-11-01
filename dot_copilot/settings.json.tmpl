@@ -1,26 +1,37 @@
 {
+  {{- if hasKey . "copilotAhpEnvironment" }}
+  "ahpEnvironment": {{ .copilotAhpEnvironment | toPrettyJson }},
+  {{- end }}
+  "autoTier": "balance",
+  "beep": true,
+  "defaultPermissionMode": "assisted",
+  "editorMode": "vim",
   "enabledMcpServers": [
     "computer-use"
   ],
   "enabledPlugins": {
+    {{- if .work }}
     "connect-copilot@agency-playground": true,
+    "workiq@copilot-plugins": true,
+    {{- end }}
     "dotnet-diag@dotnet-agent-skills": true,
     "dotnet-dnceng@dotnet-arcade-skills": true,
     "dotnet-msbuild@dotnet-agent-skills": true,
     "dotnet-test@dotnet-agent-skills": true,
     "dotnet-test@dotnet-skills": true,
     "dotnet@dotnet-agent-skills": true,
-    "dotnet@dotnet-skills": true,
-    "workiq@copilot-plugins": true
+    "dotnet@dotnet-skills": true
   },
   "experimental": true,
   "extraKnownMarketplaces": {
+    {{- if .work }}
     "agency-playground": {
       "source": {
         "repo": "agency-microsoft/playground",
         "source": "github"
       }
     },
+    {{- end }}
     "dotnet-agent-skills": {
       "source": {
         "repo": "dotnet/skills",
@@ -38,13 +49,25 @@
     "showQuota": false
   },
   "logLevel": "all",
+  "model": "gpt-6.1-sol",
+  "planContextTier": "long_context",
+  "planEffortLevel": "xhigh",
+  "planModel": "gpt-6.1-sol",
+  "planModelProviderId": "copilot",
   "renderMarkdown": true,
   "screenReader": false,
+  "showReasoning": true,
   "streamerMode": false,
-  "theme": "default",
-  "editorMode": "vim",
-  "beep": true,
-  "defaultPermissionMode": "assisted",
-  "autoTier": "balance",
-  "model": "gpt-6.1-sol"
+  "telemetry": {
+    "capture": {
+      "identity": false,
+      "policyDetail": false,
+      "prompts": false,
+      "responses": false,
+      "toolArguments": false,
+      "toolOutput": false
+    },
+    "captureContent": false
+  },
+  "theme": "default"
 }
