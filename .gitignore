@@ -4,4 +4,3 @@ dot_copilot/session-state/
 dot_copilot/logs/
 dot_copilot/*secrets*/
 dot_copilot/permissions-config.json
-tests/__pycache__/

@@ -35,7 +35,8 @@ Ocean Dark Extended.
 The shared configuration is in `.chezmoitemplates/nvim`, linked to
 `~/.config/nvim` on Linux and `AppData\Local\nvim` on Windows. The plugins
 require Neovim 0.12 or later, Git, gh, curl, tar, the Tree-sitter CLI, and a
-C compiler. On Ubuntu I use the Neovim PPA:
+C compiler. On Windows, the Visual Studio Build Tools need the C++ workload
+to provide the compiler. On Ubuntu I use the Neovim PPA:
 
 ```sh
 sudo add-apt-repository ppa:neovim-ppa/stable

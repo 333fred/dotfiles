@@ -101,8 +101,6 @@ Stop if any command fails. Use the same isolation flags with `managed
 --exclude=externals` and `diff --exclude=externals`; check the target list,
 rendered monitor and Git values, and Neovim link destination. If the user chose
 symlink mode, repeat the isolated check in a separate stage with that mode.
-Do not run the prototype's writeback validator against a checkout currently in
-use without discussing its temporary source-file modification with the user.
 
 ## 4. Back up, resolve conflicts, and apply
 

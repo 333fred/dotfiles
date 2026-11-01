@@ -13,6 +13,9 @@
 					"PackageIdentifier" : "Git.Git"
 				},
 				{
+					"PackageIdentifier" : "twpayne.chezmoi"
+				},
+				{
 					"PackageIdentifier" : "GnuPG.GnuPG"
 				},
 				{
@@ -23,6 +26,24 @@
 				},
 				{
 					"PackageIdentifier" : "GitHub.cli"
+				},
+				{
+					"PackageIdentifier" : "GitHub.Copilot"
+				},
+				{
+					"PackageIdentifier" : "Neovim.Neovim"
+				},
+				{
+					"PackageIdentifier" : "tree-sitter.tree-sitter-cli"
+				},
+				{
+					"PackageIdentifier" : "Microsoft.VisualStudio.BuildTools"
+				},
+				{
+					"PackageIdentifier" : "BurntSushi.ripgrep.MSVC"
+				},
+				{
+					"PackageIdentifier" : "dandavison.delta"
 				},
 				{
 					"PackageIdentifier" : "Microsoft.DotNet.SDK.10"
@@ -44,7 +65,7 @@
 				},
 				{
 					"PackageIdentifier" : "Microsoft.WindowsTerminal"
-				},
+				}
 			],
 			"SourceDetails" : 
 			{
