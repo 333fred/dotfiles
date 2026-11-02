@@ -76,5 +76,3 @@ vim.api.nvim_create_autocmd("BufHidden", {
         end)
     end,
 })
-
-require("ui.editor").setup()

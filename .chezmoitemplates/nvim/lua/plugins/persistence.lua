@@ -17,7 +17,7 @@ return {
         {
             "<leader>sc",
             function() require("ui.sessions").clear() end,
-            desc = "Clear session and open explorer",
+            desc = "Clear session",
         },
     },
 }

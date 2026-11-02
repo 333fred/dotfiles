@@ -60,15 +60,7 @@ return {
                 explorer = {
                     hidden = true,
                     ignored = true,
-                    on_show = function(picker)
-                        require("ui.editor").on_explorer_show(picker)
-                    end,
                     actions = {
-                        -- Escape should leave the sidebar open, not use the picker's close action.
-                        cancel = function()
-                            vim.cmd.stopinsert()
-                            vim.cmd.nohlsearch()
-                        end,
                         toggle_terminal = function()
                             Snacks.terminal()
                         end,
@@ -102,7 +94,7 @@ return {
             },
         },
         gh = { enabled = true },
-        explorer = { enabled = true },
+        explorer = { enabled = true, replace_netrw = true },
         terminal = { enabled = true },
         lazygit = {
             enabled = true,

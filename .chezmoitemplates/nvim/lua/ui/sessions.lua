@@ -170,7 +170,6 @@ function M.reload()
         return
     end
     local current = persistence.current()
-    local explorer = #Snacks.picker.get({ source = "explorer" }) > 0
     operation = "reload"
     close_pickers(function()
         operation = nil
@@ -181,9 +180,6 @@ function M.reload()
         persistence.load()
         -- Older sessions saved explorer sidebars as empty editing windows.
         remove_blank_windows()
-        if explorer then
-            Snacks.explorer({ cwd = vim.fn.getcwd(), focus = false })
-        end
     end)
 end
 
@@ -227,7 +223,7 @@ local function clear_editor(persistence, cwd, file)
     if active then
         persistence.start()
     end
-    Snacks.explorer({ cwd = cwd })
+    Snacks.dashboard({ buf = blank, win = vim.api.nvim_get_current_win() })
 end
 
 function M.clear()
