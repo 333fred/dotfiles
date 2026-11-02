@@ -1,6 +1,6 @@
 {
   {{- if hasKey . "copilotAhpEnvironment" }}
-  "ahpEnvironment": {{ .copilotAhpEnvironment | toPrettyJson }},
+  "ahpEnvironment": {{ .copilotAhpEnvironment | toPrettyJson | trim | indent 2 | trim }},
   {{- end }}
   "autoTier": "balance",
   "beep": true,

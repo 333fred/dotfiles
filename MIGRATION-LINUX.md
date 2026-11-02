@@ -6,6 +6,14 @@ below. Do not commit, push, change branches, install packages, run `sudo`,
 alter system settings, or modify the live home merely because this guide
 says how.
 
+The goal is a complete move, not a partial migration. Normal files, external
+repositories, nested Git metadata, legacy links, and dependent worktrees must
+all be reconciled so the old checkout is no longer needed by the live setup.
+A clean diff with `--exclude=externals` is only an intermediate checkpoint.
+If any dependency cannot be migrated safely, report the migration as blocked
+or incomplete; do not describe the move as complete. Keeping the old checkout
+as an inactive rollback copy is different from leaving live dependencies on it.
+
 ## 1. Establish the source and scope
 
 1. Ask the user which machine, reviewed branch/revision, and target scope to
@@ -25,6 +33,9 @@ says how.
    Remove only an approved redundant binary, after the package works.
 3. Identify the old Regolith/Stow checkout and its installed packages. Inspect
    its status, submodule status, and local changes without altering it.
+   Include `git worktree list` and inspect each dependent worktree's staged,
+   unstaged, untracked, and ignored files. A clean main checkout does not mean
+   its linked worktrees are clean or independent.
 4. Run `SOURCE=$(chezmoi source-path) || exit 1` to find the configured source.
    The standard Linux
    default is `~/.local/share/chezmoi`, or `$XDG_DATA_HOME/chezmoi` when set.
@@ -139,6 +150,10 @@ test without changing the standard source, config, cache, or state paths.
 This may copy the Linux font payload; it does not fetch externals or touch the
 live home.
 
+This preview deliberately excludes externals to isolate normal-file conflicts;
+it is not the final scope. Inventory and migrate all externals in section 5
+before declaring success.
+
 First finish the approved local JSON initialization, including machine-specific
 data and the chosen mode. Copy that config into the private staging directory.
 Initialize the staged config against its own state so subsequent commands do
@@ -224,6 +239,8 @@ wrapper's mode and repeat the isolated check in a separate stage.
    --exclude=externals --error-on-conflict`, optionally listing the
    approved paths. Stop on errors or unexpected conflicts; do not force or
    discard local changes.
+   Continue with external and legacy dependency migration. Finishing this
+   normal-file phase alone does not complete the requested move.
 
 ## 5. External repositories and system setup
 
@@ -233,20 +250,72 @@ destination before fetching. Some destinations may already be symlinks or
 contain local changes. Do not clone over them, update an old checkout through
 a link, reset, stash, rebase, or discard work.
 
-Ask the user whether and when to materialize or refresh externals, how to
-handle each existing destination, and whether SSH access is available. Only
-after approval, `chezmoi apply --include=externals
---refresh-externals=always` fetches/updates them. They follow upstream
-branches independently of the dotfiles revision. The i3status-rust checkout
-is now `~/.tools/i3status-rust`; building or installing it requires a separate
-decision.
+External migration is required, not an optional follow-up. Obtain approval for
+how to preserve each existing destination, local state, and any upstream
+updates. Use the configured repository URLs and transports unchanged. Include
+the external phase in the original plan; do not make a normal-files-only plan
+and defer these dependencies indefinitely.
 
-Do not treat a clean normal-target diff as permission to retire the old
-checkout. Externals, old `AGENTS.md` links, and legacy configuration links can
-still depend on it. Audit these links and referenced scripts separately, noting
-any already-missing dependencies rather than silently fixing unrelated issues.
-Existing submodule checkouts also have Git metadata tied to the old repository;
-copying their files does not make them independent clones.
+1. Make `.tools` and `.modules` independent real directories before installing
+   repositories beneath them. Back up their link objects without following
+   them, and preserve non-repository children too.
+2. Materialize each external as an independent repository at its configured
+   destination. Preserve its working files, ignored build outputs, staged and
+   unstaged changes, untracked files, local refs, and remotes. A fresh clone by
+   itself does not preserve those. The i3status-rust source moves from the old
+   config package to `~/.tools/i3status-rust`; keep the installed binary and
+   build artifacts unless the user approves rebuilding.
+3. Check `git rev-parse --absolute-git-dir` and the common Git directory for
+   every external, initialized nested submodule, and untracked embedded
+   repository. No metadata or object alternates may depend on the old
+   checkout. Merely copying a submodule directory leaves its `.git` file
+   pointing back to the old repository.
+4. If metadata is copied, preserve its original copy, correct `core.worktree`,
+   and normalize initialized nested repositories with Git's
+   `submodule absorbgitdirs` where appropriate. Copied stale `.git/modules`
+   stores can still be selected during recursive fetch even when ordinary
+   status commands succeed. Reconcile those stores rather than leaving
+   duplicate old worktree paths. Preserve untracked embedded repositories
+   that are not listed by `git submodule foreach`.
+5. Verify repository integrity and recursive submodule operations, not just
+   top-level `git status`. Ensure each external follows the configured branch;
+   preserve local history and stop on divergence rather than resetting it.
+   Compare the original and new working contents and local state before any
+   approved upstream refresh.
+6. Exercise the real chezmoi external apply path, only after all parent/link
+   conflicts are resolved. `chezmoi apply --include=externals` may run an
+   initial pull even with `--refresh-externals=never`: that flag is not an
+   adoption or revision-pinning mechanism. Review and record the fetched
+   fast-forwards and preserved local changes. Subsequent intentional refreshes
+   use `chezmoi apply --include=externals --refresh-externals=always`.
+   Externals track upstream independently of the dotfiles revision.
+
+Reconcile all remaining dependencies before retiring the old source:
+
+- Audit live home links and relevant system links, including aliases into
+  `.config`, Copilot's old `AGENTS.md`, the old i3status source path, and legacy
+  configurations. Retarget equivalent aliases to their migrated destinations,
+  preserve unique legacy contents independently, and back up any obsolete
+  broken link before removing it. Do not silently drop valid files.
+- Preserve dependent worktrees as independent repositories, including their
+  exact HEAD, index, working edits, untracked/ignored files, and configured
+  remotes. Verify the replacement before changing the live worktree path;
+  retaining a worktree whose common Git directory is in the old checkout is
+  not retirement.
+- Audit installed launchers, build-tool source-location metadata, and referenced
+  scripts for old paths. Preserve installed binaries. Distinguish historical
+  build/debug paths and editor history from active dependencies, and report
+  already-missing scripts rather than inventing unrelated replacements.
+- Check inherited shell variables such as `SPACESHIP_ROOT` as well as file
+  paths. A newly started shell can inherit an old exported theme root from
+  its parent even after every link is replaced. Set required managed roots
+  before loading their modules, and prove startup with the old source
+  temporarily unavailable; successful startup while that source still exists
+  can conceal a remaining dependency.
+- Record a tested rollback path for the external, legacy, and worktree changes.
+  Keep the original data and old repository as inactive rollback material.
+  Do not remove broad directories or either source checkout as an implicit
+  cleanup step.
 
 The [Regolith overrides](README.md#regolith-overrides) section lists packages
 removed in the old setup. Treat that list as historical, not permission to
@@ -262,12 +331,18 @@ needs its .NET tooling; none of those steps happens automatically.
 
 ## 6. Verify and hand off
 
-- Check the remaining chezmoi diff, Neovim link target, effective Git values,
-  and availability of the selected signing key. Do not create a commit to test
-  signing without approval.
+- Check the full remaining chezmoi diff, including externals, Neovim link
+  target, effective Git values, and availability of the selected signing key.
+  Do not create a commit to test signing without approval.
 - Verify target types and permissions as well as contents. Check the private
   local config, preserved Copilot data, old-source snapshots, external Git
   state, legacy links, and unmanaged profiles against the recorded baseline.
+  Account explicitly for approved upstream changes rather than requiring
+  refreshed tracked files to match their old revisions.
+- Confirm every external and nested repository has independent Git metadata,
+  any dirty worktree retains its edits independently, and no active link,
+  launcher, or required source path points into the old checkout. Verify a
+  fresh shell can load its migrated dependencies without the old source.
 - With permission, test Neovim startup, locked-plugin bootstrap and C# support,
   then Copilot instruction discovery and LSP. These can download software or
   modify local state. Do not authenticate, send prompts, or submit GitHub
@@ -281,5 +356,7 @@ needs its .NET tooling; none of those steps happens automatically.
   destinations; do not delete broad directories or a symlink's target.
   Move new replacement directories and files aside before restoring originals,
   and restore recorded absence for newly created files. Report normal-target
-  migration separately from external migration, application startup checks,
-  and desktop reloads; completing one does not authorize the others.
+  file and external phases together as the migration, and list application
+  startup checks and desktop reloads separately. Do not claim completion while
+  external or legacy dependencies still require the old checkout. Restarting
+  applications or the desktop still requires its own approval.
