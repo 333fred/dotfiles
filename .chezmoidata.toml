@@ -6,6 +6,6 @@ secondary = "DP-2"
 main = "DP-4"
 secondary = "DP-2"
 
-[monitorOutputs.frsilb-desk]
+[monitorOutputs.frsilb-ubuntu]
 main = "DP-2"
 secondary = "DP-0"

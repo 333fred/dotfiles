@@ -59,7 +59,7 @@ keymaps. See the [review notes](NEOVIM-REVIEW.md) for PR and Copilot workflows.
 
 ## Copilot CLI
 
-`dot_copilot` contains my global instructions, settings, and Roslyn LSP
+`private_dot_copilot` contains my global instructions, settings, and Roslyn LSP
 configuration. The LSP requires `dnx`. Authentication, permissions, sessions,
 and other runtime files stay outside the repository.
 
@@ -122,8 +122,7 @@ removed these packages to avoid conflicts with those overrides:
 
 For [regolith-desktop#1042](https://github.com/regolith-linux/regolith-desktop/issues/1042),
 the old setup renamed `/etc/environment` to `/etc/environment.back`. The
-current profile reads `/env/environment.back` instead, so those paths need
-reconciling for the workaround.
+profile reads `/etc/environment.back` when it is present.
 
 ### Fonts
 

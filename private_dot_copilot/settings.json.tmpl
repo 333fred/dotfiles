@@ -4,8 +4,12 @@
   {{- end }}
   "autoTier": "balance",
   "beep": true,
+  "companyAnnouncements": [],
   "defaultPermissionMode": "assisted",
-  "editorMode": "vim",
+  "editorMode": "normal",
+  "enabledFeatureFlags": {
+    "CATALOG_SEARCH": true
+  },
   "enabledMcpServers": [
     "computer-use"
   ],
@@ -32,6 +36,13 @@
       }
     },
     {{- end }}
+    "copilot-plugins": {
+      "autoUpdate": true,
+      "source": {
+        "repo": "github/copilot-plugins",
+        "source": "github"
+      }
+    },
     "dotnet-agent-skills": {
       "source": {
         "repo": "dotnet/skills",

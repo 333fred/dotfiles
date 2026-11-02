@@ -9,8 +9,8 @@
 #umask 022
 
 # Copy from /etc/environment. See https://github.com/regolith-linux/regolith-desktop/issues/1042
-if [ -f  "/env/environment.back" ]; then
-    . "/env/environment.back"
+if [ -f  "/etc/environment.back" ]; then
+    . "/etc/environment.back"
 fi
 
 # if running bash
