@@ -159,7 +159,7 @@ local function fixture()
                 return
             end
             state.comments_list = {
-                [vim.fs.normalize(env.file)] = { {
+                [vim.fs.normalize(env.file)] = env.threads or { {
                     line = 3, content = "Review this line",
                     comments = { { user = "reviewer", body = "Review this line" } },
                 } },
@@ -219,6 +219,46 @@ local requests = #env.requests
 env.workflow.comment("toggle")
 check_notice(env, "PR comments hidden")
 assert(#env.requests == requests, "Hiding annotations must not require a GitHub request")
+
+for _, resolved in ipairs({ false, true }) do
+    env = fixture()
+    env.threads = { {
+        start_line = 2, line = 3, resolved = resolved, content = "Thread content",
+        comments = {
+            { user = "reviewer", updated_at = "2026-11-04T20:00:00Z", body = "First line\r\nSecond line" },
+            { user = "author", updated_at = "2026-11-04T20:01:00Z", body = "@reviewer is body text", pending = true },
+        },
+    } }
+    env.workflow.comment("toggle")
+    vim.wait(10)
+    vim.api.nvim_win_set_cursor(0, { 3, 0 })
+    env.workflow.comment("open")
+    local popup = vim.api.nvim_get_current_buf()
+    local lines = vim.api.nvim_buf_get_lines(popup, 0, -1, false)
+    local text = table.concat(lines, "\n")
+    assert(text:find("First line\nSecond line", 1, true), "Comment bodies must retain their line breaks")
+    assert(text:find("@author [pending]  2026-11-04T20:01:00Z", 1, true))
+    assert(text:find("Lines 2-3", 1, true), "Multi-line thread ranges must remain visible")
+    local marks = vim.api.nvim_buf_get_extmarks(popup, vim.api.nvim_get_namespaces()["git-review.comments"],
+        0, -1, { details = true })
+    local authors, metadata, status = 0, 0, false
+    for _, mark in ipairs(marks) do
+        local row, col, details = mark[2], mark[3], mark[4]
+        if details.hl_group == "GitReviewCommentAuthor" then
+            authors = authors + 1
+            assert(lines[row + 1]:sub(col + 1, details.end_col) == (authors == 1 and "@reviewer" or "@author"))
+        elseif details.hl_group == "GitReviewCommentMeta" then
+            metadata = metadata + 1
+        elseif details.hl_group == (resolved and "GitReviewCommentResolved" or "GitReviewCommentOpen") then
+            status = true
+        end
+        assert(lines[row + 1] ~= "@reviewer is body text",
+            "Body text must not be mistaken for metadata: " .. vim.inspect({ lines = lines, mark = mark }))
+    end
+    assert(authors == 2 and metadata == 3 and status, "Authors, metadata, and thread status must have distinct highlights")
+    assert(vim.wo.winhighlight:find("Normal:GitReviewCommentBody", 1, true))
+    vim.cmd.close()
+end
 
 env = fixture()
 vim.fn.setqflist({}, " ", { title = "Unrelated list", items = {} })

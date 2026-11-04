@@ -2,6 +2,7 @@ local M = {}
 local context
 local comments_enabled = false
 local comment_win
+local comment_namespace = vim.api.nvim_create_namespace("git-review.comments")
 local namespaces = {
     vim.api.nvim_create_namespace("GHLiteNamespace"),
     vim.api.nvim_create_namespace("GHLiteDiffNamespace"),
@@ -548,6 +549,65 @@ function M.toggle_comments()
     end, false)
 end
 
+local function open_comment_popup(diagnostics)
+    local lines, highlights = {}, {}
+    local function append(text, group)
+        local row = #lines
+        vim.list_extend(lines, vim.split(text, "\n", { plain = true }))
+        if group then
+            highlights[#highlights + 1] = {
+                row = row, end_row = #lines, group = group,
+            }
+        end
+        return row
+    end
+    append("PR comments", "GitReviewCommentHeader")
+    for _, diagnostic in ipairs(diagnostics) do
+        append("")
+        local data = diagnostic.user_data or {}
+        local thread = data.thread
+        if thread then
+            append(thread.resolved and "Resolved thread" or "Open thread",
+                thread.resolved and "GitReviewCommentResolved" or "GitReviewCommentOpen")
+            if type(thread.start_line) == "number" and thread.start_line ~= thread.line then
+                append(("Lines %d-%d"):format(thread.start_line, thread.line), "GitReviewCommentMeta")
+            end
+            if data.anchor_note then
+                append(data.anchor_note, "GitReviewCommentOpen")
+            end
+            for _, comment in ipairs(thread.comments) do
+                append("")
+                local author = "@" .. (comment.user or "unknown")
+                local metadata = (comment.pending and " [pending]" or "")
+                    .. "  " .. (comment.updated_at or "Unknown time")
+                local row = append(author .. metadata, "GitReviewCommentMeta")
+                highlights[#highlights + 1] = {
+                    row = row, col = 0, end_col = #author, group = "GitReviewCommentAuthor",
+                }
+                append("")
+                local body = (comment.body or ""):gsub("\r", "")
+                append(body)
+            end
+        else
+            append(diagnostic.message)
+        end
+    end
+    local buf, win = vim.lsp.util.open_floating_preview(lines, "text", {
+        focusable = true, border = "rounded", wrap = true,
+    })
+    vim.wo[win].winhighlight = "Normal:GitReviewCommentBody,NormalFloat:GitReviewCommentBody,"
+        .. "FloatBorder:GitReviewCommentBorder"
+    for _, highlight in ipairs(highlights) do
+        vim.api.nvim_buf_set_extmark(buf, comment_namespace, highlight.row, highlight.col or 0, {
+            end_row = highlight.end_row or highlight.row,
+            end_col = highlight.end_col or 0,
+            hl_group = highlight.group,
+            hl_eol = highlight.end_row ~= nil,
+        })
+    end
+    return buf, win
+end
+
 function M.show_comment()
     if comment_win and vim.api.nvim_win_is_valid(comment_win) then
         vim.api.nvim_win_close(comment_win, true)
@@ -565,11 +625,9 @@ function M.show_comment()
     local buf = vim.api.nvim_get_current_buf()
     local line = vim.api.nvim_win_get_cursor(0)[1] - 1
     for _, ns in ipairs(namespaces) do
-        if #vim.diagnostic.get(buf, { namespace = ns, lnum = line }) > 0 then
-            local float_buf, win = vim.diagnostic.open_float(buf, {
-                namespace = ns, scope = "line", header = "PR comments", source = false,
-                focus = true, border = "rounded",
-            })
+        local diagnostics = vim.diagnostic.get(buf, { namespace = ns, lnum = line })
+        if #diagnostics > 0 then
+            local float_buf, win = open_comment_popup(diagnostics)
             if win then
                 comment_win = win
                 vim.api.nvim_set_current_win(win)
@@ -930,17 +988,20 @@ local function render_comments(bufnr, filename)
                 local comment = thread.comments[1]
                 local preview = (thread.resolved and "[resolved] " or "") .. "@" .. (comment.user or "unknown")
                     .. ": " .. vim.trim((comment.body or ""):gsub("%s+", " "))
-                local message = thread.content
+                local message, anchor_note = thread.content, nil
                 if approximate then
                     local label = reason == "deleted" and "local deletion" or "local edit"
                     preview = "[" .. label .. "] " .. preview
-                    message = "Approximate display anchor (" .. label .. ") for PR line " .. thread.line
-                        .. ".\n\n" .. message
+                    anchor_note = "Approximate display anchor (" .. label .. ") for PR line " .. thread.line .. "."
+                    message = anchor_note .. "\n\n" .. message
                 end
                 diagnostics[#diagnostics + 1] = {
                     lnum = line - 1, col = 0, message = message,
                     severity = vim.diagnostic.severity.INFO, source = "GHLite",
-                    user_data = { preview = preview, pr_line = thread.line, approximate = approximate or false },
+                    user_data = {
+                        preview = preview, pr_line = thread.line, approximate = approximate or false,
+                        thread = thread, anchor_note = anchor_note,
+                    },
                 }
             else
                 skipped = skipped + 1
@@ -965,6 +1026,17 @@ local function render_comments(bufnr, filename)
 end
 
 function M.setup_ghlite()
+    for group, link in pairs({
+        GitReviewCommentBody = "NormalFloat",
+        GitReviewCommentHeader = "Title",
+        GitReviewCommentAuthor = "Identifier",
+        GitReviewCommentMeta = "Comment",
+        GitReviewCommentOpen = "DiagnosticWarn",
+        GitReviewCommentResolved = "DiagnosticOk",
+        GitReviewCommentBorder = "FloatBorder",
+    }) do
+        vim.api.nvim_set_hl(0, group, { link = link, default = true })
+    end
     require("ghlite.config").s.pr_commands = {}
     -- Upstream's REST loader reads one page and can display outdated line coordinates.
     require("ghlite.gh").load_comments = load_all_comments

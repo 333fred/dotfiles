@@ -30,6 +30,13 @@ local function apply()
     set(0, "GitSignsChange", { fg = blue })
     set(0, "GitSignsDelete", { fg = "#bf616a" })
     set(0, "GitReviewComment", { fg = purple, bold = true })
+    set(0, "GitReviewCommentBody", { fg = "#dfe1e8", bg = "#252932" })
+    set(0, "GitReviewCommentHeader", { fg = purple, bold = true })
+    set(0, "GitReviewCommentAuthor", { fg = cyan, bg = "#303642", bold = true })
+    set(0, "GitReviewCommentMeta", { fg = blue, bg = "#303642" })
+    set(0, "GitReviewCommentOpen", { fg = yellow })
+    set(0, "GitReviewCommentResolved", { fg = "#a3be8c" })
+    set(0, "GitReviewCommentBorder", { fg = blue, bg = "#252932" })
 
     for _, group in ipairs({ "Conditional", "Repeat", "Exception", "Label", "Statement",
         "@keyword.conditional", "@keyword.repeat", "@keyword.return", "@keyword.exception" }) do
