@@ -57,3 +57,23 @@ are posted when saved.
 `\rP` compares the latest submitted review with the current PR head. Save and
 commit or stash local changes first. Both sides are read-only, and new comments
 must be on the right; GitHub may reject threads outside the commentable diff.
+
+## Windows watcher installation
+
+If CodeDiff reports `Failed to install codediff-watcher` because
+`Microsoft.PowerShell.Archive` cannot load, install the watcher from a clean
+Windows PowerShell instance:
+
+```powershell
+powershell.exe -NoProfile -NonInteractive -Command '& nvim --headless -u NONE -i NONE "+lua vim.opt.rtp:prepend(vim.env.LOCALAPPDATA .. [[\nvim-data\lazy\codediff.nvim]]); require([[codediff.core.installer.watcher]]).ensure(function(path, err) if err then error(err) end; assert(vim.fn.filereadable(path) == 1); print([[Installed watcher: ]] .. path) end)" +qa'
+```
+
+The installer invokes Windows PowerShell rather than `pwsh`. When Neovim is
+launched from PowerShell 7, inherited module paths can cause Windows PowerShell
+to load an incompatible archive module. `-NoProfile` alone does not clear
+those paths; the outer Windows PowerShell process normalizes them before
+launching Neovim.
+
+Restart Neovim after installation. This leaves execution policies and plugin
+source unchanged. Repeat the workaround if a watcher update triggers the
+failure again; CodeDiff uses polling while the watcher is unavailable.

@@ -40,7 +40,11 @@ system settings, or modify the live home merely because this guide says how.
 
 Keep this standard source directory in place: the Neovim link points into it.
 The global `work` value is computed during `chezmoi init`; rerun initialization
-after a hostname or login change. Use PowerShell natively.
+after a hostname or login change. Initialization also detects PowerShell 7's
+`$PROFILE.CurrentUserAllHosts`, selecting either the standard Documents path
+or Microsoft OneDrive Documents. Other profile locations fail initialization
+until source support is added. Rerun initialization after changing Documents
+redirection. Use PowerShell natively.
 
 ## 2. Check destinations and local behavior
 
@@ -71,7 +75,8 @@ keep. Leave the rest of `.copilot` alone.
 **Confirm with the user before continuing:**
 
 - The source maps Neovim to `$HOME\AppData\Local\nvim`, PowerShell to
-  `$HOME\Documents\PowerShell\Profile.ps1`, and Terminal to the packaged
+  `Profile.ps1` under the detected `data.powershellProfileDirectory`, and
+  Terminal to the packaged
   `Microsoft.WindowsTerminal_8wekyb3d8bbwe` LocalState. Compare those with
   `%LOCALAPPDATA%`, Neovim's reported path, `$PROFILE.CurrentUserAllHosts`,
   redirected Documents, and the actual Terminal installation. If they differ,
@@ -105,9 +110,11 @@ chezmoi's normal source, config, cache, or state paths.
 $Stage = Join-Path ([IO.Path]::GetTempPath()) ("chezmoi-migration-" + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $Stage -ErrorAction Stop | Out-Null
 New-Item -ItemType Directory -Path "$Stage\home" -ErrorAction Stop | Out-Null
-New-Item -ItemType File -Path "$Stage\config.toml" -ErrorAction Stop | Out-Null
+$StageConfig = chezmoi execute-template '{{ dict "data" (dict "work" .work "powershellProfileDirectory" .powershellProfileDirectory) | toJson }}'
+if ($LASTEXITCODE -ne 0) { throw 'Could not read approved template data' }
+New-Item -ItemType File -Path "$Stage\config.json" -Value $StageConfig -ErrorAction Stop | Out-Null
 $StageArgs = @('--source', $Source, '--destination', "$Stage\home",
-  '--config', "$Stage\config.toml", '--persistent-state', "$Stage\state.db",
+  '--config', "$Stage\config.json", '--persistent-state', "$Stage\state.db",
   '--cache', "$Stage\cache", '--mode', 'file', '--no-tty', '--error-on-conflict')
 chezmoi @StageArgs apply --exclude=externals
 if ($LASTEXITCODE -ne 0) { throw 'Isolated apply failed' }

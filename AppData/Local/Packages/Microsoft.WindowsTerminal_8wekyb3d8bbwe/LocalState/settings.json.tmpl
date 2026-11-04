@@ -1,3 +1,12 @@
+{{- $startingDirectory := .chezmoi.homeDir | replace "/" "\\" -}}
+{{- range $path := list "D:\\git" "C:\\git" -}}
+    {{- with stat $path -}}
+        {{- if .isDir -}}
+            {{- $startingDirectory = $path -}}
+            {{- break -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
@@ -79,10 +88,10 @@
             "colorScheme": "Ocean",
             "font":
             {
-                "face": "Hack Nerd Font",
+                "face": "Monaspace Neon NF",
                 "size": 11
             },
-            "startingDirectory": "C:\\git",
+            "startingDirectory": {{ $startingDirectory | toJson }},
             "useAcrylic": true
         },
         "list":

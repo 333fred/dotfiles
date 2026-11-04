@@ -1,4 +1,5 @@
 Set-Alias g git
+Set-Alias v nvim
 
 Import-Module PSReadline
 
@@ -41,4 +42,15 @@ function c {
    }
 
    & $cmd @args
+}
+
+$dotnetup = Join-Path $HOME '.dotnetup\dotnetup.exe'
+if (Test-Path -LiteralPath $dotnetup -PathType Leaf) {
+   $dotnetupScript = & $dotnetup env script --shell pwsh --dotnet --dotnetup | Out-String
+   if ($LASTEXITCODE -ne 0) {
+      Write-Error 'dotnetup environment initialization failed.'
+   }
+   elseif (-not [string]::IsNullOrWhiteSpace($dotnetupScript)) {
+      Invoke-Expression $dotnetupScript
+   }
 }

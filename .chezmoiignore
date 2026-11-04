@@ -16,6 +16,14 @@ tests
 tests/**
 
 {{ if eq .chezmoi.os "windows" }}
+{{ $profileDirectory := get . "powershellProfileDirectory" }}
+{{ if eq $profileDirectory "Documents/PowerShell" }}
+OneDrive - Microsoft
+{{ else if eq $profileDirectory "OneDrive - Microsoft/Documents/PowerShell" }}
+Documents
+{{ else }}
+{{ fail "Unsupported powershellProfileDirectory; rerun chezmoi init" }}
+{{ end }}
 .config
 .fonts
 .gnupg
@@ -38,6 +46,7 @@ tests/**
 {{ else if eq .chezmoi.os "linux" }}
 AppData
 Documents
+OneDrive - Microsoft
 {{ else }}
 {{ fail "This prototype supports native Windows and Linux only" }}
 {{ end }}

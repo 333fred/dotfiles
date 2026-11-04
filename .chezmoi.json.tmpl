@@ -9,5 +9,18 @@
 {{- $host := lower .chezmoi.hostname -}}
 {{- $user := lower .chezmoi.username -}}
 {{- $_ := set $data "work" (or (contains "frsilb" $host) (contains "frsilb" $user) (and (eq .chezmoi.os "linux") (eq $host "fred-desk"))) -}}
+{{- if eq .chezmoi.os "windows" -}}
+  {{- $profile := output "pwsh" "-NoLogo" "-NoProfile" "-NonInteractive" "-Command" "$PROFILE.CurrentUserAllHosts | ConvertTo-Json -Compress" | fromJson | replace "\\" "/" | lower -}}
+  {{- $profileDirectory := "" -}}
+  {{- range list "Documents/PowerShell" "OneDrive - Microsoft/Documents/PowerShell" -}}
+    {{- if eq $profile (joinPath $.chezmoi.homeDir . "profile.ps1" | replace "\\" "/" | lower) -}}
+      {{- $profileDirectory = . -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if eq $profileDirectory "" -}}
+    {{- fail "Unsupported PowerShell profile location; add its source path and conditional ignore before initializing" -}}
+  {{- end -}}
+  {{- $_ := set $data "powershellProfileDirectory" $profileDirectory -}}
+{{- end -}}
 {{- $_ := set $config "data" $data -}}
 {{ $config | toPrettyJson }}
