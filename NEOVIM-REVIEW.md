@@ -25,7 +25,7 @@ File comments are local-only; approval is PR-only.
 ## Copilot feedback
 
 `,aa` toggles the Copilot CLI terminal; use `/resume` to continue a session.
-Esc enters Neovim Normal mode, `i` resumes terminal input, and Alt+Esc sends
+Esc enters Neovim Normal mode, `i` resumes terminal input, and Ctrl+G sends
 Escape to Copilot. Run `:Copilot auth` once for next-edit suggestions.
 
 Local feedback persists per repository. `\ru` sends only new or edited

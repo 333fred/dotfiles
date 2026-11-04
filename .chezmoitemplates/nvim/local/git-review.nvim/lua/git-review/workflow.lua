@@ -16,7 +16,7 @@ local function checkout()
         return nil
     end
     local lines = vim.split(vim.trim(result.stdout), "\n", { plain = true })
-    return { root = vim.uv.fs_realpath(lines[1]) or lines[1], branch = lines[2] }
+    return { root = vim.fs.normalize(vim.uv.fs_realpath(lines[1]) or lines[1]), branch = lines[2] }
 end
 
 function M.target(tab)
@@ -37,7 +37,7 @@ end
 
 function M.set_target(kind, root, url, tab, implicit)
     local state = checkout()
-    if not state or (vim.uv.fs_realpath(root) or root) ~= state.root then
+    if not state or vim.fs.normalize(vim.uv.fs_realpath(root) or root) ~= state.root then
         notify("Open this review's repository first")
         return
     end

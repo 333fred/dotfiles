@@ -32,7 +32,7 @@ local function snapshot(root)
     if not root then
         return nil
     end
-    root = vim.uv.fs_realpath(root) or root
+    root = vim.fs.normalize(vim.uv.fs_realpath(root) or root)
     local result = vim.system({
         "git", "-C", root, "rev-parse", "HEAD", "--abbrev-ref", "HEAD",
     }, { text = true }):wait()
@@ -613,7 +613,7 @@ local function dispatch_line_action(command, first, last)
             notify("These lines differ from the PR head; comment on their original version in \\rp")
             return
         end
-        for _, thread in ipairs(require("ghlite.state").comments_list[name] or {}) do
+        for _, thread in ipairs(require("ghlite.state").comments_list[vim.fs.normalize(name)] or {}) do
             local start = type(thread.start_line) == "number" and thread.start_line or thread.line
             local anchor, approximate = mapping.anchor_local(start, thread.line)
             if approximate and anchor >= first and anchor <= last then
@@ -845,7 +845,7 @@ function M.comment_action(action)
             local filename = root and (root .. "/" .. path) or name
             local mapping = relative and file_map(relative, buf)
             local cursor, candidate = vim.api.nvim_win_get_cursor(0)[1], nil
-            for _, thread in ipairs(require("ghlite.state").comments_list[filename] or {}) do
+            for _, thread in ipairs(require("ghlite.state").comments_list[vim.fs.normalize(filename)] or {}) do
                 local line = root and thread.line
                     or (mapping and mapping.anchor_local(
                         type(thread.start_line) == "number" and thread.start_line or thread.line, thread.line))
@@ -887,12 +887,13 @@ local function load_all_comments(pr_number, pending_review)
     local groups = require("ghlite.comments_utils").group_comments(comments, {
         comment_hunk = false,
     }, gh.get_review_thread_statuses(pr_number, repo))
+    local filtered = {}
     for path, threads in pairs(groups) do
-        groups[path] = vim.tbl_filter(function(thread)
+        filtered[vim.fs.normalize(path)] = vim.tbl_filter(function(thread)
             return not thread.outdated and type(thread.comments[1].line) == "number"
         end, threads)
     end
-    return groups
+    return filtered
 end
 
 local function render_comments(bufnr, filename)
@@ -911,7 +912,7 @@ local function render_comments(bufnr, filename)
         end
         local diagnostics = {}
         local skipped = 0
-        local threads = require("ghlite.state").comments_list[filename] or {}
+        local threads = require("ghlite.state").comments_list[vim.fs.normalize(filename)] or {}
         local path = not is_pr_head and vim.fs.relpath(checkout.root, filename)
         local mapping = path and #threads > 0 and file_map(path, bufnr)
         for _, thread in ipairs(threads) do
@@ -968,6 +969,10 @@ function M.setup_ghlite()
     -- Upstream's REST loader reads one page and can display outdated line coordinates.
     require("ghlite.gh").load_comments = load_all_comments
     local comments = require("ghlite.comments")
+    local get_conversations = comments.get_conversations
+    comments.get_conversations = function(filename, line)
+        return get_conversations(vim.fs.normalize(filename), line)
+    end
     comments.load_comments_on_buffer_by_filename = render_comments
     local load_buffer_comments = comments.load_comments_on_buffer
     comments.load_comments_on_buffer = function(buf)

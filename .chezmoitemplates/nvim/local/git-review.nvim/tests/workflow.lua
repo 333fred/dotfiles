@@ -159,13 +159,17 @@ local function fixture()
                 return
             end
             state.comments_list = {
-                [env.file] = { {
+                [vim.fs.normalize(env.file)] = { {
                     line = 3, content = "Review this line",
                     comments = { { user = "reviewer", body = "Review this line" } },
                 } },
             }
         end,
         load_comments_on_buffer = function() end,
+        get_conversations = function(filename, line)
+            return vim.tbl_filter(function(thread) return thread.line == line end,
+                state.comments_list[filename] or {})
+        end,
         load_comments_on_visible_buffers = function()
             require("ghlite.comments").load_comments_on_buffer(env.buf)
         end,
@@ -201,8 +205,12 @@ end
 local env = fixture()
 env.workflow.comment("toggle")
 assert(env.workflow.target().implicit and env.workflow.valid(env.workflow.target()))
+assert(env.workflow.target().root == vim.fs.normalize(env.root),
+    "Review roots must match CodeDiff's normalized repository paths")
 vim.wait(10)
 assert(#vim.diagnostic.get(env.buf) == 1, "Standalone toggle must render comments")
+assert(#require("ghlite.comments").get_conversations(env.file, 3) == 1,
+    "Native buffer paths must match normalized GitHub comment paths")
 vim.api.nvim_win_set_cursor(0, { 3, 0 })
 env.workflow.comment("open")
 assert(vim.api.nvim_get_current_buf() ~= env.buf, "Standalone open must display the comment")

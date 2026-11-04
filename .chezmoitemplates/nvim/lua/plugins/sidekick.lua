@@ -11,7 +11,7 @@ return {
                     hide_ctrl_z = false,
                     prompt = false,
                     stopinsert = { "<Esc>", "stopinsert", mode = "t", desc = "Enter normal mode" },
-                    send_escape = { "<M-Esc>", "<Esc>", mode = "t", desc = "Send Escape to CLI" },
+                    send_escape = { "<C-g>", "<Esc>", mode = "t", desc = "Send Escape to CLI" },
                     nav_left = false,
                     nav_down = false,
                     nav_up = false,
