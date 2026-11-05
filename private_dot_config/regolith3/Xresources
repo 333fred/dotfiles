@@ -18,12 +18,18 @@ wm.workspace.01.name: 1:
 wm.workspace.02.name: 2:
 wm.workspace.03.name: 3:
 wm.workspace.04.name: 4:
-wm.workspace.05.name: 5:五
-wm.workspace.06.name: 6:六
-wm.workspace.07.name: 7:七
-wm.workspace.08.name: 8:八
-wm.workspace.09.name: 9:九
-wm.workspace.10.name: 10:十
+! 五
+wm.workspace.05.name: 5:\344\272\224
+! 六
+wm.workspace.06.name: 6:\345\205\255
+! 七
+wm.workspace.07.name: 7:\344\270\203
+! 八
+wm.workspace.08.name: 8:\345\205\253
+! 九
+wm.workspace.09.name: 9:\344\271\235
+! 十
+wm.workspace.10.name: 10:\345\215\201
 
 
 ! Colors
@@ -61,7 +67,7 @@ wm.bar.workspace.inactive.background.color: base01
 wm.bar.workspace.inactive.text.color: base05
 wm.bar.workspace.urgent.border.color: base08
 wm.bar.workspace.urgent.background.color: base08
-wm.bar.workspace.urgent.text.color base00
+wm.bar.workspace.urgent.text.color: base00
 
 gnome.wallpaper: ""
 rofi.theme: /home/fred/.config/rofi/colors/arc.rasi

@@ -99,12 +99,9 @@ cargo install --path . --locked
 
 ### Regolith overrides
 
-I maintain copies of Regolith defaults with my changes. The original setup
-removed these packages to avoid conflicts with those overrides:
+The custom bar and launcher are in this repository. The original setup removed
+these packages:
 
-- `regolith-wm-navigation`
-- `regolith-wm-resize`
-- `regolith-i3-gaps`
 - `i3-swap-focus`
 - `i3xrocks`
 - `regolith-i3-control-center-regolith`
