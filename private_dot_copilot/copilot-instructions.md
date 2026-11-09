@@ -31,6 +31,17 @@ guidance.
   the detail is useful and not obvious from the implementation.
 - When documentation describes what exists, keep it to a basic inventory rather
   than restating every bit of functionality in the code.
+- Treat README.md files as repository entry points. Keep them focused on
+  orientation and links to detailed documentation, not extensive documentation
+  of specific processes.
+- Never put one-time operational steps in durable, checked-in files. Keep
+  task-specific CI variable setup, container migration steps, and similar
+  instructions in a Copilot session document, an existing issue, or another
+  transient location that will not enter unrelated future sessions' context.
+  Get approval before posting or editing issue content.
+- Put error-specific troubleshooting and workarounds where the failure occurs
+  or the workaround is needed. Do not collect them in a global workaround file
+  that gets loaded into every session's context.
 
 ## Comments and replies on my behalf
 
