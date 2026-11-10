@@ -1,4 +1,5 @@
 .gitignore
+.gitattributes
 README.md
 NEOVIM-REVIEW.md
 MIGRATION-LINUX.md
