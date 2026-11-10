@@ -18,7 +18,10 @@ never stash, discard, rebase, or force-pull them.
    If there are local changes, do not pull. Show the actual output of
    `git diff` and `git diff --cached` for tracked changes, and report untracked
    paths separately. Do not substitute a prose description for the diff. Ask
-   how to handle the changes before proceeding.
+   whether to commit the changes or leave them untouched. Never commit without
+   explicit approval. If approved, stage only the approved paths, then stop and
+   ask for approval again before committing. After an approved commit, check
+   the Git state again and continue only if the source is clean.
 
 2. If the source is clean and has a configured upstream, pull with
    `git -C "$source_dir" pull --ff-only`. Do not override the configured remote

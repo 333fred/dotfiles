@@ -623,6 +623,8 @@ function M.show_comment()
         return
     end
     local buf = vim.api.nvim_get_current_buf()
+    local source_win = vim.api.nvim_get_current_win()
+    local tick = vim.api.nvim_buf_get_changedtick(buf)
     local line = vim.api.nvim_win_get_cursor(0)[1] - 1
     for _, ns in ipairs(namespaces) do
         local diagnostics = vim.diagnostic.get(buf, { namespace = ns, lnum = line })
@@ -636,6 +638,19 @@ function M.show_comment()
                         vim.api.nvim_win_close(win, true)
                     end
                 end, { buffer = float_buf, desc = "Close PR comments" })
+                vim.keymap.set("n", "<localleader>ca", function()
+                    if not vim.api.nvim_win_is_valid(source_win)
+                        or vim.api.nvim_win_get_buf(source_win) ~= buf
+                        or vim.api.nvim_buf_get_changedtick(buf) ~= tick
+                        or not same_checkout(context, snapshot()) then
+                        notify("Comment source changed; reopen the comment before replying")
+                        return
+                    end
+                    vim.api.nvim_win_close(win, true)
+                    vim.api.nvim_set_current_win(source_win)
+                    vim.api.nvim_win_set_cursor(source_win, { line + 1, 0 })
+                    require("git-review.workflow").comment("add")
+                end, { buffer = float_buf, desc = "Reply to PR comment" })
             end
             return
         end
