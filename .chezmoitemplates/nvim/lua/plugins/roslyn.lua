@@ -4,6 +4,12 @@ return {
     config = function(_, opts)
         require("roslyn").setup(opts)
         local roslyn_root_dir = vim.lsp.config.roslyn.root_dir
+        local roslyn_cmd = vim.deepcopy(vim.lsp.config.roslyn.cmd)
+        local global_tool = vim.fs.joinpath(vim.fn.expand("~"), ".dotnet", "tools", "roslyn-language-server")
+        if vim.fn.executable(global_tool) == 1 then
+            roslyn_cmd[1] = global_tool
+            vim.lsp.config("roslyn", { cmd = roslyn_cmd })
+        end
 
         local function start_roslyn_folder(root)
             local config = vim.deepcopy(vim.lsp.config.roslyn)

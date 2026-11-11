@@ -21,6 +21,9 @@ local function apply()
     set(0, "StatusLineNC", { fg = "#6e7d88", bg = "#1d2027" })
     set(0, "Visual", { bg = "#3f5570" })
     set(0, "MatchParen", { fg = foreground, bg = "#4f5b66", bold = true })
+    for _, group in ipairs({ "LspReferenceText", "LspReferenceRead", "LspReferenceWrite" }) do
+        set(0, group, { bg = "#43556a" })
+    end
     -- Shade diff backgrounds without overriding syntax or Roslyn semantic foregrounds.
     set(0, "DiffAdd", { bg = "#304038" })
     set(0, "DiffDelete", { bg = "#442f35" })
