@@ -177,6 +177,8 @@ local function fixture()
     for _, action in ipairs({ "comment_on_line", "update_comment", "delete_comment", "resolve_comment", "unresolve_comment" }) do
         comments[action] = function()
             env.actions[#env.actions + 1] = action
+            env.action_buf = vim.api.nvim_get_current_buf()
+            env.action_line = vim.api.nvim_win_get_cursor(0)[1]
             if action == "comment_on_line" or action == "update_comment" then
                 require("ghlite.utils").get_comment(nil, nil, nil, nil, nil, function(input)
                     env.posted = input
@@ -291,6 +293,32 @@ require("ghlite.comments").load_comments_on_buffer(env.buf)
 vim.wait(10)
 assert(inline_text():find("Resolved thread", 1, true) and not inline_text():find("Open thread", 1, true),
     "Resolving a thread must hide its preview without hiding reopened threads")
+
+env = fixture()
+env.workflow.comment("toggle")
+vim.wait(10)
+vim.api.nvim_win_set_cursor(0, { 3, 0 })
+env.workflow.comment("open")
+local reply = vim.fn.maparg("\\ca", "n", false, true).callback
+assert(reply, "The comment popup must offer the reply mapping")
+vim.api.nvim_win_set_cursor(0, { 1, 0 })
+reply()
+assert(env.actions[1] == "comment_on_line" and env.action_buf == env.buf and env.action_line == 3,
+    "Reply must use the source line rather than the popup cursor")
+assert(env.send, "Reply must open a draft")
+
+env = fixture()
+env.workflow.comment("toggle")
+vim.wait(10)
+vim.api.nvim_win_set_cursor(0, { 3, 0 })
+env.workflow.comment("open")
+reply = vim.fn.maparg("\\ca", "n", false, true).callback
+vim.api.nvim_buf_set_lines(env.buf, 0, 0, false, { "changed" })
+reply()
+assert(#env.actions == 0, "Reply must not use a changed source")
+check_notice(env, "Comment source changed")
+vim.cmd.close()
+vim.bo[env.buf].modified = false
 
 env = fixture()
 vim.fn.setqflist({}, " ", { title = "Unrelated list", items = {} })
