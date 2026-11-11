@@ -1090,6 +1090,10 @@ function M.setup_ghlite()
                 source = false,
                 severity = vim.diagnostic.severity.INFO,
                 format = function(diagnostic)
+                    if diagnostic.user_data and diagnostic.user_data.thread
+                        and diagnostic.user_data.thread.resolved then
+                        return nil
+                    end
                     return diagnostic.user_data and diagnostic.user_data.preview or diagnostic.message
                 end,
             },

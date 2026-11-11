@@ -231,6 +231,13 @@ for _, resolved in ipairs({ false, true }) do
     } }
     env.workflow.comment("toggle")
     vim.wait(10)
+    local namespaces = vim.api.nvim_get_namespaces()
+    local signs = vim.api.nvim_buf_get_extmarks(env.buf, namespaces["nvim.GHLiteNamespace.diagnostic.signs"],
+        0, -1, { details = true })
+    local previews = vim.api.nvim_buf_get_extmarks(env.buf, namespaces["nvim.GHLiteNamespace.diagnostic.virtual_text"],
+        0, -1, { details = true })
+    assert(#signs == 1 and signs[1][4].sign_text:match("^C"), "Every thread must retain its gutter sign")
+    assert(#previews == (resolved and 0 or 1), "Only unresolved threads should have inline previews")
     vim.api.nvim_win_set_cursor(0, { 3, 0 })
     env.workflow.comment("open")
     local popup = vim.api.nvim_get_current_buf()
@@ -259,6 +266,31 @@ for _, resolved in ipairs({ false, true }) do
     assert(vim.wo.winhighlight:find("Normal:GitReviewCommentBody", 1, true))
     vim.cmd.close()
 end
+
+env = fixture()
+env.threads = {
+    { line = 3, content = "Resolved thread", resolved = true,
+        comments = { { user = "reviewer", body = "Resolved thread" } } },
+    { line = 3, content = "Open thread",
+        comments = { { user = "reviewer", body = "Open thread" } } },
+}
+env.workflow.comment("toggle")
+vim.wait(10)
+local virtual_ns = vim.api.nvim_get_namespaces()["nvim.GHLiteNamespace.diagnostic.virtual_text"]
+local function inline_text()
+    return vim.inspect(vim.api.nvim_buf_get_extmarks(env.buf, virtual_ns, 0, -1, { details = true }))
+end
+assert(inline_text():find("Open thread", 1, true) and not inline_text():find("Resolved thread", 1, true))
+env.threads[1].resolved = false
+require("ghlite.comments").load_comments_on_buffer(env.buf)
+vim.wait(10)
+local _, count = inline_text():gsub('"C", "DiagnosticVirtualTextInfo"', "")
+assert(count == 2, "Reviews sharing a line must both contribute to the inline preview")
+env.threads[2].resolved = true
+require("ghlite.comments").load_comments_on_buffer(env.buf)
+vim.wait(10)
+assert(inline_text():find("Resolved thread", 1, true) and not inline_text():find("Open thread", 1, true),
+    "Resolving a thread must hide its preview without hiding reopened threads")
 
 env = fixture()
 vim.fn.setqflist({}, " ", { title = "Unrelated list", items = {} })
@@ -478,14 +510,19 @@ env.workflow.review("start")
 check_notice(env, "Local feedback round ready")
 assert(#env.requests == 0)
 local local_comments = {
-    { file = vim.fs.relpath(env.root, env.file), line = 3, side = "old", text = "Local line comment" },
+    { file = vim.fs.relpath(env.root, env.file), line = 3, side = "old", text = "Local line comment", resolved = true },
     { file = vim.fs.relpath(env.root, env.file), line = 0, text = "File comment" },
 }
 package.loaded["review.store"].get_all = function() return local_comments end
+package.loaded["review.store"].get_at_line = function() return local_comments[1] end
+package.loaded["review.hooks"] = { get_cursor_position = function() return local_comments[1].file, 3, "old" end }
+env.workflow.comment("open")
+assert(vim.api.nvim_get_current_line():find("[Resolved]", 1, true), "Resolved local comments must still open")
+vim.cmd.close()
 env.workflow.comment("list")
-assert(#env.picker.items == 2 and env.picker.opts.format_item(local_comments[1]):find("Pending", 1, true))
+assert(#env.picker.items == 2 and env.picker.opts.format_item(local_comments[1]):find("Resolved", 1, true))
 env.picker.callback(local_comments[1])
-assert(vim.api.nvim_get_current_line():find("[Pending]", 1, true))
+assert(vim.api.nvim_get_current_line():find("[Resolved]", 1, true))
 vim.cmd.close()
 env.workflow.comment("list_window")
 local local_list = vim.fn.getqflist()

@@ -38,14 +38,7 @@ return {
         end
         review.setup(opts)
         local marks = require("review.marks")
-        for _, name in ipairs({ "render_for_buffer", "align_buffers" }) do
-            local render = marks[name]
-            marks[name] = function(...)
-                if require("git-review.workflow").local_annotations() then
-                    render(...)
-                end
-            end
-        end
+        require("git-review.local_marks").setup(marks)
         local popup = require("review.popup")
         popup.open = function(_, text, callback)
             local workflow = require("git-review.workflow")
