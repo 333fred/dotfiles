@@ -103,6 +103,15 @@ update-github() {
   return "$exit_status"
 }
 
+upgrade() {
+  sudo -A apt update &&
+    sudo -A apt upgrade -y &&
+    sudo -A apt autoremove -y &&
+    npm update --global &&
+    dotnet tool update --global complog &&
+    dotnet tool update --global roslyn-language-server --prerelease
+}
+
 scratch() {
   local dir
   dir=$(mktemp -d /tmp/scratch.XXXXXX) || return
