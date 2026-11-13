@@ -56,9 +56,9 @@ alias v='nvim'
 alias gar='gh auth refresh -c'
 
 upgrade() {
-  sudo -A apt update &&
-    sudo -A apt upgrade -y &&
-    sudo -A apt autoremove -y &&
+  sudo apt update &&
+    sudo apt upgrade -y &&
+    sudo apt autoremove -y &&
     npm update --global &&
     copilot update &&
     dotnet tool update --global complog &&
