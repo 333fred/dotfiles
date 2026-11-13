@@ -62,7 +62,21 @@ upgrade() {
     npm update --global &&
     copilot update &&
     dotnet tool update --global complog &&
-    dotnet tool update --global roslyn-language-server --prerelease
+    dotnet tool update --global roslyn-language-server --prerelease || return
+
+  local source_dir git_status
+  source_dir=$(chezmoi source-path) || return
+  cd "$source_dir" || return
+  git_status=$(git status --porcelain) || return
+  if [[ -z "$git_status" ]]; then
+    git pull --ff-only || {
+      print -u2 "Chezmoi source pull failed; skipping apply."
+      return 1
+    }
+  else
+    print -u2 "Chezmoi source has local changes; skipping pull."
+  fi
+  chezmoi apply --refresh-externals=always --error-on-conflict
 }
 
 scratch() {
