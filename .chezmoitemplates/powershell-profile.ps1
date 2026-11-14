@@ -44,6 +44,72 @@ function c {
    & $cmd @args
 }
 
+function upgrade {
+   & winget source update
+   if ($LASTEXITCODE -ne 0) {
+      Write-Error "winget source update failed with exit code $LASTEXITCODE."
+      return
+   }
+
+   & winget upgrade --all --accept-source-agreements --accept-package-agreements
+   if ($LASTEXITCODE -ne 0) {
+      Write-Error "winget upgrade failed with exit code $LASTEXITCODE."
+      return
+   }
+
+   & npm update --global
+   if ($LASTEXITCODE -ne 0) {
+      Write-Error "npm update failed with exit code $LASTEXITCODE."
+      return
+   }
+
+   & copilot update
+   if ($LASTEXITCODE -ne 0) {
+      Write-Error "Copilot update failed with exit code $LASTEXITCODE."
+      return
+   }
+
+   & dotnet tool update --global complog
+   if ($LASTEXITCODE -ne 0) {
+      Write-Error "Updating the complog .NET tool failed with exit code $LASTEXITCODE."
+      return
+   }
+
+   & dotnet tool update --global roslyn-language-server --prerelease
+   if ($LASTEXITCODE -ne 0) {
+      Write-Error "Updating the roslyn-language-server .NET tool failed with exit code $LASTEXITCODE."
+      return
+   }
+
+   $sourceDir = & chezmoi source-path
+   if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($sourceDir)) {
+      Write-Error 'Could not determine the chezmoi source directory.'
+      return
+   }
+
+   $gitStatus = & git -C $sourceDir status --porcelain
+   if ($LASTEXITCODE -ne 0) {
+      Write-Error 'Could not check the chezmoi source status.'
+      return
+   }
+
+   if ([string]::IsNullOrWhiteSpace(($gitStatus -join "`n"))) {
+      & git -C $sourceDir pull --ff-only
+      if ($LASTEXITCODE -ne 0) {
+         Write-Error 'Chezmoi source pull failed; skipping apply.'
+         return
+      }
+   }
+   else {
+      Write-Warning 'Chezmoi source has local changes; skipping pull.'
+   }
+
+   & chezmoi apply --refresh-externals=always --error-on-conflict
+   if ($LASTEXITCODE -ne 0) {
+      Write-Error 'Chezmoi apply failed.'
+   }
+}
+
 $dotnetup = Join-Path $HOME '.dotnetup\dotnetup.exe'
 if (Test-Path -LiteralPath $dotnetup -PathType Leaf) {
    $dotnetupScript = & $dotnetup env script --shell pwsh --dotnet --dotnetup | Out-String
