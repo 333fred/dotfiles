@@ -2,6 +2,7 @@ return {
     "seblyng/roslyn.nvim",
     opts = {},
     config = function(_, opts)
+        require("config.roslyn").setup()
         require("roslyn").setup(opts)
         local roslyn_root_dir = vim.lsp.config.roslyn.root_dir
         local roslyn_cmd = vim.deepcopy(vim.lsp.config.roslyn.cmd)

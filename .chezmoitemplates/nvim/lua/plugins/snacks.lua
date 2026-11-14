@@ -31,6 +31,9 @@ return {
         dashboard = { enabled = true },
         picker = {
             enabled = true,
+            transform = function(item)
+                require("config.roslyn").picker_transform(item)
+            end,
             on_change = function(picker)
                 -- Preview buffers suppress FileType events and are not the current window.
                 vim.schedule(function()
