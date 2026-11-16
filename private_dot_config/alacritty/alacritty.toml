@@ -63,5 +63,17 @@ size = 11.0
 [font.normal]
 family = "Monaspace Neon Frozen"
 
+[keyboard]
+bindings = [
+  { key = "C", mods = "Control|Shift", mode = "Alt|~Vi|~Search", chars = "\u001b[99;6u" },
+  { key = "V", mods = "Control|Shift", mode = "Alt|~Vi|~Search", chars = "\u001b[118;6u" },
+  { key = "C", mods = "Control|Shift", mode = "~Alt|~Vi|~Search", action = "Copy" },
+  { key = "V", mods = "Control|Shift", mode = "~Alt|~Vi|~Search", action = "Paste" },
+  { key = "C", mods = "Control|Shift", mode = "Vi|~Search", action = "Copy" },
+  { key = "C", mods = "Control|Shift", mode = "Vi|~Search", action = "ClearSelection" },
+  { key = "C", mods = "Control|Shift", mode = "Search", action = "Copy" },
+  { key = "V", mods = "Control|Shift", mode = "Search", action = "Paste" },
+]
+
 [window]
 opacity = 0.92

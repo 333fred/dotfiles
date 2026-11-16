@@ -46,8 +46,12 @@ function M.view(tab)
 end
 
 function M.foldexpr(lnum)
-    local range = vim.b.git_review_checks_fold
-    return range and lnum >= range[1] and lnum <= range[2] and 1 or 0
+    for _, range in ipairs(vim.b.git_review_folds or {}) do
+        if lnum >= range[1] and lnum <= range[2] then
+            return 1
+        end
+    end
+    return 0
 end
 
 local function reported(value, fallback)
@@ -93,6 +97,7 @@ local function check_state(check)
 end
 
 local function status_lines(pr, lines, highlights)
+    local folds = {}
     local function add(prefix, text, style)
         append(lines, highlights, prefix, text, style)
     end
@@ -174,7 +179,8 @@ local function status_lines(pr, lines, highlights)
         or (pr.autoMergeRequest == vim.NIL and "muted" or "unknown"))
     local changes_prefix = ("Changes: %s files ("):format(pr.changedFiles or "Unknown")
     local additions, deletions = "+" .. (pr.additions or "Unknown"), "-" .. (pr.deletions or "Unknown")
-    add("", changes_prefix .. additions .. " / " .. deletions .. ")")
+    local has_files = type(pr.files) == "table" and #pr.files > 0
+    add("", changes_prefix .. additions .. " / " .. deletions .. ")" .. (has_files and " (Space to toggle)" or ""))
     highlights[#highlights + 1] = {
         row = #lines - 1, col = #changes_prefix, end_col = #changes_prefix + #additions, group = "GitSignsAdd",
     }
@@ -182,6 +188,27 @@ local function status_lines(pr, lines, highlights)
         row = #lines - 1, col = #changes_prefix + #additions + 3,
         end_col = #changes_prefix + #additions + 3 + #deletions, group = "GitSignsDelete",
     }
+    if has_files then
+        local first = #lines
+        for _, file in ipairs(pr.files) do
+            local prefix = "- " .. vim.fn.strtrans(file.path) .. "  "
+            local added, deleted = "+" .. file.additions, "-" .. file.deletions
+            add("", prefix .. added .. " / " .. deleted)
+            highlights[#highlights + 1] = {
+                row = #lines - 1, col = #prefix, end_col = #prefix + #added, group = "GitSignsAdd",
+            }
+            highlights[#highlights + 1] = {
+                row = #lines - 1, col = #prefix + #added + 3,
+                end_col = #prefix + #added + 3 + #deleted, group = "GitSignsDelete",
+            }
+        end
+        folds[#folds + 1] = { first, #lines }
+    end
+    if type(pr.files) ~= "table" then
+        add("Files: ", "Unavailable", "unknown")
+    elseif type(pr.changedFiles) == "number" and #pr.files < pr.changedFiles then
+        add("Files: ", ("Only %d of %d returned"):format(#pr.files, pr.changedFiles), "pending")
+    end
     add("Awaiting review: ", names(pr.reviewRequests, "@"),
         type(pr.reviewRequests) ~= "table" and "unknown" or (#pr.reviewRequests > 0 and "pending" or "muted"))
     add("Assignees: ", names(pr.assignees, "@"))
@@ -216,8 +243,9 @@ local function status_lines(pr, lines, highlights)
         for _, check in ipairs(checks) do
             add("- ", check[1], check[2])
         end
-        return { first, #lines }
+        folds[#folds + 1] = { first, #lines }
     end
+    return folds
 end
 
 local function buffer(pr, root)
@@ -252,7 +280,7 @@ local function buffer(pr, root)
     highlights[#highlights + 1] = {
         row = 2, col = #reference + 3, end_col = #reference + 3 + #label, group = style[2],
     }
-    vim.b[buf].git_review_checks_fold = status_lines(pr, lines, highlights)
+    vim.b[buf].git_review_folds = status_lines(pr, lines, highlights)
     vim.list_extend(lines, { "", "## Description", "" })
     vim.list_extend(lines, vim.split((pr.body or ""):gsub("\r\n", "\n"), "\n", { plain = true }))
     vim.bo[buf].modifiable = true
@@ -268,7 +296,7 @@ local function buffer(pr, root)
     vim.bo[buf].modifiable = false
     vim.bo[buf].readonly = true
     vim.bo[buf].filetype = "markdown"
-    vim.keymap.set("n", "<Space>", "za", { buffer = buf, desc = "Toggle check details" })
+    vim.keymap.set("n", "<Space>", "za", { buffer = buf, desc = "Toggle details" })
     vim.keymap.set("n", "gx", function() vim.ui.open(pr.url) end, { buffer = buf, desc = "Open PR on GitHub" })
     vim.keymap.set("n", "q", function()
         local lifecycle = require("codediff.ui.lifecycle")

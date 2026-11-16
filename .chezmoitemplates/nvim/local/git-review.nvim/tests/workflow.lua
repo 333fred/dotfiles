@@ -69,9 +69,23 @@ local function fixture()
             elseif command[2] == "repo" then
                 result.stdout = "https://github.com/example/repo\n"
             elseif command[3] == "graphql" then
-                result.stdout = vim.json.encode({ {
-                    data = { repository = { pullRequest = { latestOpinionatedReviews = { nodes = {} } } } },
-                } })
+                if text:find("files(first:", 1, true) then
+                    if env.files_error then
+                        result.code, result.stderr = 1, "files unavailable"
+                    else
+                        local pages = {}
+                        for _, nodes in ipairs(env.file_pages or { {} }) do
+                            pages[#pages + 1] = {
+                                data = { repository = { pullRequest = { files = { nodes = nodes } } } },
+                            }
+                        end
+                        result.stdout = vim.json.encode(pages)
+                    end
+                else
+                    result.stdout = vim.json.encode({ {
+                        data = { repository = { pullRequest = { latestOpinionatedReviews = { nodes = {} } } } },
+                    } })
+                end
             else
                 error("Unexpected GitHub command: " .. text)
             end
@@ -203,6 +217,24 @@ local function check_notice(env, text)
     assert(env.notices[#env.notices] and env.notices[#env.notices]:find(text, 1, true),
         vim.inspect(env.notices))
 end
+
+local files_env = fixture()
+files_env.file_pages = {
+    { { path = "first.lua", additions = 3, deletions = 1 } },
+    { { path = "second.lua", additions = 0, deletions = 4 } },
+}
+package.loaded["git-review.description"].open = function(pr) files_env.opened_pr = pr end
+files_env.review.select_pr(files_env.pr.url)
+assert(vim.deep_equal(files_env.opened_pr.files, { files_env.file_pages[1][1], files_env.file_pages[2][1] }))
+local files_request = files_env.requests[#files_env.requests]
+assert(vim.tbl_contains(files_request, "--paginate") and vim.tbl_contains(files_request, "--slurp"))
+
+files_env = fixture()
+files_env.files_error = true
+package.loaded["git-review.description"].open = function(pr) files_env.opened_pr = pr end
+files_env.review.select_pr(files_env.pr.url)
+assert(files_env.opened_pr and files_env.opened_pr.files == nil)
+check_notice(files_env, "Could not load PR files: files unavailable")
 
 local env = fixture()
 env.workflow.comment("toggle")

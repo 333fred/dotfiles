@@ -5,6 +5,10 @@ vim.keymap.set("n", "<Esc>", "<Cmd>nohlsearch<CR>", { desc = "Clear search highl
 vim.keymap.set("n", "<Space>", "za", { desc = "Toggle fold" })
 vim.keymap.set({ "i", "c" }, "<C-BS>", "<C-w>", { desc = "Delete previous word" })
 vim.keymap.set("x", "<C-S-c>", '"+y', { desc = "Copy selection" })
+vim.keymap.set("n", "<C-S-v>", '"+p', { desc = "Paste from system clipboard" })
+vim.keymap.set("x", "<C-S-v>", '"+P', { desc = "Replace selection from system clipboard" })
+vim.keymap.set("i", "<C-S-v>", "<C-r><C-o>+", { desc = "Paste from system clipboard" })
+vim.keymap.set("c", "<C-S-v>", "<C-r>+", { desc = "Paste from system clipboard" })
 -- Older terminals encode Ctrl+Space as Ctrl+@ (NUL).
 for _, key in ipairs({ "<C-Space>", "<C-@>" }) do
     vim.keymap.set("i", key, vim.lsp.completion.get, { desc = "Show completions" })

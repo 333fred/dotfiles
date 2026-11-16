@@ -153,7 +153,7 @@ local function clean_checkout(checkout)
     return true
 end
 
-local function run_pr(action, require_clean, with_comments, target, metadata_only)
+local function run_pr(action, require_clean, with_comments, target, metadata_only, with_files)
     if checkout_in_progress then
         notify("PR checkout is still in progress")
         return
@@ -235,6 +235,33 @@ local function run_pr(action, require_clean, with_comments, target, metadata_onl
         for _, page in ipairs(vim.json.decode(reviews.stdout)) do
             vim.list_extend(pr.currentReviews, page.data.repository.pullRequest.latestOpinionatedReviews.nodes)
         end
+        if with_files then
+            local files = require("async").await(3, vim.system, {
+                "gh", "api", "graphql", "--hostname", host, "--paginate", "--slurp",
+                "-f", "query=" .. [[
+                    query($owner: String!, $name: String!, $number: Int!, $endCursor: String) {
+                        repository(owner: $owner, name: $name) {
+                            pullRequest(number: $number) {
+                                files(first: 100, after: $endCursor) {
+                                    nodes { path additions deletions }
+                                    pageInfo { hasNextPage endCursor }
+                                }
+                            }
+                        }
+                    }
+                ]],
+                "-f", "owner=" .. owner, "-f", "name=" .. name, "-F", "number=" .. pr.number,
+            }, { cwd = checkout.root, text = true })
+            if files.code == 0 then
+                pr.files = {}
+                for _, page in ipairs(vim.json.decode(files.stdout)) do
+                    vim.list_extend(pr.files, page.data.repository.pullRequest.files.nodes)
+                end
+            else
+                require("ghlite.ui").schedule()
+                notify("Could not load PR files: " .. vim.trim(files.stderr))
+            end
+        end
         if not metadata_only then
             ensure_pr_commits(pr, checkout.root)
         end
@@ -309,7 +336,7 @@ end
 function M.select_pr(url)
     return run_pr(function(pr)
         require("git-review.description").open(pr, context.root)
-    end, false, false, url, true)
+    end, false, false, url, true, true)
 end
 
 function M.description()
@@ -324,7 +351,7 @@ function M.description()
         else
             require("git-review.description").open(pr, context.root)
         end
-    end, false, false, nil, true)
+    end, false, false, nil, true, true)
 end
 
 local function checkout_is_clean(checkout)
@@ -440,7 +467,7 @@ function M.pr_diff()
         else
             open_pr_diff(vim.trim(result.stdout), pr.headRefOid, pr)
         end
-    end, false, true)
+    end, false, true, nil, false, true)
 end
 
 function M.since_review()
@@ -520,7 +547,7 @@ function M.since_review()
         end
         open_pr_diff(left, pr.headRefOid, pr)
         notify("Changes since your review submitted " .. latest.submitted_at, vim.log.levels.INFO)
-    end, true, true)
+    end, true, true, nil, false, true)
 end
 
 function M.toggle_comments()
