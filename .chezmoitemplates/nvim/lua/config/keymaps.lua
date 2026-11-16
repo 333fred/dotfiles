@@ -63,6 +63,12 @@ vim.keymap.set("n", "<localleader>pO", function()
         live = false,
     })
 end, { desc = "Pull requests mentioning, assigned to, or requesting review from you or your team" })
+vim.keymap.set("n", "<localleader>pn", function()
+    require("git-review.hotlist").open(true)
+end, { desc = "PR notification hotlist (no team activity or one team approval)" })
+vim.keymap.set("n", "<localleader>pN", function()
+    require("git-review.hotlist").open(false)
+end, { desc = "All open PR notifications" })
 for key, direction in pairs({ j = "next", k = "prev" }) do
     vim.keymap.set("n", "<localleader>" .. key, function()
         if vim.wo.diff then
