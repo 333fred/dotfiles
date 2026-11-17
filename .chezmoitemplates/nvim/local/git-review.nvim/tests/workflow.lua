@@ -597,4 +597,52 @@ env.workflow.comment("toggle")
 assert(#env.requests == 0)
 check_notice(env, "Repository or branch changed")
 
+env = fixture()
+local gh_mock, graphql_calls, rest_calls = package.loaded["ghlite.gh"], {}, {}
+gh_mock.update_comment = function(id, body)
+    rest_calls[#rest_calls + 1] = { "update", id, body }
+    return id == 404 and { message = "Not Found" } or { body = body }
+end
+gh_mock.delete_comment = function(id)
+    rest_calls[#rest_calls + 1] = { "delete", id }
+    return id == 404 and '{"message":"Not Found"}' or ""
+end
+local pending_review
+package.loaded["ghlite.pr_utils"] = { active_pending_review = function() return pending_review end }
+package.loaded["ghlite.system"].run_result = function(command)
+    local query = command[5]:sub(#"query=" + 1)
+    graphql_calls[#graphql_calls + 1] = command
+    local data
+    if query:find("node(id: $id)", 1, true) then
+        assert(command[7] == "id=REVIEW")
+        data = { node = { comments = { nodes = { { id = "PRRC_7", databaseId = 7 } } } } }
+    elseif query:find("updatePullRequestReviewComment", 1, true) then
+        data = { updatePullRequestReviewComment = {
+            pullRequestReviewComment = { body = "edited", updatedAt = "2026-01-01T00:00:00Z" } } }
+    else
+        assert(query:find("deletePullRequestReviewComment", 1, true))
+        data = { deletePullRequestReviewComment = {} }
+    end
+    return { code = 0, stdout = vim.json.encode({ data = data }) }
+end
+env.review.setup_ghlite()
+require("ghlite.state").selected_PR = { number = 42 }
+assert(gh_mock.update_comment(7, "edited").body == "edited" and rest_calls[1][2] == 7,
+    "Without a pending review, comments use REST")
+rest_calls = {}
+pending_review = { node_id = "REVIEW" }
+local updated = gh_mock.update_comment(7, "edited")
+assert(updated.body == "edited" and updated.updated_at == "2026-01-01T00:00:00Z" and #rest_calls == 0,
+    "Pending comments must be updated through GraphQL")
+local mutation = graphql_calls[#graphql_calls]
+assert(vim.tbl_contains(mutation, "id=PRRC_7") and vim.tbl_contains(mutation, "body=edited"))
+gh_mock.delete_comment(7)
+assert(#rest_calls == 0 and graphql_calls[#graphql_calls][5]:find("deletePullRequestReviewComment", 1, true))
+assert(gh_mock.update_comment(8, "published").body == "published" and rest_calls[1][2] == 8,
+    "Published comments use REST")
+assert(gh_mock.update_comment(404, "x").errors, "REST failures must be reported as errors")
+assert(not pcall(gh_mock.delete_comment, 404), "REST delete failures must raise")
+package.loaded["ghlite.system"].run_result = function() return { code = 1, stdout = "", stderr = "boom" } end
+assert(not pcall(gh_mock.update_comment, 7, "x"), "GraphQL failures must raise")
+
 print("Passed " .. cases .. " standalone PR workflow scenarios")

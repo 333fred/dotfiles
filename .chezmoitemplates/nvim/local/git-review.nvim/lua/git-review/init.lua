@@ -1080,8 +1080,62 @@ function M.setup_ghlite()
         vim.api.nvim_set_hl(0, group, { link = link, default = true })
     end
     require("ghlite.config").s.pr_commands = {}
+    local gh = require("ghlite.gh")
     -- Upstream's REST loader reads one page and can display outdated line coordinates.
-    require("ghlite.gh").load_comments = load_all_comments
+    gh.load_comments = load_all_comments
+    -- REST cannot see comments in an unsubmitted review, and ghlite treats its 404 as success.
+    local function graphql(query, vars)
+        local command = { "gh", "api", "graphql", "-f", "query=" .. query }
+        for key, value in pairs(vars) do
+            vim.list_extend(command, { "-f", key .. "=" .. value })
+        end
+        local result = require("ghlite.system").run_result(command)
+        local ok, data = pcall(vim.json.decode, result.stdout or "")
+        if result.code ~= 0 or not ok or type(data) ~= "table" or data.errors then
+            error("GitHub request failed: " .. vim.trim(result.stderr or ""))
+        end
+        return data.data
+    end
+    local function pending_node(comment_id)
+        local pr = require("ghlite.state").selected_PR
+        local review = pr and require("ghlite.pr_utils").active_pending_review(pr.number)
+        if not review then
+            return nil
+        end
+        local data = graphql([[query($id: ID!) { node(id: $id) { ... on PullRequestReview {
+            comments(first: 100) { nodes { id databaseId } } } } }]], { id = review.node_id })
+        for _, node in ipairs(data.node and data.node.comments and data.node.comments.nodes or {}) do
+            if node.databaseId == comment_id then
+                return node.id
+            end
+        end
+    end
+    local rest_update, rest_delete = gh.update_comment, gh.delete_comment
+    gh.update_comment = function(comment_id, body)
+        local id = pending_node(comment_id)
+        if not id then
+            local resp = rest_update(comment_id, body)
+            return type(resp.body) == "string" and resp or { errors = { resp.message or "Update failed" } }
+        end
+        local updated = graphql([[mutation($id: ID!, $body: String!) {
+            updatePullRequestReviewComment(input: { pullRequestReviewCommentId: $id, body: $body }) {
+              pullRequestReviewComment { body updatedAt } } }]], { id = id, body = body })
+            .updatePullRequestReviewComment.pullRequestReviewComment
+        return { body = updated.body, updated_at = updated.updatedAt }
+    end
+    gh.delete_comment = function(comment_id)
+        local id = pending_node(comment_id)
+        if id then
+            graphql([[mutation($id: ID!) { deletePullRequestReviewComment(input: { id: $id }) {
+                clientMutationId } }]], { id = id })
+            return ""
+        end
+        local resp = rest_delete(comment_id)
+        if resp and vim.trim(resp) ~= "" then
+            error("Could not delete comment: " .. resp)
+        end
+        return resp
+    end
     local comments = require("ghlite.comments")
     local get_conversations = comments.get_conversations
     comments.get_conversations = function(filename, line)
