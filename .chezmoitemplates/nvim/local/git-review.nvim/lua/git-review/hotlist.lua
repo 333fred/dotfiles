@@ -16,9 +16,25 @@ local pr_fields = [[
 -- latestOpinionatedReviews holds each reviewer's current approval state, so
 -- long review histories rarely need paging.
 local activity_fields = [[
+    viewerReviews: reviews(author: $viewer, first: 1) {
+      totalCount
+    }
     latestOpinionatedReviews(first: 100) { pageInfo { hasNextPage } nodes { author { login } state } }
     reviews(first: 100) { pageInfo { hasNextPage } nodes { author { login } state } }
-    comments(first: 100) { pageInfo { hasNextPage } nodes { author { login } } }]]
+    comments(first: 100) { pageInfo { hasNextPage } nodes { author { login } } }
+    timelineItems(last: 10, itemTypes: [
+      ISSUE_COMMENT, PULL_REQUEST_REVIEW, PULL_REQUEST_COMMIT,
+      HEAD_REF_FORCE_PUSHED_EVENT, READY_FOR_REVIEW_EVENT, REOPENED_EVENT
+    ]) {
+      nodes {
+        ... on IssueComment { author { __typename login } createdAt }
+        ... on PullRequestReview { author { __typename login } state createdAt submittedAt }
+        ... on PullRequestCommit { commit { committedDate author { user { login } } } }
+        ... on HeadRefForcePushedEvent { actor { __typename login } createdAt }
+        ... on ReadyForReviewEvent { actor { __typename login } createdAt }
+        ... on ReopenedEvent { actor { __typename login } createdAt }
+      }
+    }]]
 
 function M.open(filtered)
     Snacks.picker.gh_pr({
@@ -36,8 +52,38 @@ local function login(user)
     return user and user ~= vim.NIL and user.login:lower() or nil
 end
 
+-- Bot activity and unsubmitted reviews do not need a response from the viewer.
+local function last_actor(nodes)
+    local latest, actor
+    for _, node in ipairs(nodes) do
+        local who, time = node.author or node.actor, node.submittedAt or node.createdAt
+        if node.commit then
+            local author = node.commit.author
+            who = author ~= vim.NIL and author.user ~= vim.NIL and author.user or { login = "" }
+            time = node.commit.committedDate
+        end
+        if node.state ~= "PENDING" and who and who ~= vim.NIL and who.__typename ~= "Bot"
+            and (not latest or time >= latest) then
+            latest, actor = time, who.login:lower()
+        end
+    end
+    return actor
+end
+
+local function viewer_active(viewer, reviews, comments)
+    for _, review in ipairs(reviews) do
+        if review.login == viewer then
+            return true
+        end
+    end
+    return vim.tbl_contains(comments, viewer)
+end
+
 -- reviews: chronological { login, state }; comments: commenter logins.
-function M.eligible(team, reviews, comments)
+function M.eligible(team, viewer, reviews, comments)
+    if viewer_active(viewer, reviews, comments) then
+        return true
+    end
     local activity, decisions = false, {}
     for _, review in ipairs(reviews) do
         if review.state ~= "PENDING" and review.login and team[review.login] then
@@ -109,17 +155,19 @@ function M.finder(_, ctx, filtered)
             return items
         end
 
-        local notifications = get("repos/{owner}/{repo}/notifications?all=false")
+        local user = filtered and start({ "api", "user" })
+        local notifications = get("repos/{owner}/{repo}/notifications?all=true")
         if not notifications then
             return
         end
         local candidates, threads, seen, repo = {}, {}, {}, nil
         for _, thread in ipairs(notifications) do
-            if thread.unread and thread.subject.type == "PullRequest" then
+            if thread.subject.type == "PullRequest" then
                 repo = thread.repository.full_name
                 candidates[#candidates + 1] = {
                     number = assert(tonumber(thread.subject.url:match("/pulls/(%d+)$"))),
                     time = thread.updated_at,
+                    unread = thread.unread,
                 }
             end
         end
@@ -127,8 +175,11 @@ function M.finder(_, ctx, filtered)
             return a.time == b.time and a.number < b.number or a.time < b.time
         end)
         for _, thread in ipairs(candidates) do
-            if not seen[thread.number] then
-                seen[thread.number] = true
+            local first = seen[thread.number]
+            if first then
+                first.unread = first.unread or thread.unread
+            else
+                seen[thread.number] = thread
                 threads[#threads + 1] = thread
             end
         end
@@ -136,10 +187,22 @@ function M.finder(_, ctx, filtered)
             return
         end
         local owner, name = repo:match("^([^/]+)/(.+)$")
+        local viewer
+        if filtered then
+            user = finish(user)
+            if not user then
+                return
+            end
+            viewer = user.login:lower()
+        end
 
         local procs = {}
         for first = 1, #threads, batch_size do
-            local parts = { "query($owner: String!, $name: String!) {", "repository(owner: $owner, name: $name) {" }
+            local parts = {
+                filtered and "query($owner: String!, $name: String!, $viewer: String!) {"
+                    or "query($owner: String!, $name: String!) {",
+                "repository(owner: $owner, name: $name) {",
+            }
             for i = first, math.min(first + batch_size - 1, #threads) do
                 parts[#parts + 1] = ("pr%d: pullRequest(number: %d) { %s %s }"):format(
                     threads[i].number, threads[i].number, pr_fields, filtered and activity_fields or "")
@@ -149,10 +212,14 @@ function M.finder(_, ctx, filtered)
                 parts[#parts + 1] = team_query
             end
             parts[#parts + 1] = "}"
-            procs[#procs + 1] = start({
+            local args = {
                 "api", "graphql", "-f", "query=" .. table.concat(parts, "\n"),
                 "-f", "owner=" .. owner, "-f", "name=" .. name,
-            })
+            }
+            if filtered then
+                vim.list_extend(args, { "-f", "viewer=" .. viewer })
+            end
+            procs[#procs + 1] = start(args)
         end
         local prs, team_data = {}, nil
         for _, proc in ipairs(procs) do
@@ -204,16 +271,21 @@ function M.finder(_, ctx, filtered)
             for _, comment in ipairs(vim.list_extend(issue_comments, review_comments)) do
                 comments[#comments + 1] = login(comment.user)
             end
-            return M.eligible(team, reviews, comments)
+            return M.eligible(team, viewer, reviews, comments)
         end
 
         local function graph_eligible(pr)
-            local opinions = pr.latestOpinionatedReviews
-            if opinions.pageInfo.hasNextPage then
+            local comments = {}
+            for _, comment in ipairs(pr.comments.nodes) do
+                comments[#comments + 1] = login(comment.author)
+            end
+            if pr.viewerReviews.totalCount > 0 or vim.tbl_contains(comments, viewer) then
+                return true
+            elseif pr.comments.pageInfo.hasNextPage or pr.latestOpinionatedReviews.pageInfo.hasNextPage then
                 return rest_eligible(pr.number)
             end
             local approvals, activity = 0, false
-            for _, review in ipairs(opinions.nodes) do
+            for _, review in ipairs(pr.latestOpinionatedReviews.nodes) do
                 if team[login(review.author) or ""] then
                     activity = true
                     if review.state == "APPROVED" then
@@ -227,12 +299,12 @@ function M.finder(_, ctx, filtered)
             for _, review in ipairs(pr.reviews.nodes) do
                 activity = activity or review.state ~= "PENDING" and team[login(review.author) or ""] or false
             end
-            for _, comment in ipairs(pr.comments.nodes) do
-                activity = activity or team[login(comment.author) or ""] or false
+            for _, commenter in ipairs(comments) do
+                activity = activity or team[commenter or ""] or false
             end
             if activity then
                 return false
-            elseif pr.reviews.pageInfo.hasNextPage or pr.comments.pageInfo.hasNextPage then
+            elseif pr.reviews.pageInfo.hasNextPage then
                 return rest_eligible(pr.number)
             end
             return true
@@ -243,7 +315,8 @@ function M.finder(_, ctx, filtered)
             if pr and pr ~= vim.NIL and pr.state == "OPEN" then
                 local include = true
                 if filtered then
-                    include = graph_eligible(pr)
+                    include = (thread.unread or last_actor(pr.timelineItems.nodes) ~= viewer)
+                        and graph_eligible(pr)
                 end
                 if include == nil then
                     return

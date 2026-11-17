@@ -3,7 +3,7 @@ local plugin = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h:h")
 package.path = plugin .. "/lua/?.lua;" .. plugin .. "/lua/?/init.lua;" .. package.path
 local hotlist = require("git-review.hotlist")
 
-local notifications_endpoint = "repos/{owner}/{repo}/notifications?all=false&per_page=100"
+local notifications_endpoint = "repos/{owner}/{repo}/notifications?all=true&per_page=100"
 local base = "repos/example/repo"
 
 local function connection(nodes, more)
@@ -28,6 +28,7 @@ local function fixture()
             if args[2] == "graphql" then
                 local query = args[4]:sub(#"query=" + 1)
                 assert(args[6] == "owner=example" and args[8] == "name=repo")
+                assert(args[10] == (query:find("$viewer", 1, true) and "viewer=333fred" or nil))
                 env.graphql[#env.graphql + 1] = { query = query, concurrent = env.pending }
                 data = { data = { repository = {} } }
                 for number in query:gmatch("pullRequest%(number: (%d+)%)") do
@@ -37,6 +38,9 @@ local function fixture()
                     data.data.organization = { team = { members = env.team } }
                 end
                 data = not env.graphql_failure and data
+            elseif args[2] == "user" then
+                env.requests[#env.requests + 1] = "user"
+                data = not env.user_failure and { login = "333Fred" }
             else
                 local endpoint = args[2]
                 env.requests[#env.requests + 1] = endpoint
@@ -72,6 +76,7 @@ local function fixture()
             author = { login = "author" }, url = "https://github.com/example/repo/pull/" .. number,
             labels = connection({ { name = "Area-Compilers" } }),
             latestOpinionatedReviews = connection(), reviews = connection(), comments = connection(),
+            viewerReviews = { totalCount = 0 }, timelineItems = { nodes = {} },
         }
         return self.prs[number]
     end
@@ -101,10 +106,10 @@ env:add(4, "2026-01-01T00:00:00Z")
 env:add(2, "2026-01-04T00:00:00Z")
 env.responses[notifications_endpoint][1] = {
     { unread = true, updated_at = "2026-01-01T00:00:00Z", subject = { type = "Issue" } },
-    { unread = false, updated_at = "2026-01-01T00:00:00Z", subject = { type = "PullRequest" } },
 }
-assert(vim.deep_equal(env:run(false), { 2, 4, 1 }), "Unread open PRs must be deduplicated and sorted by notification time")
-assert(#env.errors == 0 and #env.refreshed == 3 and #env.graphql == 1)
+env.responses[notifications_endpoint][2][1].unread = false
+assert(vim.deep_equal(env:run(false), { 2, 4, 1 }), "Open PRs must be deduplicated and sorted by notification time")
+assert(#env.errors == 0 and #env.refreshed == 3 and #env.graphql == 1 and #env.requests == 1)
 assert(env.items[1].notification_time == "2026-01-01T00:00:00Z")
 assert(env.items[1].author.login == "author" and env.items[1].url == "https://github.com/example/repo/pull/2")
 assert(env.items[1].labels[1].name == "Area-Compilers" and not env.items[1].isDraft)
@@ -112,42 +117,49 @@ assert(not env.graphql[1].query:find("reviews", 1, true) and not env.graphql[1].
     "Unfiltered notifications must not fetch team activity")
 
 env = fixture()
-for number = 1, 14 do
+env.team.nodes[#env.team.nodes + 1] = { login = "reviewer" }
+for number = 1, 16 do
     env:add(number, string.format("2026-01-%02dT00:00:00Z", number))
+end
+local function rest(number, reviews, issue_comments, review_comments)
+    env.responses[base .. "/pulls/" .. number .. "/reviews?per_page=100"] = reviews or { {} }
+    env.responses[base .. "/issues/" .. number .. "/comments?per_page=100"] = issue_comments or { {} }
+    env.responses[base .. "/pulls/" .. number .. "/comments?per_page=100"] = review_comments or { {} }
 end
 env.prs[1].latestOpinionatedReviews = connection({ review("outsider", "APPROVED") })
 env.prs[1].comments = connection({ comment("outsider") })
-env.prs[2].latestOpinionatedReviews = connection({ review("333Fred", "APPROVED") })
-env.prs[2].reviews = connection({ review("333fred", "APPROVED"), review("teammate", "COMMENTED") })
-env.prs[3].latestOpinionatedReviews = connection({ review("333fred", "APPROVED"), review("teammate", "APPROVED") })
-env.prs[4].reviews = connection({ review("333fred", "COMMENTED") })
-env.prs[5].latestOpinionatedReviews = connection({ review("333fred", "CHANGES_REQUESTED") })
-env.prs[6].reviews = connection({ review("333fred", "DISMISSED") })
-env.prs[7].latestOpinionatedReviews = connection({ review("333fred", "APPROVED"), review("teammate", "CHANGES_REQUESTED") })
-env.prs[8].reviews = connection({ review("333fred", "PENDING"), review(nil, "COMMENTED") })
+env.prs[2].latestOpinionatedReviews = connection({ review("Teammate", "APPROVED") })
+env.prs[2].reviews = connection({ review("teammate", "APPROVED"), review("reviewer", "COMMENTED") })
+env.prs[3].latestOpinionatedReviews = connection({ review("teammate", "APPROVED"), review("reviewer", "APPROVED") })
+env.prs[4].reviews = connection({ review("teammate", "COMMENTED") })
+env.prs[5].latestOpinionatedReviews = connection({ review("teammate", "CHANGES_REQUESTED") })
+env.prs[6].viewerReviews.totalCount = 1
+env.prs[6].latestOpinionatedReviews = connection({ review("teammate", "APPROVED"), review("reviewer", "APPROVED") })
+env.prs[7].latestOpinionatedReviews = connection({ review("teammate", "APPROVED"), review("reviewer", "CHANGES_REQUESTED") })
+env.prs[8].reviews = connection({ review("teammate", "PENDING"), review(nil, "COMMENTED") })
 env.prs[9].comments = connection({ comment("Teammate") })
-env.prs[10].latestOpinionatedReviews = connection({ review("333fred", "APPROVED") }, true)
-env.responses[base .. "/pulls/10/reviews?per_page=100"] = { {
-    { user = { login = "333fred" }, state = "APPROVED" }, { user = { login = "teammate" }, state = "APPROVED" },
-} }
-env.responses[base .. "/issues/10/comments?per_page=100"] = { {} }
-env.responses[base .. "/pulls/10/comments?per_page=100"] = { {} }
-env.prs[11].reviews = connection({ review("outsider", "COMMENTED") }, true)
-env.responses[base .. "/pulls/11/reviews?per_page=100"] = { {}, { { user = { login = "teammate" }, state = "COMMENTED" } } }
-env.responses[base .. "/issues/11/comments?per_page=100"] = { {} }
-env.responses[base .. "/pulls/11/comments?per_page=100"] = { {} }
-env.prs[12].comments = connection({ comment("outsider") }, true)
-env.responses[base .. "/pulls/12/reviews?per_page=100"] = { {} }
-env.responses[base .. "/issues/12/comments?per_page=100"] = { {} }
-env.responses[base .. "/pulls/12/comments?per_page=100"] = { {}, { { user = { login = "outsider" } } } }
-env.prs[13].reviews = connection({ review("teammate", "COMMENTED") }, true)
-env.prs[14].latestOpinionatedReviews = connection({ review("teammate", "APPROVED") })
-env.prs[14].reviews = connection({}, true)
-assert(vim.deep_equal(env:run(true), { 1, 2, 7, 8, 12, 14 }),
-    "Include only no team activity or exactly one current team approver")
+env.prs[10].comments = connection({ comment("teammate"), comment("333FRED") })
+env.prs[11].latestOpinionatedReviews = connection({ review("teammate", "APPROVED") }, true)
+rest(11, { {
+    { user = { login = "teammate" }, state = "APPROVED" }, { user = { login = "reviewer" }, state = "APPROVED" },
+} })
+env.prs[12].reviews = connection({ review("outsider", "COMMENTED") }, true)
+rest(12, { {}, { { user = { login = "teammate" }, state = "COMMENTED" } } })
+env.prs[13].comments = connection({ comment("outsider") }, true)
+rest(13, nil, nil, { {}, { { user = { login = "outsider" } } } })
+env.prs[14].comments = connection({ comment("teammate") }, true)
+rest(14, { { { user = { login = "teammate" }, state = "COMMENTED" } } }, nil, { {}, { { user = { login = "333fred" } } } })
+env.prs[15].comments = connection({}, true)
+rest(15, { { { user = { login = "teammate" }, state = "COMMENTED" }, { user = { login = "333fred" }, state = "PENDING" } } })
+env.prs[15].reviews = connection({ review("teammate", "COMMENTED") }, true)
+env:add(17, "2026-01-17T00:00:00Z").reviews = connection({ review("teammate", "COMMENTED") }, true)
+env.prs[16].latestOpinionatedReviews = connection({ review("teammate", "APPROVED") })
+env.prs[16].reviews = connection({}, true)
+assert(vim.deep_equal(env:run(true), { 1, 2, 6, 7, 8, 10, 13, 14, 15, 16 }),
+    "Include PRs with viewer activity, no team activity, or exactly one current team approver")
 assert(#env.errors == 0)
 for _, request in ipairs(env.requests) do
-    assert(request == notifications_endpoint or request:find("/1[012]/"),
+    assert(request == notifications_endpoint or request == "user" or request:find("/1[1-5]/"),
         "Only undecided PRs with truncated activity may use REST: " .. request)
 end
 
@@ -165,7 +177,33 @@ env.team = connection({ { login = "333fred" } }, true)
 env.responses["orgs/dotnet/teams/roslyn-compiler/members?per_page=100"] = { { { login = "333fred" } }, { { login = "member" } } }
 assert(#env:run(true) == 0 and #env.errors == 0, "Large teams must be fully paginated")
 
-for _, failure in ipairs({ notifications_endpoint, "graphql", base .. "/pulls/1/reviews?per_page=100" }) do
+env = fixture()
+local function event(user, time, kind)
+    local who = user and { __typename = kind or "User", login = user } or vim.NIL
+    return { author = who, createdAt = time }
+end
+for number = 1, 7 do
+    local pr = env:add(number, string.format("2026-01-%02dT00:00:00Z", number))
+    pr.viewerReviews.totalCount = 1
+    env.responses[notifications_endpoint][number + 1][1].unread = number == 2
+end
+local tail = event("333Fred", "2026-01-02T00:00:00Z")
+env.prs[1].timelineItems.nodes = { event("teammate", "2026-01-01T00:00:00Z"), tail }
+env.prs[2].timelineItems.nodes = { tail }
+env.prs[3].timelineItems.nodes = { tail, event("outsider", "2026-01-03T00:00:00Z") }
+env.prs[4].timelineItems.nodes = { tail, event("azure-pipelines", "2026-01-03T00:00:00Z", "Bot") }
+env.prs[5].timelineItems.nodes = {
+    tail, { author = { __typename = "User", login = "333fred" }, state = "PENDING", createdAt = "2026-01-04T00:00:00Z" },
+    { author = { __typename = "User", login = "teammate" }, state = "COMMENTED",
+        createdAt = "2026-01-01T00:00:00Z", submittedAt = "2026-01-03T00:00:00Z" },
+}
+env.prs[6].timelineItems.nodes = { tail, { commit = { committedDate = "2026-01-03T00:00:00Z", author = { user = vim.NIL } } } }
+env:add(7, "2026-01-08T00:00:00Z").viewerReviews.totalCount = 1
+env.prs[7].timelineItems.nodes = { tail }
+assert(vim.deep_equal(env:run(true), { 2, 3, 5, 6, 7 }),
+    "Read notifications whose latest non-bot activity is the viewer's must be excluded")
+
+for _, failure in ipairs({ notifications_endpoint, "user", "graphql", base .. "/pulls/1/reviews?per_page=100" }) do
     env = fixture()
     env:add(1, "2026-01-01T00:00:00Z").reviews = connection({}, true)
     env.responses[base .. "/pulls/1/reviews?per_page=100"] = { {} }
@@ -173,6 +211,8 @@ for _, failure in ipairs({ notifications_endpoint, "graphql", base .. "/pulls/1/
     env.responses[base .. "/pulls/1/comments?per_page=100"] = { {} }
     if failure == "graphql" then
         env.graphql_failure = true
+    elseif failure == "user" then
+        env.user_failure = true
     else
         env.responses[failure] = false
     end
