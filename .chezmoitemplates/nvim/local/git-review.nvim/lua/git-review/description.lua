@@ -248,12 +248,29 @@ local function status_lines(pr, lines, highlights)
     return folds
 end
 
+local function configure_folds(win)
+    local options = vim.wo[win][0]
+    options.foldexpr = "v:lua.require'git-review.description'.foldexpr(v:lnum)"
+    options.foldmethod = "expr"
+    options.foldtext = ""
+    options.foldminlines = 0
+    options.foldlevel = 0
+    options.foldenable = true
+end
+
 local function buffer(pr, root)
     local name = pr.url:gsub("^https://", "git-review://") .. "?root=" .. vim.uri_encode(root)
     local buf = vim.fn.bufnr(name)
     if buf == -1 then
         buf = vim.api.nvim_create_buf(true, true)
         vim.api.nvim_buf_set_name(buf, name)
+        vim.api.nvim_create_autocmd("BufWinEnter", {
+            buffer = buf,
+            callback = function()
+                -- 'foldlevelstart' can reset the folds when the overview is displayed again.
+                configure_folds(vim.api.nvim_get_current_win())
+            end,
+        })
     end
     vim.bo[buf].buftype = "nofile"
     vim.bo[buf].bufhidden = "hide"
@@ -318,15 +335,6 @@ local function buffer(pr, root)
         end, { buffer = buf, desc = action:gsub("_", " ") })
     end
     return buf
-end
-
-local function configure_folds(win)
-    vim.wo[win].foldexpr = "v:lua.require'git-review.description'.foldexpr(v:lnum)"
-    vim.wo[win].foldmethod = "expr"
-    vim.wo[win].foldtext = ""
-    vim.wo[win].foldminlines = 0
-    vim.wo[win].foldlevel = 0
-    vim.wo[win].foldenable = true
 end
 
 local function configure_window(win)
