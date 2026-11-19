@@ -66,7 +66,9 @@ and other runtime files stay outside the repository.
 ## Git
 
 The shared Git configuration uses Delta and selects platform-specific settings,
-email, and signing key through chezmoi. SSH keys can be created with
+email, and signing key through chezmoi. Machine-local settings that shouldn't
+be synchronized go in an unmanaged `~/.gitconfig.local`, which the shared
+configuration includes last. SSH keys can be created with
 `ssh-keygen -t ed25519`; `gh auth login` configures the GitHub CLI. My YubiKey
 and GPG setup is documented in [gnupg/README.md](gnupg/README.md).
 

@@ -169,6 +169,7 @@
   branch = false
 [pull]
   ff = only
+  twohead = ort
 [interactive]
   diffFilter = delta --color-only --features=interactive
 [delta "interactive"]
@@ -191,6 +192,7 @@
 {{ if eq .chezmoi.os "windows" }}
 [core]
   sshCommand = C:/Windows/System32/OpenSSH/ssh.exe
+  longpaths = true
 [gpg]
   program = {{ lookPath "gpg" | quote }}
 {{ else if eq .chezmoi.os "linux" }}
@@ -201,6 +203,8 @@
 
 {{ if .work }}
 [credential "azrepos:org/devdiv"]
+  username = frsilb@microsoft.com
+[credential "azrepos:org/msdata"]
   username = frsilb@microsoft.com
 {{ end }}
 
@@ -217,3 +221,7 @@
 {{ else }}
   signingkey = 66C04B3419EC346816F3C2275D1C0E06CE5CD929
 {{ end }}
+
+# Unmanaged machine-local settings; a missing file is ignored.
+[include]
+  path = .gitconfig.local

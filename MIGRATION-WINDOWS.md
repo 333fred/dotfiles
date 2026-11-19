@@ -82,8 +82,8 @@ keep. Leave the rest of `.copilot` alone.
   redirected Documents, and the actual Terminal installation. If they differ,
   stop and agree on source changes or a different rollout.
 - The Git template selects email by work classification and signing key by
-  hostname. It no longer includes the old `.gitconfig.user` or
-  `.gitconfig.local` files.
+  hostname. It no longer includes the old `.gitconfig.user` file; it
+  includes an unmanaged `.gitconfig.local` last for machine-local settings.
   Compare the effective settings, confirm which values should win, and
   preserve and reconcile any needed settings from those files before applying.
   Machine-specific trusted directories can be supplied as

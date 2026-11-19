@@ -45,23 +45,24 @@ function c {
 }
 
 function upgrade {
-   & winget source update
-   if ($LASTEXITCODE -ne 0) {
-      Write-Error "winget source update failed with exit code $LASTEXITCODE."
-      return
+   function Invoke-OptionalUpdate($description, [scriptblock]$command) {
+      $ErrorActionPreference = 'Stop'
+      $PSNativeCommandUseErrorActionPreference = $false
+
+      try {
+         & $command
+         if ($LASTEXITCODE -ne 0) {
+            Write-Warning "${description} failed with exit code $LASTEXITCODE."
+         }
+      }
+      catch {
+         Write-Warning "${description} failed: $($_.Exception.Message)"
+      }
    }
 
-   & winget upgrade --all --accept-source-agreements --accept-package-agreements
-   if ($LASTEXITCODE -ne 0) {
-      Write-Error "winget upgrade failed with exit code $LASTEXITCODE."
-      return
-   }
-
-   & npm update --global
-   if ($LASTEXITCODE -ne 0) {
-      Write-Error "npm update failed with exit code $LASTEXITCODE."
-      return
-   }
+   Invoke-OptionalUpdate 'winget source update' { & winget source update }
+   Invoke-OptionalUpdate 'winget upgrade' { & winget upgrade --all --accept-source-agreements --accept-package-agreements }
+   Invoke-OptionalUpdate 'npm update' { & npm update --global }
 
    & copilot update
    if ($LASTEXITCODE -ne 0) {

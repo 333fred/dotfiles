@@ -105,8 +105,9 @@ and do not require changing directories.
    marketplace entries in the review rather than silently dropping them.
    Check both work and non-work renders when changing shared settings.
 4. Compare effective Git email, signing key, credential helper, GPG, and
-   pager with the rendered template. The new template does **not** include
-   `.gitconfig.local`. Ask how to preserve any needed local settings; do not
+   pager with the rendered template. The new template includes an unmanaged
+   `.gitconfig.local` last, overriding shared values. Review its contents, and
+   ask how to preserve any needed local settings; do not
    delete local files or silently move credentials into tracked source.
    Check every key in the local file, not just the expected identity fields.
    Use a rendered candidate with a temporary `GIT_CONFIG_GLOBAL` to compare
