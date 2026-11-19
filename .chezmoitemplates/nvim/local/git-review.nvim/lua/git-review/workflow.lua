@@ -9,9 +9,15 @@ local function notify(message)
 end
 
 local function checkout()
+    local name = vim.api.nvim_buf_get_name(0)
+    local path = vim.bo.buftype == "" and name ~= "" and name or vim.fn.getcwd()
+    local root = vim.fs.root(path, ".git")
+    if not root then
+        return nil
+    end
     local result = vim.system({
         "git", "rev-parse", "--show-toplevel", "--abbrev-ref", "HEAD",
-    }, { text = true }):wait()
+    }, { cwd = root, text = true }):wait()
     if result.code ~= 0 then
         return nil
     end
@@ -127,6 +133,7 @@ function M.open_local(action)
         notify("Open a Git checkout first")
         return
     end
+    vim.cmd.lcd(state.root)
     prepare_local({ kind = "local", root = state.root, branch = state.branch })
     if action == "open" then
         vim.cmd({ cmd = "CodeDiff", args = { "--repo", state.root } })
