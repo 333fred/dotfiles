@@ -43,14 +43,8 @@ sudo add-apt-repository ppa:neovim-ppa/stable
 sudo apt update && sudo apt install neovim gh curl
 ```
 
-Install the Roslyn language server with the .NET SDK:
-
-```sh
-dotnet tool install -g roslyn-language-server --prerelease --source https://pkgs.dev.azure.com/azure-public/vside/_packaging/vs-impl/nuget/v3/index.json
-```
-
-Use `dotnet tool update -g` if it is already installed. The .NET tools directory
-must be on `PATH`. The first Neovim launch downloads the locked plugins.
+Neovim launches the Roslyn language server through `dnx` from the .NET SDK;
+no global tool install is needed. The first Neovim launch downloads the locked plugins.
 Open `nvim .` at a solution or project root and use `:Roslyn target` to choose
 a solution if needed. On Linux, `vim` and `v` alias to `nvim`.
 

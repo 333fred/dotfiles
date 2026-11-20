@@ -76,12 +76,6 @@ function upgrade {
       return
    }
 
-   & dotnet tool update --global roslyn-language-server --prerelease
-   if ($LASTEXITCODE -ne 0) {
-      Write-Error "Updating the roslyn-language-server .NET tool failed with exit code $LASTEXITCODE."
-      return
-   }
-
    $sourceDir = & chezmoi source-path
    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($sourceDir)) {
       Write-Error 'Could not determine the chezmoi source directory.'

@@ -55,14 +55,19 @@ alias v='nvim'
 
 alias gar='gh auth refresh -c'
 
+_upgrade_tool() {
+  print -r -- "Running: $*"
+  "$@" || print -ru2 -- "Warning: $* failed (exit $?). Continuing."
+}
+
 upgrade() {
   sudo apt update &&
     sudo apt upgrade -y &&
-    sudo apt autoremove -y &&
-    npm update --global &&
-    copilot update &&
-    dotnet tool update --global complog &&
-    dotnet tool update --global roslyn-language-server --prerelease || return
+    sudo apt autoremove -y || return
+
+  _upgrade_tool npm update --global
+  _upgrade_tool copilot update
+  _upgrade_tool dotnet tool update --global complog --no-http-cache
 
   local source_dir git_status
   source_dir=$(chezmoi source-path) || return
