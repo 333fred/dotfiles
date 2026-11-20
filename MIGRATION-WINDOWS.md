@@ -90,6 +90,10 @@ keep. Leave the rest of `.copilot` alone.
   `data.gitSafeDirectories` in the local chezmoi configuration.
 - Check the configured Windows GPG and OpenSSH paths, and Delta. The template
   locates GPG through `PATH`. Do not deploy a known-broken signing configuration.
+- Check that `gpgconf --list-dirs homedir` points to the managed GnuPG directory
+  under the user's roaming AppData. Applying its settings registers a per-user
+  remote-disconnect task and reloads the agent, clearing cached passphrases.
+  Confirm those effects before applying; the Windows SSH agent is unchanged.
 - The Copilot settings template accepts the machine-specific agent-host block
   as `data.copilotAhpEnvironment` in the local chezmoi configuration.
   Preserve it locally where needed, without committing machine identifiers.

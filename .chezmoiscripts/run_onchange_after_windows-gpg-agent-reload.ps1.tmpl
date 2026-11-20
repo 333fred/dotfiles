@@ -1,0 +1,8 @@
+{{- if and (eq .chezmoi.os "windows") (eq (lower (replace "/" "\\" .chezmoi.destDir)) (lower (replace "/" "\\" .chezmoi.homeDir))) -}}
+# Reload when the agent configuration changes: {{ include "AppData\\Roaming\\private_gnupg\\gpg-agent.conf" | sha256sum }}
+$ErrorActionPreference = 'Stop'
+& gpgconf.exe --reload gpg-agent
+if ($LASTEXITCODE -ne 0) {
+    throw "Could not reload gpg-agent (exit code $LASTEXITCODE)."
+}
+{{- end }}

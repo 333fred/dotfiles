@@ -1,0 +1,52 @@
+{{- if and (eq .chezmoi.os "windows") (eq (lower (replace "/" "\\" .chezmoi.destDir)) (lower (replace "/" "\\" .chezmoi.homeDir))) -}}
+$ErrorActionPreference = 'Stop'
+
+$identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+$user = $identity.Name
+$taskName = "chezmoi-gpg-agent-remote-disconnect-$($identity.User.Value)"
+$gpgconf = (Get-Command gpgconf.exe -CommandType Application).Source
+$gpgHome = (& $gpgconf --list-dirs homedir | Out-String).Trim()
+if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($gpgHome)) {
+    throw 'Could not determine the GnuPG home directory.'
+}
+
+$expectedHome = Join-Path $HOME 'AppData\Roaming\gnupg'
+if (-not [string]::Equals([IO.Path]::GetFullPath($gpgHome).TrimEnd('\'), [IO.Path]::GetFullPath($expectedHome).TrimEnd('\'), [StringComparison]::OrdinalIgnoreCase)) {
+    throw "GnuPG home '$gpgHome' does not match the managed directory '$expectedHome'."
+}
+
+$arguments = '--homedir "{0}" --reload gpg-agent' -f $gpgHome
+$existing = Get-ScheduledTask -TaskPath '\' -TaskName $taskName -ErrorAction SilentlyContinue
+if ($existing) {
+    $task = ([xml](Export-ScheduledTask -TaskPath '\' -TaskName $taskName)).Task
+    $trigger = $task.Triggers.SessionStateChangeTrigger
+    $principal = $task.Principals.Principal
+    $action = $task.Actions.Exec
+    if ($task.Triggers.ChildNodes.Count -ne 1 -or $task.Actions.ChildNodes.Count -ne 1 -or $task.Principals.ChildNodes.Count -ne 1 -or
+        $trigger.StateChange -ne 'RemoteDisconnect' -or $trigger.UserId -ne $user -or ($trigger.Enabled -and $trigger.Enabled -ne 'true') -or
+        ($principal.UserId -ne $user -and $principal.UserId -ne $identity.User.Value) -or
+        $principal.LogonType -ne 'InteractiveToken' -or ($principal.RunLevel -and $principal.RunLevel -ne 'LeastPrivilege') -or
+        $action.Command -ne $gpgconf -or $action.Arguments -ne $arguments -or
+        ($task.Settings.Enabled -and $task.Settings.Enabled -ne 'true') -or $task.Settings.MultipleInstancesPolicy -ne 'Queue' -or
+        $task.Settings.ExecutionTimeLimit -ne 'PT1M' -or
+        $task.Settings.DisallowStartIfOnBatteries -ne 'false' -or $task.Settings.StopIfGoingOnBatteries -ne 'false') {
+        throw "Scheduled task '$taskName' already exists with different settings; inspect it before applying."
+    }
+    return
+}
+
+$xmlUser = [Security.SecurityElement]::Escape($user)
+$xmlCommand = [Security.SecurityElement]::Escape($gpgconf)
+$xmlArguments = [Security.SecurityElement]::Escape($arguments)
+$xml = @"
+<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo><Description>Clear the GnuPG passphrase cache on remote-session disconnect.</Description></RegistrationInfo>
+  <Triggers><SessionStateChangeTrigger><Enabled>true</Enabled><UserId>$xmlUser</UserId><StateChange>RemoteDisconnect</StateChange></SessionStateChangeTrigger></Triggers>
+  <Principals><Principal id="Owner"><UserId>$xmlUser</UserId><LogonType>InteractiveToken</LogonType><RunLevel>LeastPrivilege</RunLevel></Principal></Principals>
+  <Settings><MultipleInstancesPolicy>Queue</MultipleInstancesPolicy><DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries><StopIfGoingOnBatteries>false</StopIfGoingOnBatteries><AllowStartOnDemand>true</AllowStartOnDemand><Enabled>true</Enabled><ExecutionTimeLimit>PT1M</ExecutionTimeLimit></Settings>
+  <Actions Context="Owner"><Exec><Command>$xmlCommand</Command><Arguments>$xmlArguments</Arguments></Exec></Actions>
+</Task>
+"@
+Register-ScheduledTask -TaskPath '\' -TaskName $taskName -Xml $xml | Out-Null
+{{- end }}

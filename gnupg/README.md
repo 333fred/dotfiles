@@ -9,10 +9,12 @@ YubiKeys, not in this repository or in the computer's GnuPG home.
 ## Set up another computer
 
 Install GnuPG, a suitable pinentry program, and smartcard/PC/SC support. On
-Linux, chezmoi deploys the agent settings from `private_dot_gnupg`; the files
-in this `gnupg` directory are excluded from deployment. On another OS, adapt
-`gpg-agent.conf` to the local pinentry path and
-smartcard setup instead. Then, with either YubiKey inserted:
+Linux, chezmoi deploys the agent settings from `private_dot_gnupg`. On Windows,
+it also configures the passphrase cache and a per-user task to clear it when a
+remote session disconnects, without changing the SSH agent. The files in this
+`gnupg` directory are excluded from deployment. On another OS, adapt
+`gpg-agent.conf` to the local pinentry path and smartcard setup instead. Then,
+with either YubiKey inserted:
 
 ```sh
 gpg --import gnupg/public-key.asc
@@ -45,7 +47,7 @@ has serial `08670189`; the second has serial `20199095`. The original card's
 public-key URL still points to its previous GitHub key listing; use the
 repository's public key above rather than relying on a card `fetch`.
 
-The repository's `gpg-agent.conf` enables GnuPG's SSH agent. Restart the
+The Linux `gpg-agent.conf` enables GnuPG's SSH agent. Restart the
 agent after installing it (`gpgconf --kill gpg-agent`), then set
 `SSH_AUTH_SOCK` to `$(gpgconf --list-dirs agent-ssh-socket)` in a shell where
 you want to use this card for SSH; `ssh-add -L` should list its public key.
