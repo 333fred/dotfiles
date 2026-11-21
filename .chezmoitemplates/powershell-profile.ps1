@@ -9,13 +9,55 @@ Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
 Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 
-Import-Module posh-git
-Import-Module posh-sshell
-Start-SshAgent -Quiet
-
 Invoke-Expression (&starship init powershell)
 
-Import-Module -Name Terminal-Icons
+$initializeShellFeatures = {
+   try {
+      Import-Module posh-git -Global -ErrorAction Stop
+   }
+   catch {
+      [Console]::Error.WriteLine("Failed to initialize posh-git: $_")
+   }
+
+   try {
+      Import-Module Terminal-Icons -Global -ErrorAction Stop
+   }
+   catch {
+      [Console]::Error.WriteLine("Failed to initialize Terminal-Icons: $_")
+   }
+
+   try {
+      Import-Module posh-sshell -Global -ErrorAction Stop
+      Start-SshAgent -Quiet -ErrorAction Stop
+   }
+   catch {
+      [Console]::Error.WriteLine("Failed to initialize the SSH agent: $_")
+   }
+}
+
+$shellArguments = [Environment]::GetCommandLineArgs()
+$oneShot = $false
+$noExit = $false
+foreach ($argument in $shellArguments | Select-Object -Skip 1) {
+   if ($argument.Length -ge 3 -and '-NoExit'.StartsWith($argument, [StringComparison]::OrdinalIgnoreCase)) {
+      $noExit = $true
+   }
+   if ($argument.Length -ge 5 -and '-NonInteractive'.StartsWith($argument, [StringComparison]::OrdinalIgnoreCase)) {
+      $oneShot = $true
+      break
+   }
+   if ($argument.Length -ge 2 -and @('-Command', '-CommandWithArgs', '-EncodedCommand', '-File').Where({ $_.StartsWith($argument, [StringComparison]::OrdinalIgnoreCase) }).Count -gt 0) {
+      $oneShot = -not $noExit
+      break
+   }
+}
+
+if ($oneShot) {
+   & $initializeShellFeatures
+}
+else {
+   Register-EngineEvent -SourceIdentifier PowerShell.OnIdle -MaxTriggerCount 1 -Action $initializeShellFeatures | Out-Null
+}
 
 # PowerShell parameter completion shim for the dotnet CLI
 Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
