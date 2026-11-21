@@ -33,3 +33,17 @@ vim.opt.foldlevelstart = 99
 vim.opt.completeopt = { "menu", "menuone", "noselect", "popup" }
 vim.opt.wildoptions:append("fuzzy")
 vim.opt.wildignorecase = true
+
+vim.filetype.add({
+    extension = {
+        nativeproj = "xml",
+        proj = "xml",
+        projitems = "xml",
+        props = "xml",
+        shproj = "xml",
+        sqlproj = "xml",
+        targets = "xml",
+        tasks = "xml",
+        vcxproj = "xml",
+    },
+})
